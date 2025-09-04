@@ -66,6 +66,7 @@ export class AuthController {
     description: 'Returns current user info',
     type: UserDto,
   })
+  @ValidateResponse(UserDto)
   me(): UserDto {
     return this.authService.me();
   }
