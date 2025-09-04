@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { UserDto } from './user.dto';
 
 export class LoginResponseDto {
   @ApiProperty({
@@ -27,4 +35,13 @@ export class LoginResponseDto {
   @IsNumber()
   @IsNotEmpty()
   expiresIn: number;
+
+  @ApiProperty({
+    type: UserDto,
+    description: 'User info',
+  })
+  @ValidateNested()
+  @Type(() => UserDto)
+  @IsNotEmpty()
+  user: UserDto;
 }

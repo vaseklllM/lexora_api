@@ -1,11 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
-import { UserDto } from './dto/user.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -25,7 +29,8 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'User register' })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: 'Registers user and returns access token',
   })
   register(@Body() registerDto: RegisterDto) {
@@ -34,21 +39,11 @@ export class AuthController {
 
   @Post('logout')
   @ApiOperation({ summary: 'User logout' })
-  @ApiOkResponse({
+  @ApiResponse({
+    status: 200,
     description: 'Logs out user and returns access token',
   })
   logout() {
     return this.authService.logout();
-  }
-
-  @Get('me')
-  @ApiOperation({ summary: 'Get current user info' })
-  @ApiOkResponse({
-    description: 'Returns current user info',
-    type: UserDto,
-  })
-  @ValidateResponse(UserDto)
-  me(): UserDto {
-    return this.authService.me();
   }
 }
