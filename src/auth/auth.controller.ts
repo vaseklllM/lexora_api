@@ -47,6 +47,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiOkResponse({
     description: 'Refresh access token',
+    type: RefreshResponseDto,
   })
   @ValidateResponse(RefreshResponseDto)
   refresh(@Body() refreshDto: RefreshDto): RefreshResponseDto {
