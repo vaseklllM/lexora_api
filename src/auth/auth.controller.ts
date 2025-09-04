@@ -8,6 +8,8 @@ import { ValidateResponse } from '../common/decorators/validate-response.decorat
 import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
+import { LogoutResponseDto } from './dto/logout-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -29,8 +31,10 @@ export class AuthController {
   @ApiOperation({ summary: 'User register' })
   @ApiOkResponse({
     description: 'Registers user and returns access token',
+    type: RegisterResponseDto,
   })
-  register(@Body() registerDto: RegisterDto) {
+  @ValidateResponse(RegisterResponseDto)
+  register(@Body() registerDto: RegisterDto): RegisterResponseDto {
     return this.authService.register(registerDto);
   }
 
@@ -38,8 +42,10 @@ export class AuthController {
   @ApiOperation({ summary: 'User logout' })
   @ApiOkResponse({
     description: 'Logs out user and returns access token',
+    type: LogoutResponseDto,
   })
-  logout() {
+  @ValidateResponse(LogoutResponseDto)
+  logout(): LogoutResponseDto {
     return this.authService.logout();
   }
 
