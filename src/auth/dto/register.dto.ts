@@ -39,6 +39,6 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(8)
-  @MatchPasswords('password', { message: 'Паролі не співпадають' })
+  @MatchPasswords('password', { message: 'Passwords do not match' })
   confirmPassword: string;
 }
