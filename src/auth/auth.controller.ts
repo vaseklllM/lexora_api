@@ -6,6 +6,8 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
 import { UserDto } from './dto/user.dto';
+import { RefreshDto } from './dto/refresh.dto';
+import { RefreshResponseDto } from './dto/refresh-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -39,6 +41,16 @@ export class AuthController {
   })
   logout() {
     return this.authService.logout();
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiOkResponse({
+    description: 'Refresh access token',
+  })
+  @ValidateResponse(RefreshResponseDto)
+  refresh(@Body() refreshDto: RefreshDto): RefreshResponseDto {
+    return this.authService.refresh(refreshDto);
   }
 
   @Get('me')

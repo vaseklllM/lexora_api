@@ -3,6 +3,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { UserDto } from './dto/user.dto';
+import { RefreshDto } from './dto/refresh.dto';
+import { RefreshResponseDto } from './dto/refresh-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +31,14 @@ export class AuthService {
 
   logout() {
     return 'Logout';
+  }
+
+  refresh(refreshDto: RefreshDto): RefreshResponseDto {
+    return {
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9_' + refreshDto.refreshToken,
+      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      expiresIn: 3600,
+    };
   }
 
   me(): UserDto {
