@@ -28,4 +28,14 @@ export class AuthController {
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logs out user and returns access token',
+  })
+  logout() {
+    return this.authService.logout();
+  }
 }

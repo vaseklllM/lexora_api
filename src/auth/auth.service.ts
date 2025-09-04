@@ -5,10 +5,14 @@ import { RegisterDto } from './dto/register.dto';
 @Injectable()
 export class AuthService {
   login(loginDto: LoginDto) {
-    return 'Login : ' + loginDto.email;
+    return 'Login: ' + loginDto.email;
   }
 
   register(registerDto: RegisterDto) {
     return 'Register: ' + registerDto.email;
+  }
+
+  logout() {
+    return 'Logout';
   }
 }
