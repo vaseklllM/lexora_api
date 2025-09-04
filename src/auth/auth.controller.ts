@@ -1,8 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { ValidateResponse } from '../common/decorators/validate-response.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -11,11 +18,12 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'User login' })
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Authenticates user and returns access token',
+    type: LoginResponseDto,
   })
-  login(@Body() loginDto: LoginDto) {
+  @ValidateResponse(LoginResponseDto)
+  login(@Body() loginDto: LoginDto): LoginResponseDto {
     return this.authService.login(loginDto);
   }
 
