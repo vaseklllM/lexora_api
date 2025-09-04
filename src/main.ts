@@ -23,6 +23,7 @@ async function bootstrap() {
     .setDescription('API documentation for Lexora application')
     .setVersion('0.1.0')
     .addBearerAuth()
+    .addTag('Authentication', 'User authentication and registration operations')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
