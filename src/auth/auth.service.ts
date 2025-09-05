@@ -2,10 +2,8 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { UserDto } from './dto/user.dto';
@@ -15,6 +13,7 @@ import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
+import { LocalUser } from './strategies/local.strategy';
 
 @Injectable()
 export class AuthService {
@@ -23,27 +22,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const user = await this.databaseService.user.findUnique({
-      where: { email: loginDto.email },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const isPasswordValid = await argon2.verify(
-      user.password,
-      loginDto.password,
-      {
-        secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
-      },
-    );
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-
+  login(user: LocalUser): LoginResponseDto {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload, {
       secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),

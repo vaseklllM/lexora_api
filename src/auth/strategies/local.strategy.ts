@@ -5,6 +5,8 @@ import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
 import { User } from 'generated/prisma';
 
+export type LocalUser = Omit<User, 'password'>;
+
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly databaseService: DatabaseService) {
@@ -17,7 +19,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validateUser(
     email: string,
     password: string,
-  ): Promise<Omit<User, 'password'> | null> {
+  ): Promise<LocalUser | null> {
     const user = await this.databaseService.user.findUnique({
       where: { email },
     });
@@ -39,10 +41,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     return result;
   }
 
-  async validate(
-    email: string,
-    password: string,
-  ): Promise<Omit<User, 'password'>> {
+  async validate(email: string, password: string): Promise<LocalUser> {
     const user = await this.validateUser(email, password);
 
     if (!user) {

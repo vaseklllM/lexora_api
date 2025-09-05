@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import {
@@ -20,6 +27,8 @@ import {
   CurrentUser,
   type JwtPayload,
 } from './decorators/current-user.decorator';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import type { LocalUser } from './strategies/local.strategy';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -27,14 +36,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @UseGuards(LocalAuthGuard)
   @ApiOperation({ summary: 'User login' })
   @ApiOkResponse({
     description: 'Authenticates user and returns access token',
     type: LoginResponseDto,
   })
   @ValidateResponse(LoginResponseDto)
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
-    return this.authService.login(loginDto);
+  login(
+    @Body() loginDto: LoginDto,
+    @Request() req: { user: LocalUser },
+  ): LoginResponseDto {
+    return this.authService.login(req.user);
   }
 
   @Post('register')
