@@ -20,7 +20,7 @@ export class AuthService {
       data: {
         email: loginDto.email,
         password: loginDto.password,
-        name: 'John Doe',
+        name: 'John Do 2',
       },
     });
 
