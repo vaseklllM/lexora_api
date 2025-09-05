@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
@@ -17,7 +18,10 @@ import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const user = await this.databaseService.user.findUnique({
@@ -32,7 +36,7 @@ export class AuthService {
       user.password,
       loginDto.password,
       {
-        secret: Buffer.from(process.env.PASSWORD_SECRET_KEY as string, 'utf-8'),
+        secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
       },
     );
 
@@ -40,18 +44,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    const payload = { sub: user.id, email: user.email };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
     return {
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      token: accessToken,
+      refreshToken: refreshToken,
       expiresIn: 3600,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-        avatar: user.avatar ?? undefined,
-      },
     };
   }
 
@@ -66,7 +66,7 @@ export class AuthService {
     }
 
     const hash = await argon2.hash(registerDto.password, {
-      secret: Buffer.from(process.env.PASSWORD_SECRET_KEY as string, 'utf-8'),
+      secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
     });
 
     const res = await this.databaseService.user.create({
@@ -77,18 +77,14 @@ export class AuthService {
       },
     });
 
+    const payload = { sub: res.id, email: res.email };
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
     return {
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+      token: accessToken,
+      refreshToken: refreshToken,
       expiresIn: 3600,
-      user: {
-        id: res.id,
-        email: res.email,
-        name: res.name,
-        createdAt: res.createdAt.toISOString(),
-        updatedAt: res.updatedAt.toISOString(),
-        avatar: res.avatar ?? undefined,
-      },
     };
   }
 
