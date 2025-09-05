@@ -3,15 +3,15 @@ services:
     image: postgres:16
     container_name: lexora_db
     environment:
-      POSTGRES_USER: lexora
-      POSTGRES_PASSWORD: lexora
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
       POSTGRES_DB: lexora
     ports:
       - '127.0.0.1:5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U lexora -d lexora']
+      test: ['CMD-SHELL', 'pg_isready -U admin -d lexora']
       interval: 5s
       timeout: 5s
       retries: 10
