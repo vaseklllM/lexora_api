@@ -15,12 +15,11 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { JwtTokenDto } from './dto/jwt-tocken.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
 import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
@@ -40,13 +39,13 @@ export class AuthController {
   @ApiOperation({ summary: 'User login' })
   @ApiOkResponse({
     description: 'Authenticates user and returns access token',
-    type: LoginResponseDto,
+    type: JwtTokenDto,
   })
-  @ValidateResponse(LoginResponseDto)
+  @ValidateResponse(JwtTokenDto)
   login(
     @Body() loginDto: LoginDto,
     @Request() req: { user: LocalUser },
-  ): LoginResponseDto {
+  ): JwtTokenDto {
     return this.authService.login(req.user);
   }
 
@@ -54,10 +53,10 @@ export class AuthController {
   @ApiOperation({ summary: 'User register' })
   @ApiOkResponse({
     description: 'Registers user and returns access token',
-    type: RegisterResponseDto,
+    type: JwtTokenDto,
   })
-  @ValidateResponse(RegisterResponseDto)
-  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
+  @ValidateResponse(JwtTokenDto)
+  register(@Body() registerDto: RegisterDto): Promise<JwtTokenDto> {
     return this.authService.register(registerDto);
   }
 

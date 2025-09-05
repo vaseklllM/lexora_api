@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 
-export class LoginResponseDto {
+export class JwtTokenDto {
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     description: 'User token',

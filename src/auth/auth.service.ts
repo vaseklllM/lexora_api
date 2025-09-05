@@ -5,15 +5,15 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
+import { JwtTokenDto } from './dto/jwt-tocken.dto';
 import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
-import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
 import { LocalUser } from './strategies/local.strategy';
+import type { User } from 'generated/prisma';
 
 @Injectable()
 export class AuthService {
@@ -22,24 +22,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  login(user: LocalUser): LoginResponseDto {
+  private generateTokens(user: Pick<User, 'id' | 'email'>): JwtTokenDto {
     const payload = { sub: user.id, email: user.email };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-      secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
-    });
 
     return {
-      token: accessToken,
-      refreshToken: refreshToken,
+      token: this.jwtService.sign(payload, {
+        secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
+      }),
+      refreshToken: this.jwtService.sign(payload, {
+        expiresIn: '7d',
+        secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
+      }),
       expiresIn: 3600,
     };
   }
 
-  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+  login(user: LocalUser): JwtTokenDto {
+    return this.generateTokens(user);
+  }
+
+  async register(registerDto: RegisterDto): Promise<JwtTokenDto> {
     // Check if user with this email already exists
     const existingUser = await this.databaseService.user.findUnique({
       where: { email: registerDto.email },
@@ -61,20 +63,7 @@ export class AuthService {
       },
     });
 
-    const payload = { sub: res.id, email: res.email };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-      secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
-    });
-
-    return {
-      token: accessToken,
-      refreshToken: refreshToken,
-      expiresIn: 3600,
-    };
+    return this.generateTokens(res);
   }
 
   async logout(userId: string): Promise<LogoutResponseDto> {
