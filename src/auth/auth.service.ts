@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
@@ -15,18 +20,36 @@ export class AuthService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const res = await this.databaseService.user.findMany();
+    const user = await this.databaseService.user.findUnique({
+      where: { email: loginDto.email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await argon2.verify(
+      user.password,
+      loginDto.password,
+      {
+        secret: Buffer.from(process.env.PASSWORD_SECRET_KEY as string, 'utf-8'),
+      },
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
 
     return {
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + loginDto.email,
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       expiresIn: 3600,
       user: {
-        id: res[0].id,
-        email: 'user@example.com',
-        name: 'John Doe',
-        createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: '2023-01-01T00:00:00Z',
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
         avatar: 'https://example.com/avatar.jpg',
       },
     };
