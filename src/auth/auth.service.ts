@@ -98,10 +98,18 @@ export class AuthService {
     };
   }
 
-  logout(): LogoutResponseDto {
+  async logout(userId: string): Promise<LogoutResponseDto> {
+    const user = await this.databaseService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     return {
       message: 'Successfully logged out',
-      loggedOutAt: '2023-01-01T00:00:00Z',
+      loggedOutAt: new Date().toISOString(),
     };
   }
 

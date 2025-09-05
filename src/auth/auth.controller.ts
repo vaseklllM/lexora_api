@@ -15,7 +15,7 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
-import { JwtGuard } from './guards/jwt.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   CurrentUser,
   type JwtPayload,
@@ -49,14 +49,16 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'User logout' })
   @ApiOkResponse({
     description: 'Logs out user and returns access token',
     type: LogoutResponseDto,
   })
   @ValidateResponse(LogoutResponseDto)
-  logout(): LogoutResponseDto {
-    return this.authService.logout();
+  logout(@CurrentUser() user: JwtPayload): Promise<LogoutResponseDto> {
+    return this.authService.logout(user.sub);
   }
 
   @Post('refresh')
@@ -71,7 +73,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user info' })
   @ApiOkResponse({
