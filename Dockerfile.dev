@@ -1,0 +1,20 @@
+# Dockerfile для разработки NestJS API
+FROM node:20-alpine
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем package.json и package-lock.json для кэширования зависимостей
+COPY package*.json ./
+
+# Устанавливаем зависимости (включая devDependencies для разработки)
+RUN npm ci
+
+# Копируем весь исходный код
+COPY . .
+
+# Открываем порт (приложение использует 4000)
+EXPOSE 4000
+
+# Команда для запуска в режиме разработки с hot reload
+CMD ["npm", "run", "start:dev"]

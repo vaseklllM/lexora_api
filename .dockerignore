@@ -1,0 +1,45 @@
+# Зависимости
+node_modules
+npm-debug.log*
+
+# Сборка
+dist
+build
+
+# Кэши
+.npm
+.eslintcache
+
+# Логи
+logs
+*.log
+
+# Временные файлы
+.tmp
+.temp
+
+# IDE
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Тесты
+coverage
+.nyc_output
+
+# Переменные окружения (могут содержать секреты)
+.env
+.env.local
+.env.*.local
+
+# Операционная система
+.DS_Store
+Thumbs.db
