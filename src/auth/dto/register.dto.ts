@@ -46,6 +46,9 @@ export class RegisterDto {
   @Matches(/.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?].*/, {
     message: 'Password must contain at least one special character',
   })
+  @Matches(/^\S*$/, {
+    message: 'Password must not contain spaces',
+  })
   password: string;
 
   @ApiProperty({
