@@ -28,6 +28,7 @@ export class AuthService {
     return {
       token: this.jwtService.sign(payload, {
         secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
+        expiresIn: '1h',
       }),
       refreshToken: this.jwtService.sign(payload, {
         expiresIn: '7d',
