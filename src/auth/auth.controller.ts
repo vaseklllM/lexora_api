@@ -34,7 +34,7 @@ export class AuthController {
     type: RegisterResponseDto,
   })
   @ValidateResponse(RegisterResponseDto)
-  register(@Body() registerDto: RegisterDto): RegisterResponseDto {
+  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
     return this.authService.register(registerDto);
   }
 

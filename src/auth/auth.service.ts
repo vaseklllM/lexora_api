@@ -7,33 +7,21 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
-import { PrismaClient } from '../../generated/prisma';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class AuthService {
+  constructor(private readonly databaseService: DatabaseService) {}
+
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
-    const client = new PrismaClient();
-
-    await client.$connect();
-
-    await client.user.create({
-      data: {
-        email: loginDto.email,
-        password: loginDto.password,
-        name: 'John Do 2',
-      },
-    });
-
-    // const res = await client.user.findMany();
-
-    // console.log(res);
+    const res = await this.databaseService.user.findMany();
 
     return {
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + loginDto.email,
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       expiresIn: 3600,
       user: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
+        id: res[0].id,
         email: 'user@example.com',
         name: 'John Doe',
         createdAt: '2023-01-01T00:00:00Z',
@@ -43,17 +31,25 @@ export class AuthService {
     };
   }
 
-  register(registerDto: RegisterDto): RegisterResponseDto {
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
+    const res = await this.databaseService.user.create({
+      data: {
+        email: registerDto.email,
+        password: registerDto.password,
+        name: registerDto.name,
+      },
+    });
+
     return {
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + registerDto.email,
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       expiresIn: 3600,
       user: {
-        id: '550e8400-e29b-41d4-a716-446655440000',
-        email: 'user@example.com',
-        name: 'John Doe',
-        createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: '2023-01-01T00:00:00Z',
+        id: res.id,
+        email: res.email,
+        name: res.name,
+        createdAt: res.createdAt.toISOString(),
+        updatedAt: res.updatedAt.toISOString(),
         avatar: 'https://example.com/avatar.jpg',
       },
     };
