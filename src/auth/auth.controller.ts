@@ -1,7 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
@@ -10,6 +15,11 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
+import { JwtGuard } from './guards/jwt.guard';
+import {
+  CurrentUser,
+  type JwtPayload,
+} from './decorators/current-user.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -61,13 +71,15 @@ export class AuthController {
   }
 
   @Get('me')
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user info' })
   @ApiOkResponse({
     description: 'Returns current user info',
     type: UserDto,
   })
   @ValidateResponse(UserDto)
-  me(): UserDto {
-    return this.authService.me();
+  async me(@CurrentUser() user: JwtPayload): Promise<UserDto> {
+    return this.authService.me(user.sub);
   }
 }

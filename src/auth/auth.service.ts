@@ -45,8 +45,13 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '7d',
+      secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
+    });
 
     return {
       token: accessToken,
@@ -78,8 +83,13 @@ export class AuthService {
     });
 
     const payload = { sub: res.id, email: res.email };
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: '7d',
+      secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
+    });
 
     return {
       token: accessToken,
@@ -103,14 +113,22 @@ export class AuthService {
     };
   }
 
-  me(): UserDto {
+  async me(userId: string): Promise<UserDto> {
+    const user = await this.databaseService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     return {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      email: 'user@example.com',
-      name: 'John Doe',
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      avatar: 'https://example.com/avatar.jpg',
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+      avatar: user.avatar ?? undefined,
     };
   }
 }
