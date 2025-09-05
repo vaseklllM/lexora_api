@@ -41,7 +41,7 @@ export class AuthService {
     }
 
     return {
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + loginDto.email,
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       expiresIn: 3600,
       user: {
@@ -78,7 +78,7 @@ export class AuthService {
     });
 
     return {
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + registerDto.email,
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
       expiresIn: 3600,
       user: {
