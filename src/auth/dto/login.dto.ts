@@ -12,7 +12,7 @@ export class LoginDto {
   email: string;
 
   @ApiProperty({
-    example: 'password123',
+    example: 'Password123!',
     description: 'User password',
     minLength: 8,
   })
