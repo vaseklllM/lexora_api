@@ -6,6 +6,7 @@ import {
   IsUUID,
   IsUrl,
   IsDateString,
+  IsOptional,
 } from 'class-validator';
 
 export class UserDto {
@@ -39,6 +40,7 @@ export class UserDto {
     required: false,
   })
   @IsUrl()
+  @IsOptional()
   avatar?: string;
 
   @ApiProperty({

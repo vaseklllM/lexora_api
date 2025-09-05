@@ -50,7 +50,7 @@ export class AuthService {
         name: user.name,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
-        avatar: 'https://example.com/avatar.jpg',
+        avatar: user.avatar ?? undefined,
       },
     };
   }
@@ -87,7 +87,7 @@ export class AuthService {
         name: res.name,
         createdAt: res.createdAt.toISOString(),
         updatedAt: res.updatedAt.toISOString(),
-        avatar: 'https://example.com/avatar.jpg',
+        avatar: res.avatar ?? undefined,
       },
     };
   }
