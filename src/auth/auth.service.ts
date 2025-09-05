@@ -8,6 +8,7 @@ import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
 import { DatabaseService } from 'src/database/database.service';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -41,10 +42,14 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
+    const hash = await argon2.hash(registerDto.password, {
+      secret: Buffer.from(process.env.PASSWORD_SECRET_KEY as string, 'utf-8'),
+    });
+
     const res = await this.databaseService.user.create({
       data: {
         email: registerDto.email,
-        password: registerDto.password,
+        password: hash,
         name: registerDto.name,
       },
     });
