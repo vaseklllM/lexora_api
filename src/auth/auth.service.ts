@@ -7,10 +7,27 @@ import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
+import { PrismaClient } from '../../generated/prisma';
 
 @Injectable()
 export class AuthService {
-  login(loginDto: LoginDto): LoginResponseDto {
+  async login(loginDto: LoginDto): Promise<LoginResponseDto> {
+    const client = new PrismaClient();
+
+    await client.$connect();
+
+    await client.user.create({
+      data: {
+        email: loginDto.email,
+        password: loginDto.password,
+        name: 'John Doe',
+      },
+    });
+
+    // const res = await client.user.findMany();
+
+    // console.log(res);
+
     return {
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' + loginDto.email,
       refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
@@ -19,7 +36,6 @@ export class AuthService {
         id: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         name: 'John Doe',
-        isActive: true,
         createdAt: '2023-01-01T00:00:00Z',
         updatedAt: '2023-01-01T00:00:00Z',
         avatar: 'https://example.com/avatar.jpg',
@@ -36,7 +52,6 @@ export class AuthService {
         id: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         name: 'John Doe',
-        isActive: true,
         createdAt: '2023-01-01T00:00:00Z',
         updatedAt: '2023-01-01T00:00:00Z',
         avatar: 'https://example.com/avatar.jpg',
@@ -64,7 +79,6 @@ export class AuthService {
       id: '550e8400-e29b-41d4-a716-446655440000',
       email: 'user@example.com',
       name: 'John Doe',
-      isActive: true,
       createdAt: '2023-01-01T00:00:00Z',
       updatedAt: '2023-01-01T00:00:00Z',
       avatar: 'https://example.com/avatar.jpg',

@@ -4,7 +4,6 @@ import {
   IsNotEmpty,
   IsEmail,
   IsUUID,
-  IsBoolean,
   IsUrl,
   IsDateString,
 } from 'class-validator';
@@ -41,13 +40,6 @@ export class UserDto {
   })
   @IsUrl()
   avatar?: string;
-
-  @ApiProperty({
-    example: true,
-    description: 'Whether the user is active',
-  })
-  @IsBoolean()
-  isActive: boolean;
 
   @ApiProperty({
     example: '2023-01-01T00:00:00Z',

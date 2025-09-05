@@ -29,28 +29,28 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: lexora_backend
-    ports:
-      - '127.0.0.1:4000:4000' # API сервер
-    volumes:
-      - .:/app # Монтируем код для hot reload
-      - /app/node_modules # Исключаем node_modules из монтирования
-    environment:
-      - NODE_ENV=development
-      - PORT=4000
-    depends_on:
-      - db
-    develop:
-      watch:
-        - action: sync
-          path: ./src
-          target: /app/src
-        - action: rebuild
-          path: package.json
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dev
+  #   container_name: lexora_backend
+  #   ports:
+  #     - '127.0.0.1:4000:4000' # API сервер
+  #   volumes:
+  #     - .:/app # Монтируем код для hot reload
+  #     - /app/node_modules # Исключаем node_modules из монтирования
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PORT=4000
+  #   depends_on:
+  #     - db
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./src
+  #         target: /app/src
+  #       - action: rebuild
+  #         path: package.json
 
 volumes:
   pgdata:

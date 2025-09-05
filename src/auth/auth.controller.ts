@@ -23,7 +23,7 @@ export class AuthController {
     type: LoginResponseDto,
   })
   @ValidateResponse(LoginResponseDto)
-  login(@Body() loginDto: LoginDto): LoginResponseDto {
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponseDto> {
     return this.authService.login(loginDto);
   }
 
