@@ -24,7 +24,7 @@ import { LogoutResponseDto } from './dto/logout-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   CurrentUser,
-  type JwtPayload,
+  type ICurrentUser,
 } from './decorators/current-user.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { LocalUser } from './strategies/local.strategy';
@@ -69,8 +69,8 @@ export class AuthController {
     type: LogoutResponseDto,
   })
   @ValidateResponse(LogoutResponseDto)
-  logout(@CurrentUser() user: JwtPayload): Promise<LogoutResponseDto> {
-    return this.authService.logout(user.sub);
+  logout(@CurrentUser() user: ICurrentUser): Promise<LogoutResponseDto> {
+    return this.authService.logout(user);
   }
 
   @Post('refresh')
@@ -93,7 +93,7 @@ export class AuthController {
     type: UserDto,
   })
   @ValidateResponse(UserDto)
-  async me(@CurrentUser() user: JwtPayload): Promise<UserDto> {
-    return this.authService.me(user.sub);
+  async me(@CurrentUser() user: ICurrentUser): Promise<UserDto> {
+    return this.authService.me(user.id);
   }
 }

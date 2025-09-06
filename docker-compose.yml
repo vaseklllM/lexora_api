@@ -29,6 +29,20 @@ services:
     volumes:
       - pgadmin:/var/lib/pgadmin
 
+  redis:
+    image: redis:7-alpine
+    container_name: lexora_redis
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   # backend:
   #   build:
   #     context: .
@@ -55,3 +69,4 @@ services:
 volumes:
   pgdata:
   pgadmin:
+  redis_data:

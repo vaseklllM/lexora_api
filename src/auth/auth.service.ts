@@ -14,16 +14,20 @@ import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
 import { LocalUser } from './strategies/local.strategy';
 import type { User } from 'generated/prisma';
+import { ICurrentUser, JwtPayload } from './decorators/current-user.decorator';
+import { v4 as uuidv4 } from 'uuid';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
 
   private generateTokens(user: Pick<User, 'id' | 'email'>): JwtTokenDto {
-    const payload = { sub: user.id, email: user.email };
+    const payload: JwtPayload = { sub: user.id, jwtId: uuidv4() };
 
     return {
       token: this.jwtService.sign(payload, {
@@ -67,10 +71,15 @@ export class AuthService {
     return this.generateTokens(res);
   }
 
-  async logout(userId: string): Promise<LogoutResponseDto> {
+  async logout(currentUser: ICurrentUser): Promise<LogoutResponseDto> {
     const user = await this.databaseService.user.findUnique({
-      where: { id: userId },
+      where: { id: currentUser.id },
     });
+
+    await this.redisService.set(
+      `user:logout:${currentUser.id}:refresh_token`,
+      currentUser.jwt.id,
+    );
 
     if (!user) {
       throw new NotFoundException('User not found');

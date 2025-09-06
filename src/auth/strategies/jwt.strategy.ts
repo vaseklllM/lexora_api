@@ -2,13 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { DatabaseService } from '../../database/database.service';
-
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  iat?: number;
-  exp?: number;
-}
+import { ICurrentUser, JwtPayload } from '../decorators/current-user.decorator';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -20,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<ICurrentUser> {
     const user = await this.databaseService.user.findUnique({
       where: { id: payload.sub },
     });
@@ -29,11 +23,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User not found');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...userWithoutPassword } = user;
+
     return {
-      sub: user.id,
-      email: user.email,
-      iat: payload.iat,
-      exp: payload.exp,
+      ...userWithoutPassword,
+      jwt: {
+        id: payload.jwtId,
+        iat: payload.iat,
+        exp: payload.exp,
+      },
     };
   }
 }
