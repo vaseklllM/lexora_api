@@ -30,10 +30,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const result = await this.redisService.get(
-      this.authService.getRedisLogoutKey(user.id),
+      this.authService.getRedisLogoutKey(payload.jwtId),
     );
 
-    if (result === payload.jwtId) {
+    if (result === user.id) {
       throw new UnauthorizedException();
     }
 

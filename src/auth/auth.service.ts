@@ -26,8 +26,8 @@ export class AuthService {
     private readonly redisService: RedisService,
   ) {}
 
-  getRedisLogoutKey(userId: string): string {
-    return `user:${userId}:logout`;
+  getRedisLogoutKey(jwtId: string): string {
+    return `jwt:${jwtId}:logout`;
   }
 
   private generateTokens(user: Pick<User, 'id' | 'email'>): JwtTokenDto {
@@ -81,8 +81,9 @@ export class AuthService {
     });
 
     await this.redisService.set(
-      this.getRedisLogoutKey(currentUser.id),
-      currentUser.jwt.id,
+      this.getRedisLogoutKey(currentUser.jwt.id),
+      currentUser.id,
+      currentUser.jwt.exp! - Math.floor(Date.now() / 1000),
     );
 
     if (!user) {
