@@ -26,6 +26,10 @@ export class AuthService {
     private readonly redisService: RedisService,
   ) {}
 
+  getRedisLogoutKey(userId: string): string {
+    return `user:${userId}:logout`;
+  }
+
   private generateTokens(user: Pick<User, 'id' | 'email'>): JwtTokenDto {
     const payload: JwtPayload = { sub: user.id, jwtId: uuidv4() };
 
@@ -77,7 +81,7 @@ export class AuthService {
     });
 
     await this.redisService.set(
-      `user:logout:${currentUser.id}:refresh_token`,
+      this.getRedisLogoutKey(currentUser.id),
       currentUser.jwt.id,
     );
 

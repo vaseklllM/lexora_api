@@ -23,7 +23,7 @@ export class RedisService {
       } else {
         await this.redis.set(key, serializedValue);
       }
-      this.logger.debug(`Set key: ${key} with TTL: ${ttl || 'no expiration'}`);
+      this.logger.log(`Set key: ${key} with TTL: ${ttl || 'no expiration'}`);
     } catch (error) {
       this.logger.error(`Error setting key ${key}:`, error);
       throw error;

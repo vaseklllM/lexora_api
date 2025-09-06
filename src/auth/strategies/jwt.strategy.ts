@@ -3,10 +3,16 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { DatabaseService } from '../../database/database.service';
 import { ICurrentUser, JwtPayload } from '../decorators/current-user.decorator';
+import { RedisService } from 'src/redis/redis.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly databaseService: DatabaseService) {
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly redisService: RedisService,
+    private readonly authService: AuthService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -21,6 +27,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     if (!user) {
       throw new UnauthorizedException('User not found');
+    }
+
+    const result = await this.redisService.get(
+      this.authService.getRedisLogoutKey(user.id),
+    );
+
+    if (result === payload.jwtId) {
+      throw new UnauthorizedException();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
