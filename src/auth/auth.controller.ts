@@ -80,7 +80,7 @@ export class AuthController {
     type: RefreshResponseDto,
   })
   @ValidateResponse(RefreshResponseDto)
-  refresh(@Body() refreshDto: RefreshDto): RefreshResponseDto {
+  refresh(@Body() refreshDto: RefreshDto): Promise<RefreshResponseDto> {
     return this.authService.refresh(refreshDto);
   }
 

@@ -2,8 +2,9 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { JwtTokenDto } from './dto/jwt-tocken.dto';
 import { UserDto } from './dto/user.dto';
@@ -25,10 +26,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
   ) {}
-
-  getRedisLogoutKey(jwtId: string): string {
-    return `jwt:${jwtId}:logout`;
-  }
 
   private generateTokens(user: Pick<User, 'id' | 'email'>): JwtTokenDto {
     const payload: JwtPayload = { sub: user.id, jwtId: uuidv4() };
@@ -80,11 +77,12 @@ export class AuthService {
       where: { id: currentUser.id },
     });
 
-    await this.redisService.set(
-      this.getRedisLogoutKey(currentUser.jwt.id),
-      currentUser.id,
-      currentUser.jwt.exp! - Math.floor(Date.now() / 1000),
-    );
+    await this.redisService.setJwtLogout({
+      sub: currentUser.id,
+      jwtId: currentUser.jwt.id,
+      exp: currentUser.jwt.exp,
+      iat: currentUser.jwt.iat,
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -96,12 +94,48 @@ export class AuthService {
     };
   }
 
-  refresh(refreshDto: RefreshDto): RefreshResponseDto {
-    return {
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9_' + refreshDto.refreshToken,
-      refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-      expiresIn: 3600,
-    };
+  async refresh(refreshDto: RefreshDto): Promise<RefreshResponseDto> {
+    try {
+      const jwtPayload: JwtPayload = await this.jwtService.verify(
+        refreshDto.refreshToken,
+        {
+          secret: Buffer.from(
+            process.env.JWT_REFRESH_SECRET as string,
+            'utf-8',
+          ),
+        },
+      );
+
+      if (!jwtPayload) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const redisUserId = await this.redisService.getJwtRefresh(
+        jwtPayload.jwtId,
+      );
+
+      if (redisUserId === jwtPayload.sub) {
+        throw new UnauthorizedException();
+      }
+
+      await this.redisService.setJwtLogout(jwtPayload);
+      await this.redisService.setJwtRefresh(jwtPayload);
+
+      const user = await this.databaseService.user.findUnique({
+        where: { id: jwtPayload.sub },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      return this.generateTokens(user);
+    } catch (error) {
+      if (error instanceof JsonWebTokenError) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+      throw error;
+    }
   }
 
   async me(userId: string): Promise<UserDto> {
