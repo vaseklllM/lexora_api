@@ -84,6 +84,13 @@ export class AuthService {
       iat: currentUser.jwt.iat,
     });
 
+    await this.redisService.setJwtRefresh({
+      sub: currentUser.id,
+      jwtId: currentUser.jwt.id,
+      exp: currentUser.jwt.exp,
+      iat: currentUser.jwt.iat,
+    });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
