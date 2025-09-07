@@ -28,6 +28,7 @@ import {
 } from './decorators/current-user.decorator';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { LocalUser } from './strategies/local.strategy';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -35,6 +36,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @Throttle({ short: { limit: 5, ttl: 30000 } })
   @UseGuards(LocalAuthGuard)
   @ApiOperation({ summary: 'User login' })
   @ApiOkResponse({
@@ -51,6 +53,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'User register' })
+  @Throttle({ short: { limit: 5, ttl: 30000 } })
   @ApiOkResponse({
     description: 'Registers user and returns access token',
     type: JwtTokenDto,
