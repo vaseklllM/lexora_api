@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     const result = await this.redisService.getJwtLogout(payload.jwtId);
 
-    if (result === user.id) {
+    if (result) {
       throw new UnauthorizedException();
     }
 
