@@ -121,7 +121,7 @@ export class AuthService {
         jwtPayload.jwtId,
       );
 
-      if (redisUserId === jwtPayload.sub) {
+      if (redisUserId) {
         throw new UnauthorizedException();
       }
 
