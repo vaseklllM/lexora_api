@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JsonWebTokenError, JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
-import { JwtTokenDto } from './dto/jwt-tocken.dto';
+import { JwtTokenDto } from './dto/jwt-token.dto';
 import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';

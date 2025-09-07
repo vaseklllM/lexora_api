@@ -15,7 +15,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
-import { JwtTokenDto } from './dto/jwt-tocken.dto';
+import { JwtTokenDto } from './dto/jwt-token.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
 import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
