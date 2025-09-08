@@ -16,7 +16,10 @@ import { FolderResponseDto } from './dto/folder-response.dto';
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async folder(userId: string, folderId: string): Promise<FolderResponseDto> {
+  async getFolder(
+    userId: string,
+    folderId: string,
+  ): Promise<FolderResponseDto> {
     const folder = await this.databaseService.folder.findFirst({
       where: { userId, id: folderId },
     });
