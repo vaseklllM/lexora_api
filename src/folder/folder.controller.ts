@@ -40,7 +40,7 @@ export class FolderController {
     @CurrentUser() user: ICurrentUser,
     @Param('id') folderId: string,
   ): Promise<FolderResponseDto> {
-    return this.folderService.getFolder(user.id, folderId);
+    return this.folderService.get(user.id, folderId);
   }
 
   @Post('create')
