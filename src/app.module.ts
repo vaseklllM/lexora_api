@@ -5,6 +5,7 @@ import { RedisModule } from './redis/redis.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
+import { LanguagesModule } from './languages/languages.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
     DatabaseModule,
     AuthModule,
     RedisModule,
+    LanguagesModule,
   ],
   providers: [
     {
