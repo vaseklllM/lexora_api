@@ -16,7 +16,7 @@ import { FolderResponseDto } from './dto/folder-response.dto';
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async checkIsExistFolder(userId: string, folderId: string) {
+  private async checkIsExistFolder(userId: string, folderId: string) {
     const folder = await this.databaseService.folder.findFirst({
       where: { userId, id: folderId },
     });
@@ -155,6 +155,10 @@ export class FolderService {
     if (!folder) {
       throw new NotFoundException('Folder not found');
     }
+
+    await this.databaseService.deck.deleteMany({
+      where: { folderId: deleteFolderDto.id },
+    });
 
     await this.databaseService.folder.delete({
       where: { id: deleteFolderDto.id, userId },

@@ -8,18 +8,26 @@ import { CreateDeckResponseDto } from './dto/create-deck-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { RenameDeckDto } from './dto/rename-deck.dto';
 import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
-import { FolderService } from 'src/folder/folder.service';
 import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 
 @Injectable()
 export class DeckService {
-  constructor(
-    private readonly databaseService: DatabaseService,
-    private readonly folderService: FolderService,
-  ) {}
+  constructor(private readonly databaseService: DatabaseService) {}
 
-  async checkIsExistDeck(userId: string, deckId: string) {
+  private async checkIsExistFolder(userId: string, folderId: string) {
+    const folder = await this.databaseService.folder.findFirst({
+      where: { userId, id: folderId },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    return folder;
+  }
+
+  private async checkIsExistDeck(userId: string, deckId: string) {
     const findDeck = await this.databaseService.deck.findFirst({
       where: { id: deckId, userId },
     });
@@ -36,10 +44,7 @@ export class DeckService {
     createDeckDto: CreateDeckDto,
   ): Promise<CreateDeckResponseDto> {
     if (createDeckDto.folderId) {
-      await this.folderService.checkIsExistFolder(
-        userId,
-        createDeckDto.folderId,
-      );
+      await this.checkIsExistFolder(userId, createDeckDto.folderId);
     }
 
     const findDeck = await this.databaseService.deck.findFirst({
