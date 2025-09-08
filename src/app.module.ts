@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import { LanguagesModule } from './languages/languages.module';
 import { FolderModule } from './folder/folder.module';
+import { DeckModule } from './deck/deck.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { FolderModule } from './folder/folder.module';
     RedisModule,
     LanguagesModule,
     FolderModule,
+    DeckModule,
   ],
   providers: [
     {

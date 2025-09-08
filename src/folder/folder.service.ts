@@ -36,7 +36,7 @@ export class FolderService {
       where: {
         userId,
         name,
-        parentId: parentFolderId,
+        parentId: parentFolderId ?? null,
       },
     });
 

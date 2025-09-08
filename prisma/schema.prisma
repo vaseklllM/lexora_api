@@ -22,6 +22,7 @@ model User {
   name      String
   avatar    String?
   folders   Folder[]
+  decks     Deck[]
 }
 
 model Language {
@@ -43,4 +44,16 @@ model Folder {
   parentId  String?  
   parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
   children  Folder[] @relation("FolderHierarchy")
+  decks     Deck[]
+}
+
+
+model Deck {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  folderId  String?
+  folder    Folder?   @relation(fields: [folderId], references: [id])
 }
