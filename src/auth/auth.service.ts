@@ -14,7 +14,7 @@ import { LogoutResponseDto } from './dto/logout-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
 import { LocalUser } from './strategies/local.strategy';
-import type { User } from 'generated/prisma';
+import type { User } from '@prisma/client';
 import { ICurrentUser, JwtPayload } from './decorators/current-user.decorator';
 import { v4 as uuidv4 } from 'uuid';
 import { RedisService } from 'src/redis/redis.service';

@@ -20,12 +20,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prepare": "husky",
     "type-check": "tsc --noEmit",
-    "seed": "ts-node prisma/seeds/index.ts"
+    "seed": "ts-node src/common/seeds/index.ts"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
-      "eslint --max-warnings 0 --rule no-console:error --rule no-debugger:error"
+      "eslint --max-warnings 0 --rule no-debugger:error"
     ]
   },
   "dependencies": {
@@ -95,6 +95,6 @@
     "testEnvironment": "node"
   },
   "prisma": {
-    "seed": "ts-node prisma/seeds/index.ts"
+    "seed": "ts-node src/common/seeds/index.ts"
   }
 }

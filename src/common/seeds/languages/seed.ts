@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import languages from './list.json';
 
 const prisma = new PrismaClient();
@@ -8,7 +8,7 @@ async function main() {
 
   // Clear existing languages first
   console.log('🧹 Clearing existing languages...');
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+
   await prisma.language.deleteMany({});
   console.log('✅ Existing languages cleared');
 
@@ -17,7 +17,6 @@ async function main() {
 
   for (const language of languages) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await prisma.language.create({
         data: language,
       });

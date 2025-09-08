@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
-import { User } from 'generated/prisma';
+import { User } from '@prisma/client';
 
 export type LocalUser = Omit<User, 'password'>;
 
