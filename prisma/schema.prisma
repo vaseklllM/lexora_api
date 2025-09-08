@@ -23,3 +23,10 @@ model User {
   name      String
   avatar    String?
 }
+
+model Language {
+  code       String  @id 
+  name       String
+  nativeName String
+  iconSymbol String
+}
