@@ -1,9 +1,15 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { CreateFolderResponseDto } from './dto/create-folder-response.dto';
 import { RenameFolderDto } from './dto/rename-folder.dto';
 import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
+import { DeleteFolderDto } from './dto/delete-folder.dto';
+import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 @Injectable()
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
@@ -52,5 +58,24 @@ export class FolderService {
     });
 
     return { message: 'Folder renamed successfully' };
+  }
+
+  async delete(
+    userId: string,
+    deleteFolderDto: DeleteFolderDto,
+  ): Promise<DeleteFolderResponseDto> {
+    const folder = await this.databaseService.folder.findUnique({
+      where: { id: deleteFolderDto.id, userId },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    await this.databaseService.folder.delete({
+      where: { id: deleteFolderDto.id, userId },
+    });
+
+    return { message: 'Folder deleted successfully' };
   }
 }
