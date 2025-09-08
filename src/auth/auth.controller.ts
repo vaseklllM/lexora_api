@@ -8,12 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { JwtTokenDto } from './dto/jwt-token.dto';
 import { ValidateResponse } from '../common/decorators/validate-response.decorator';
@@ -21,7 +16,6 @@ import { UserDto } from './dto/user.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { RefreshResponseDto } from './dto/refresh-response.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import {
   CurrentUser,
   type ICurrentUser,
@@ -29,6 +23,7 @@ import {
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { LocalUser } from './strategies/local.strategy';
 import { Throttle } from '@nestjs/throttler';
+import { Auth } from 'src/common/decorators/auth';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -64,8 +59,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @Auth()
   @ApiOperation({ summary: 'User logout' })
   @ApiOkResponse({
     description: 'Logs out user and returns access token',
@@ -88,8 +82,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  @Auth()
   @ApiOperation({ summary: 'Get current user info' })
   @ApiOkResponse({
     description: 'Returns current user info',
