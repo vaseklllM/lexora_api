@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Patch, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
@@ -11,6 +11,8 @@ import { CreateDeckResponseDto } from './dto/create-deck-response.dto';
 import { ValidateResponse } from 'src/common/decorators/validate-response.decorator';
 import { RenameDeckDto } from './dto/rename-deck.dto';
 import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
+import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
+import { DeleteDeckDto } from './dto/delete-deck.dto';
 
 @ApiTags('Decks')
 @Controller('deck')
@@ -45,5 +47,20 @@ export class DeckController {
     @Body() renameDeckDto: RenameDeckDto,
   ): Promise<RenameDeckResponseDto> {
     return this.deskService.rename(user.id, renameDeckDto);
+  }
+
+  @Delete('delete')
+  @Auth()
+  @ApiOperation({ summary: 'Delete a deck' })
+  @ApiOkResponse({
+    description: 'Returns the message about deleted deck',
+    type: DeleteDeckResponseDto,
+  })
+  @ValidateResponse(DeleteDeckResponseDto)
+  delete(
+    @CurrentUser() user: ICurrentUser,
+    @Body() deleteDeckDto: DeleteDeckDto,
+  ): Promise<DeleteDeckResponseDto> {
+    return this.deskService.delete(user.id, deleteDeckDto);
   }
 }

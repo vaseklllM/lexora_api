@@ -9,6 +9,8 @@ import { DatabaseService } from 'src/database/database.service';
 import { RenameDeckDto } from './dto/rename-deck.dto';
 import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 import { FolderService } from 'src/folder/folder.service';
+import { DeleteDeckDto } from './dto/delete-deck.dto';
+import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 
 @Injectable()
 export class DeckService {
@@ -109,6 +111,21 @@ export class DeckService {
 
     return {
       message: `Deck '${deck.name}' renamed successfully`,
+    };
+  }
+
+  async delete(
+    userId: string,
+    deleteDeckDto: DeleteDeckDto,
+  ): Promise<DeleteDeckResponseDto> {
+    const findDeck = await this.checkIsExistDeck(userId, deleteDeckDto.deckId);
+
+    await this.databaseService.deck.delete({
+      where: { id: deleteDeckDto.deckId, userId },
+    });
+
+    return {
+      message: `Deck '${findDeck.name}' deleted successfully`,
     };
   }
 }
