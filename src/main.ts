@@ -24,6 +24,7 @@ async function bootstrap() {
     .setVersion('0.1.0')
     .addBearerAuth()
     .addTag('Authentication', 'User authentication and registration operations')
+    .addTag('Folders', 'Folder management operations for organizing decks')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

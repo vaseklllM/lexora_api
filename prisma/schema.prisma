@@ -21,6 +21,7 @@ model User {
   updatedAt DateTime @updatedAt
   name      String
   avatar    String?
+  folders   Folder[]
 }
 
 model Language {
@@ -28,4 +29,13 @@ model Language {
   name       String
   nativeName String
   iconSymbol String
+}
+
+model Folder {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
