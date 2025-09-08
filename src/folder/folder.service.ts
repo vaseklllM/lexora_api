@@ -63,12 +63,14 @@ export class FolderService {
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
+      numberOfCards: 0,
       childFolders:
         parentFolders?.map((folder) => ({
           name: folder.name,
           id: folder.id,
           createdAt: folder.createdAt.toISOString(),
           updatedAt: folder.updatedAt.toISOString(),
+          numberOfCards: 0,
         })) ?? [],
     };
   }

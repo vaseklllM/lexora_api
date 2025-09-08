@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -40,6 +41,14 @@ class Folder {
   @IsNotEmpty()
   @IsOptional()
   updatedAt?: string;
+
+  @ApiProperty({
+    example: 10,
+    description: 'Number of cards in the folder',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  numberOfCards: number;
 }
 
 export class FolderResponseDto extends Folder {
