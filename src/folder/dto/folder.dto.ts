@@ -38,5 +38,5 @@ export class CreateFolderDto {
   @IsDateString()
   @IsNotEmpty()
   @IsOptional()
-  updatedAt: string;
+  updatedAt?: string;
 }

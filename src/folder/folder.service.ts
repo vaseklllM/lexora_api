@@ -14,11 +14,28 @@ import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  private async checkFolderName(userId: string, name: string) {
+  private async checkFolderName(
+    userId: string,
+    name: string,
+    parentFolderId?: string,
+  ) {
+    if (parentFolderId) {
+      const parentFolder = await this.databaseService.folder.findFirst({
+        where: {
+          id: parentFolderId,
+        },
+      });
+
+      if (!parentFolder) {
+        throw new NotFoundException('Parent folder not found');
+      }
+    }
+
     const findFolderByName = await this.databaseService.folder.findFirst({
       where: {
         userId,
         name,
+        parentId: parentFolderId,
       },
     });
 
@@ -31,12 +48,17 @@ export class FolderService {
     userId: string,
     createFolderDto: CreateFolderDto,
   ): Promise<CreateFolderResponseDto> {
-    await this.checkFolderName(userId, createFolderDto.name);
+    await this.checkFolderName(
+      userId,
+      createFolderDto.name,
+      createFolderDto.parentFolderId,
+    );
 
     const folder = await this.databaseService.folder.create({
       data: {
         name: createFolderDto.name,
         userId,
+        parentId: createFolderDto.parentFolderId,
       },
     });
 
