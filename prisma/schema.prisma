@@ -38,4 +38,9 @@ model Folder {
   updatedAt DateTime @updatedAt
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  
+  // Self-reference for hierarchical structure
+  parentId  String?  
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children  Folder[] @relation("FolderHierarchy")
 }
