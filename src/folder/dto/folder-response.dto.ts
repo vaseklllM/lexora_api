@@ -44,10 +44,17 @@ class Folder {
 
 export class FolderResponseDto extends Folder {
   @ApiProperty({
-    example: 'Parent folders',
-    description: 'Parent folders',
+    example: [
+      {
+        name: 'Folder name',
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        createdAt: '2023-01-01T00:00:00Z',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+    ],
+    description: 'Child folders',
   })
   @IsArray()
   @IsNotEmpty()
-  parentFolders: Folder[];
+  childFolders: Folder[];
 }

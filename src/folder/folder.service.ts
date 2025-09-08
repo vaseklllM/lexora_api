@@ -63,7 +63,7 @@ export class FolderService {
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
-      parentFolders:
+      childFolders:
         parentFolders?.map((folder) => ({
           name: folder.name,
           id: folder.id,
