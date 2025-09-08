@@ -10,6 +10,7 @@ import { RenameFolderDto } from './dto/rename-folder.dto';
 import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
 import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
+import { FolderResponseDto } from './dto/folder-response.dto';
 @Injectable()
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
@@ -44,6 +45,34 @@ export class FolderService {
     }
   }
 
+  async folder(userId: string, folderId: string): Promise<FolderResponseDto> {
+    const folder = await this.databaseService.folder.findFirst({
+      where: { userId, id: folderId },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    const parentFolders = await this.databaseService.folder.findMany({
+      where: { userId, parentId: folder.id },
+    });
+
+    return {
+      name: folder.name,
+      id: folder.id,
+      createdAt: folder.createdAt.toISOString(),
+      updatedAt: folder.updatedAt.toISOString(),
+      parentFolders:
+        parentFolders?.map((folder) => ({
+          name: folder.name,
+          id: folder.id,
+          createdAt: folder.createdAt.toISOString(),
+          updatedAt: folder.updatedAt.toISOString(),
+        })) ?? [],
+    };
+  }
+
   async create(
     userId: string,
     createFolderDto: CreateFolderDto,
@@ -75,8 +104,8 @@ export class FolderService {
     await this.checkFolderName(userId, renameFolderDto.newName);
 
     await this.databaseService.folder.update({
-      where: { id: renameFolderDto.id },
-      data: { name: renameFolderDto.newName },
+      where: { id: renameFolderDto.id, userId },
+      data: { name: renameFolderDto.newName, updatedAt: new Date() },
     });
 
     return { message: 'Folder renamed successfully' };

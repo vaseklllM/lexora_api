@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { FolderService } from './folder.service';
@@ -13,11 +21,27 @@ import { RenameFolderDto } from './dto/rename-folder.dto';
 import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
 import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
+import { FolderResponseDto } from './dto/folder-response.dto';
 
 @ApiTags('Folders')
 @Controller('folder')
 export class FolderController {
   constructor(private readonly folderService: FolderService) {}
+
+  @Get(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Get a folder' })
+  @ApiOkResponse({
+    description: 'Returns the folder',
+    type: FolderResponseDto,
+  })
+  @ValidateResponse(FolderResponseDto)
+  folder(
+    @CurrentUser() user: ICurrentUser,
+    @Param('id') folderId: string,
+  ): Promise<FolderResponseDto> {
+    return this.folderService.folder(user.id, folderId);
+  }
 
   @Post('create')
   @Auth()
