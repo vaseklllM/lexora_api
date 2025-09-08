@@ -9,6 +9,8 @@ import {
 import { Auth } from 'src/common/decorators/auth';
 import { CreateDeckResponseDto } from './dto/create-deck-response.dto';
 import { ValidateResponse } from 'src/common/decorators/validate-response.decorator';
+import { RenameDeckDto } from './dto/rename-deck.dto';
+import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 
 @ApiTags('Decks')
 @Controller('deck')
@@ -28,5 +30,20 @@ export class DeckController {
     @Body() createDeckDto: CreateDeckDto,
   ): Promise<CreateDeckResponseDto> {
     return this.deskService.create(user.id, createDeckDto);
+  }
+
+  @Post('rename')
+  @Auth()
+  @ApiOperation({ summary: 'Rename a deck' })
+  @ApiOkResponse({
+    description: 'Returns the renamed deck',
+    type: CreateDeckResponseDto,
+  })
+  @ValidateResponse(CreateDeckResponseDto)
+  rename(
+    @CurrentUser() user: ICurrentUser,
+    @Body() renameDeckDto: RenameDeckDto,
+  ): Promise<RenameDeckResponseDto> {
+    return this.deskService.rename(user.id, renameDeckDto);
   }
 }

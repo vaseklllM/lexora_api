@@ -6,21 +6,22 @@ import {
 import { CreateDeckDto } from './dto/create-deck.dto';
 import { CreateDeckResponseDto } from './dto/create-deck-response.dto';
 import { DatabaseService } from 'src/database/database.service';
+import { RenameDeckDto } from './dto/rename-deck.dto';
+import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 
 @Injectable()
 export class DeckService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  private async checkDeckName(args: {
-    userId: string;
-    name: string;
-    folderId?: string;
-  }): Promise<void> {
-    if (args.folderId) {
+  async create(
+    userId: string,
+    createDeckDto: CreateDeckDto,
+  ): Promise<CreateDeckResponseDto> {
+    if (createDeckDto.folderId) {
       const folder = await this.databaseService.folder.findFirst({
         where: {
-          userId: args.userId,
-          id: args.folderId,
+          userId,
+          id: createDeckDto.folderId,
         },
       });
 
@@ -29,30 +30,19 @@ export class DeckService {
       }
     }
 
-    const deck = await this.databaseService.deck.findFirst({
+    const findDeck = await this.databaseService.deck.findFirst({
       where: {
-        userId: args.userId,
-        name: args.name,
-        folderId: args.folderId ?? null,
+        userId,
+        name: createDeckDto.name,
+        folderId: createDeckDto.folderId ?? null,
       },
     });
 
-    if (deck) {
+    if (findDeck) {
       throw new ConflictException(
-        `Deck with name '${args.name}' already exists`,
+        `Deck with name '${findDeck.name}' already exists`,
       );
     }
-  }
-
-  async create(
-    userId: string,
-    createDeckDto: CreateDeckDto,
-  ): Promise<CreateDeckResponseDto> {
-    await this.checkDeckName({
-      userId,
-      name: createDeckDto.name,
-      folderId: createDeckDto.folderId,
-    });
 
     const deck = await this.databaseService.deck.create({
       data: {
@@ -65,6 +55,20 @@ export class DeckService {
     return {
       name: deck.name,
       id: deck.id,
+    };
+  }
+
+  async rename(
+    userId: string,
+    renameDeckDto: RenameDeckDto,
+  ): Promise<RenameDeckResponseDto> {
+    const deck = await this.databaseService.deck.update({
+      where: { id: renameDeckDto.deckId, userId },
+      data: { name: renameDeckDto.name },
+    });
+
+    return {
+      message: `Deck '${deck.name}' renamed successfully`,
     };
   }
 }
