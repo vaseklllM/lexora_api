@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DeckService } from './deck.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
@@ -32,14 +32,14 @@ export class DeckController {
     return this.deskService.create(user.id, createDeckDto);
   }
 
-  @Post('rename')
+  @Patch('rename')
   @Auth()
   @ApiOperation({ summary: 'Rename a deck' })
   @ApiOkResponse({
     description: 'Returns the renamed deck',
-    type: CreateDeckResponseDto,
+    type: RenameDeckResponseDto,
   })
-  @ValidateResponse(CreateDeckResponseDto)
+  @ValidateResponse(RenameDeckResponseDto)
   rename(
     @CurrentUser() user: ICurrentUser,
     @Body() renameDeckDto: RenameDeckDto,

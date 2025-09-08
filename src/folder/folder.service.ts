@@ -11,39 +11,10 @@ import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
 import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 import { FolderResponseDto } from './dto/folder-response.dto';
+
 @Injectable()
 export class FolderService {
   constructor(private readonly databaseService: DatabaseService) {}
-
-  private async checkFolderName(
-    userId: string,
-    name: string,
-    parentFolderId?: string,
-  ) {
-    if (parentFolderId) {
-      const parentFolder = await this.databaseService.folder.findFirst({
-        where: {
-          id: parentFolderId,
-        },
-      });
-
-      if (!parentFolder) {
-        throw new NotFoundException('Parent folder not found');
-      }
-    }
-
-    const findFolderByName = await this.databaseService.folder.findFirst({
-      where: {
-        userId,
-        name,
-        parentId: parentFolderId ?? null,
-      },
-    });
-
-    if (findFolderByName) {
-      throw new ConflictException(`Folder with name '${name}' already exists`);
-    }
-  }
 
   async folder(userId: string, folderId: string): Promise<FolderResponseDto> {
     const folder = await this.databaseService.folder.findFirst({
@@ -79,11 +50,31 @@ export class FolderService {
     userId: string,
     createFolderDto: CreateFolderDto,
   ): Promise<CreateFolderResponseDto> {
-    await this.checkFolderName(
-      userId,
-      createFolderDto.name,
-      createFolderDto.parentFolderId,
-    );
+    if (createFolderDto.parentFolderId) {
+      const parentFolder = await this.databaseService.folder.findFirst({
+        where: {
+          id: createFolderDto.parentFolderId,
+        },
+      });
+
+      if (!parentFolder) {
+        throw new NotFoundException('Parent folder not found');
+      }
+    }
+
+    const findFolderByName = await this.databaseService.folder.findFirst({
+      where: {
+        userId,
+        name: createFolderDto.name,
+        parentId: createFolderDto.parentFolderId ?? null,
+      },
+    });
+
+    if (findFolderByName) {
+      throw new ConflictException(
+        `Folder with name '${findFolderByName.name}' already exists`,
+      );
+    }
 
     const folder = await this.databaseService.folder.create({
       data: {
@@ -103,7 +94,41 @@ export class FolderService {
     userId: string,
     renameFolderDto: RenameFolderDto,
   ): Promise<RenameFolderResponseDto> {
-    await this.checkFolderName(userId, renameFolderDto.newName);
+    const findFolder = await this.databaseService.folder.findFirst({
+      where: { id: renameFolderDto.id, userId },
+    });
+
+    if (!findFolder) {
+      throw new NotFoundException('Folder not found');
+    }
+
+    if (findFolder.parentId) {
+      const parentFolder = await this.databaseService.folder.findFirst({
+        where: {
+          parentId: findFolder.parentId,
+          name: renameFolderDto.newName,
+        },
+      });
+
+      if (parentFolder) {
+        throw new ConflictException(
+          `Folder with name '${parentFolder.name}' already exists`,
+        );
+      }
+    } else {
+      const sameNameFolder = await this.databaseService.folder.findFirst({
+        where: {
+          userId,
+          name: renameFolderDto.newName,
+        },
+      });
+
+      if (sameNameFolder) {
+        throw new ConflictException(
+          `Folder with name '${sameNameFolder.name}' already exists`,
+        );
+      }
+    }
 
     await this.databaseService.folder.update({
       where: { id: renameFolderDto.id, userId },
