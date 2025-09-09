@@ -68,25 +68,7 @@
 
 ## Змінні оточення
 
-Створіть файл `.env` у корені проекту з наступними змінними:
-
-```env
-# База даних
-DATABASE_URL="postgresql://admin:1234@localhost:5433/lexora"
-
-# JWT
-JWT_SECRET="your-secret-key"
-JWT_EXPIRES_IN="1h"
-JWT_REFRESH_SECRET="your-refresh-secret"
-JWT_REFRESH_EXPIRES_IN="7d"
-
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# Додаток
-PORT=4000
-NODE_ENV="development"
-```
+Створіть файл `.env` у корені проекту на основі `.env.example`:
 
 ## Compile and run the project
 
