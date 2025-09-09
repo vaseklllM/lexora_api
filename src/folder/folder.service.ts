@@ -28,6 +28,29 @@ export class FolderService {
     return folder;
   }
 
+  private async getNumberOfCards(
+    userId: string,
+    folderId: string,
+  ): Promise<number> {
+    // Count cards directly in this folder
+    const directCards: number = await this.databaseService.card.count({
+      where: { userId, deck: { folderId: folderId } },
+    });
+
+    // Find all child folders
+    const childFolders = await this.databaseService.folder.findMany({
+      where: { userId, parentId: folderId },
+    });
+
+    // Recursively count cards in child folders
+    let childCards = 0;
+    for (const childFolder of childFolders) {
+      childCards += await this.getNumberOfCards(userId, childFolder.id);
+    }
+
+    return directCards + childCards;
+  }
+
   async get(userId: string, folderId: string): Promise<FolderResponseDto> {
     const folder = await this.checkIsExistFolder(userId, folderId);
 
@@ -35,12 +58,14 @@ export class FolderService {
       where: { userId, parentId: folder.id },
     });
 
+    const numberOfCards = await this.getNumberOfCards(userId, folderId);
+
     return {
       name: folder.name,
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
-      numberOfCards: 0,
+      numberOfCards: numberOfCards,
       childFolders:
         parentFolders?.map((folder) => ({
           name: folder.name,
