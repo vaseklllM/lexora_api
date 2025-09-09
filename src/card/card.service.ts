@@ -43,20 +43,32 @@ export class CardService {
     languageCode: string,
     word: string,
   ): Promise<string | undefined> {
-    switch (languageCode) {
-      case 'en': {
-        const response = await fetch(
-          `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
-        );
+    try {
+      switch (languageCode) {
+        case 'en': {
+          const response = await fetch(
+            `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
+          );
 
-        if (!response.ok) {
-          return undefined;
+          if (!response.ok) {
+            return undefined;
+          }
+
+          const data: { phonetics?: { audio?: string }[] }[] =
+            await response.json();
+
+          const audios: string[] = data
+            .flatMap((item) =>
+              item.phonetics?.map((phonetic) => phonetic.audio),
+            )
+            .filter((audio) => audio) as string[];
+
+          return audios[0];
         }
-
-        console.log(response);
-
-        return 'https://api.dictionaryapi.dev/media/pronunciations/en/queue-au.mp3';
       }
+    } catch (_error) {
+      console.error(_error);
+      return undefined;
     }
   }
 
@@ -130,16 +142,23 @@ export class CardService {
   ): Promise<UpdateCardResponseDto> {
     const { cardId, ...updateCardData } = updateCardDto;
 
-    await this.checkIsExistCard(userId, cardId);
+    const card = await this.checkIsExistCard(userId, cardId);
+    const deck = await this.checkIsExistDeck(userId, card.deckId);
 
-    const card = await this.databaseService.card.update({
+    const nativeSoundUrl = await this.getNativeSoundUrl(
+      deck.languageWhatILearnCode,
+      updateCardData.textInLearningLanguage,
+    );
+
+    const newCard = await this.databaseService.card.update({
       where: { id: cardId },
       data: {
         ...updateCardData,
+        nativeSoundUrl,
       },
     });
 
-    return this.convertCardToGetCardResponseDto(card);
+    return this.convertCardToGetCardResponseDto(newCard);
   }
 
   async delete(userId: string, cardId: string): Promise<DeleteCardResponseDto> {

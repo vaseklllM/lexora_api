@@ -53,18 +53,18 @@ model Folder {
 
 
 model Deck {
-  id                    String   @id @default(uuid())
-  name                  String
-  createdAt             DateTime @default(now())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id])
-  folderId              String?
-  folder                Folder?   @relation(fields: [folderId], references: [id])
+  id                      String   @id @default(uuid())
+  name                    String
+  createdAt               DateTime @default(now())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id])
+  folderId                String?
+  folder                  Folder?   @relation(fields: [folderId], references: [id])
   languageWhatIKnowCode   String 
-  languageWhatIKnow     Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowCode], references: [code])
+  languageWhatIKnow       Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowCode], references: [code])
   languageWhatILearnCode  String 
-  languageWhatILearn    Language @relation("LanguageWhatILearn",fields: [languageWhatILearnCode], references: [code])
-  cards                 Card[]
+  languageWhatILearn      Language @relation("LanguageWhatILearn",fields: [languageWhatILearnCode], references: [code])
+  cards                   Card[]
 }
 
 model Card {
