@@ -32,23 +32,28 @@ export class FolderService {
     userId: string,
     folderId: string,
   ): Promise<number> {
-    // Count cards directly in this folder
-    const directCards: number = await this.databaseService.card.count({
-      where: { userId, deck: { folderId: folderId } },
-    });
+    // Use raw SQL with recursive CTE to count all cards in folder and subfolders
+    const result = await this.databaseService.$queryRaw<[{ count: bigint }]>`
+      WITH RECURSIVE folder_tree AS (
+        -- Base case: start with the target folder
+        SELECT id FROM "Folder" WHERE id = ${folderId} AND "userId" = ${userId}
+        
+        UNION ALL
+        
+        -- Recursive case: find all child folders
+        SELECT f.id 
+        FROM "Folder" f
+        INNER JOIN folder_tree ft ON f."parentId" = ft.id
+        WHERE f."userId" = ${userId}
+      )
+      SELECT COUNT(*)::int as count
+      FROM "Card" c
+      INNER JOIN "Deck" d ON c."deckId" = d.id
+      INNER JOIN folder_tree ft ON d."folderId" = ft.id
+      WHERE c."userId" = ${userId}
+    `;
 
-    // Find all child folders
-    const childFolders = await this.databaseService.folder.findMany({
-      where: { userId, parentId: folderId },
-    });
-
-    // Recursively count cards in child folders
-    let childCards = 0;
-    for (const childFolder of childFolders) {
-      childCards += await this.getNumberOfCards(userId, childFolder.id);
-    }
-
-    return directCards + childCards;
+    return Number(result[0]?.count || 0);
   }
 
   async get(userId: string, folderId: string): Promise<FolderResponseDto> {
@@ -60,20 +65,24 @@ export class FolderService {
 
     const numberOfCards = await this.getNumberOfCards(userId, folderId);
 
+    // Calculate numberOfCards for each child folder
+    const childFoldersWithCounts = await Promise.all(
+      parentFolders?.map(async (childFolder) => ({
+        name: childFolder.name,
+        id: childFolder.id,
+        createdAt: childFolder.createdAt.toISOString(),
+        updatedAt: childFolder.updatedAt.toISOString(),
+        numberOfCards: await this.getNumberOfCards(userId, childFolder.id),
+      })) ?? [],
+    );
+
     return {
       name: folder.name,
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
       numberOfCards: numberOfCards,
-      childFolders:
-        parentFolders?.map((folder) => ({
-          name: folder.name,
-          id: folder.id,
-          createdAt: folder.createdAt.toISOString(),
-          updatedAt: folder.updatedAt.toISOString(),
-          numberOfCards: 0,
-        })) ?? [],
+      childFolders: childFoldersWithCounts,
     };
   }
 
