@@ -132,6 +132,10 @@ export class CardService {
       take: startLearningSessionDto.count ?? 5,
     });
 
+    if (cards.length === 0) {
+      throw new NotFoundException('No cards to learn');
+    }
+
     return {
       cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
     };
@@ -173,6 +177,10 @@ export class CardService {
         },
       },
     });
+
+    if (cards.length === 0) {
+      throw new NotFoundException('No cards to review');
+    }
 
     return {
       cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
