@@ -24,6 +24,8 @@ import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
 import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
+import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
+import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -44,6 +46,22 @@ export class CardController {
     @Query() getCardsToLearnDto: GetCardsToLearnDto,
   ): Promise<GetCardsToLearnResponseDto> {
     return this.cardService.getCardsToLearn(user.id, getCardsToLearnDto);
+  }
+
+  @Get('get-cards-for-review')
+  @Auth()
+  @ApiOperation({ summary: 'Get cards for review' })
+  @ApiOkResponse({
+    description: 'Returns the cards for review',
+    type: GetCardsToLearnResponseDto,
+    isArray: true,
+  })
+  @ValidateResponse(GetCardsToLearnResponseDto)
+  getCardsForReview(
+    @CurrentUser() user: ICurrentUser,
+    @Query() getCardsForReviewDto: GetCardsForReviewDto,
+  ): Promise<GetCardsForReviewResponseDto> {
+    return this.cardService.getCardsForReview(user.id, getCardsForReviewDto);
   }
 
   @Get(':id')

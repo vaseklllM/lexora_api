@@ -9,6 +9,8 @@ import { Card } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
 import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
+import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
+import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
 
 @Injectable()
 export class CardService {
@@ -122,6 +124,22 @@ export class CardService {
     const cards = await this.databaseService.card.findMany({
       where: { userId, deckId: getCardsToLearnDto.deckId, isNew: true },
       take: getCardsToLearnDto.count ?? 5,
+    });
+
+    return {
+      cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
+    };
+  }
+
+  async getCardsForReview(
+    userId: string,
+    getCardsForReviewDto: GetCardsForReviewDto,
+  ): Promise<GetCardsForReviewResponseDto> {
+    await this.checkIsExistDeck(userId, getCardsForReviewDto.deckId);
+
+    const cards = await this.databaseService.card.findMany({
+      where: { userId, deckId: getCardsForReviewDto.deckId, isNew: false },
+      take: getCardsForReviewDto.count ?? 5,
     });
 
     return {
