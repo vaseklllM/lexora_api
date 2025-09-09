@@ -7,6 +7,8 @@ import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { Card } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
+import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
+import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
 
 @Injectable()
 export class CardService {
@@ -108,6 +110,22 @@ export class CardService {
 
     return {
       message: `Card '${deletedCard.textInLearningLanguage}' deleted successfully`,
+    };
+  }
+
+  async getCardsToLearn(
+    userId: string,
+    getCardsToLearnDto: GetCardsToLearnDto,
+  ): Promise<GetCardsToLearnResponseDto> {
+    await this.checkIsExistDeck(userId, getCardsToLearnDto.deckId);
+
+    const cards = await this.databaseService.card.findMany({
+      where: { userId, deckId: getCardsToLearnDto.deckId, isNew: true },
+      take: getCardsToLearnDto.count ?? 5,
+    });
+
+    return {
+      cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
     };
   }
 }

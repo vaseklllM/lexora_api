@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/common/decorators/auth';
@@ -21,11 +22,29 @@ import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
+import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
+import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
 
 @ApiTags('Cards')
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
+
+  @Get('get-cards-to-learn')
+  @Auth()
+  @ApiOperation({ summary: 'Get cards to learn' })
+  @ApiOkResponse({
+    description: 'Returns the cards to learn',
+    type: GetCardsToLearnResponseDto,
+    isArray: true,
+  })
+  @ValidateResponse(GetCardsToLearnResponseDto)
+  getCardsToLearn(
+    @CurrentUser() user: ICurrentUser,
+    @Query() getCardsToLearnDto: GetCardsToLearnDto,
+  ): Promise<GetCardsToLearnResponseDto> {
+    return this.cardService.getCardsToLearn(user.id, getCardsToLearnDto);
+  }
 
   @Get(':id')
   @Auth()
