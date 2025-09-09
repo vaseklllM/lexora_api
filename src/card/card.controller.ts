@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -26,6 +27,8 @@ import { StartLearningSessionResponseDto } from './dto/start-learning-session-re
 import { StartLearningSessionDto } from './dto/start-learning-session.dto';
 import { StartReviewSessionDto } from './dto/start-review-session.dto';
 import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
+import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
+import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -48,6 +51,24 @@ export class CardController {
     return this.cardService.startLearningSession(
       user.id,
       startLearningSessionDto,
+    );
+  }
+
+  @Patch('finish-learning-session')
+  @Auth()
+  @ApiOperation({ summary: 'Finish learning session' })
+  @ApiOkResponse({
+    description: 'Returns the message about finished learning session',
+    type: FinishLearningSessionResponseDto,
+  })
+  @ValidateResponse(FinishLearningSessionResponseDto)
+  finishLearningSession(
+    @CurrentUser() user: ICurrentUser,
+    @Body() finishLearningSessionDto: FinishLearningSessionDto,
+  ): Promise<FinishLearningSessionResponseDto> {
+    return this.cardService.finishLearningSession(
+      user.id,
+      finishLearningSessionDto,
     );
   }
 

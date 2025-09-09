@@ -11,6 +11,8 @@ import { StartLearningSessionDto } from './dto/start-learning-session.dto';
 import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
 import { StartReviewSessionDto } from './dto/start-review-session.dto';
 import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
+import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
+import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
 
 @Injectable()
 export class CardService {
@@ -128,6 +130,24 @@ export class CardService {
 
     return {
       cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
+    };
+  }
+
+  async finishLearningSession(
+    userId: string,
+    finishLearningSessionDto: FinishLearningSessionDto,
+  ): Promise<FinishLearningSessionResponseDto> {
+    await this.databaseService.card.updateMany({
+      where: {
+        userId,
+        isNew: true,
+        id: { in: finishLearningSessionDto.cardIds },
+      },
+      data: { isNew: false },
+    });
+
+    return {
+      message: 'Learning session finished successfully',
     };
   }
 
