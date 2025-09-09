@@ -10,6 +10,7 @@ import { FolderModule } from './folder/folder.module';
 import { DeckModule } from './deck/deck.module';
 import { CardModule } from './card/card.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     DeckModule,
     CardModule,
     DashboardModule,
+    AiModule,
   ],
   providers: [
     {

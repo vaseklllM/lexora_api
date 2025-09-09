@@ -21,7 +21,15 @@ async function bootstrap() {
     .setVersion('0.1.0')
     .addBearerAuth()
     .addTag('Authentication', 'User authentication and registration operations')
-    .addTag('Folders', 'Folder management operations for organizing decks')
+    .addTag(
+      'Folders',
+      'Folder management operations for organizing decks and cards',
+    )
+    .addTag('Decks', 'Deck management operations for organizing cards')
+    .addTag('Cards', 'Card management operations for organizing cards')
+    .addTag('Languages', 'Language management operations')
+    .addTag('AI', 'AI-powered translation and word analysis services')
+    .addTag('Dashboard', 'Main page')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
