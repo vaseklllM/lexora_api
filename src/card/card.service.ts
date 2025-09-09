@@ -106,12 +106,9 @@ export class CardService {
     userId: string,
     createCardDto: CreateCardDto,
   ): Promise<CreateCardResponseDto> {
-    const deck: Deck = await this.checkIsExistDeck(
-      userId,
-      createCardDto.deckId,
-    );
+    const deck = await this.checkIsExistDeck(userId, createCardDto.deckId);
 
-    const nativeSoundUrl: string | undefined = await this.getNativeSoundUrl(
+    const nativeSoundUrl = await this.getNativeSoundUrl(
       deck.languageWhatILearnCode,
       createCardDto.textInLearningLanguage,
     );
