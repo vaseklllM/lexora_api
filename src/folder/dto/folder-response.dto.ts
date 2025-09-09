@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { DeckDto, DeckExample } from 'src/deck/dto/deck.dto';
 
 class Folder {
   @ApiProperty({
@@ -66,4 +67,12 @@ export class FolderResponseDto extends Folder {
   @IsArray()
   @IsNotEmpty()
   childFolders: Folder[];
+
+  @ApiProperty({
+    example: [DeckExample],
+    description: 'Child decks',
+  })
+  @IsArray()
+  @IsNotEmpty()
+  childDecks: DeckDto[];
 }

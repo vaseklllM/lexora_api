@@ -11,6 +11,7 @@ import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
 import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 import { FolderResponseDto } from './dto/folder-response.dto';
+import { DeckDto } from 'src/deck/dto/deck.dto';
 
 @Injectable()
 export class FolderService {
@@ -28,7 +29,7 @@ export class FolderService {
     return folder;
   }
 
-  private async getNumberOfCards(
+  private async getNumberOfCardsInFolder(
     userId: string,
     folderId: string,
   ): Promise<number> {
@@ -56,6 +57,26 @@ export class FolderService {
     return Number(result[0]?.count || 0);
   }
 
+  private async getDecksInFolder(
+    userId: string,
+    folderId: string,
+  ): Promise<DeckDto[]> {
+    const decks = await this.databaseService.deck.findMany({
+      where: { userId, folderId },
+    });
+
+    return decks.map((deck) => ({
+      id: deck.id,
+      name: deck.name,
+      numberOfNewCards: 0,
+      numberOfCardsInProgress: 0,
+      numberOfCardsNeedToReview: 0,
+      languageWhatIKnow: deck.languageWhatIKnowId,
+      languageWhatILearn: deck.languageWhatILearnId,
+      numberOfCards: 0,
+    }));
+  }
+
   async get(userId: string, folderId: string): Promise<FolderResponseDto> {
     const folder = await this.checkIsExistFolder(userId, folderId);
 
@@ -63,7 +84,7 @@ export class FolderService {
       where: { userId, parentId: folder.id },
     });
 
-    const numberOfCards = await this.getNumberOfCards(userId, folderId);
+    const numberOfCards = await this.getNumberOfCardsInFolder(userId, folderId);
 
     // Calculate numberOfCards for each child folder
     const childFoldersWithCounts = await Promise.all(
@@ -72,7 +93,10 @@ export class FolderService {
         id: childFolder.id,
         createdAt: childFolder.createdAt.toISOString(),
         updatedAt: childFolder.updatedAt.toISOString(),
-        numberOfCards: await this.getNumberOfCards(userId, childFolder.id),
+        numberOfCards: await this.getNumberOfCardsInFolder(
+          userId,
+          childFolder.id,
+        ),
       })) ?? [],
     );
 
@@ -83,6 +107,7 @@ export class FolderService {
       updatedAt: folder.updatedAt.toISOString(),
       numberOfCards: numberOfCards,
       childFolders: childFoldersWithCounts,
+      childDecks: await this.getDecksInFolder(userId, folder.id),
     };
   }
 
