@@ -10,10 +10,27 @@ import { RenameDeckDto } from './dto/rename-deck.dto';
 import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
+import { GetDeckResponseDto } from './dto/get-deck-response.dto';
 
 @Injectable()
 export class DeckService {
   constructor(private readonly databaseService: DatabaseService) {}
+
+  async get(userId: string, deckId: string): Promise<GetDeckResponseDto> {
+    const findDeck = await this.checkIsExistDeck(userId, deckId);
+
+    const numberOfCards = await this.databaseService.card.count({
+      where: { deckId },
+    });
+
+    return {
+      id: findDeck.id,
+      name: findDeck.name,
+      languageWhatIKnow: findDeck.languageWhatIKnowId,
+      languageWhatILearn: findDeck.languageWhatILearnId,
+      numberOfCards: numberOfCards,
+    };
+  }
 
   private async checkIsExistFolder(userId: string, folderId: string) {
     const folder = await this.databaseService.folder.findFirst({
