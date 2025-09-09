@@ -12,7 +12,7 @@ export class AiService {
     fillCardDataDto: FillCardDataDto,
   ): Promise<FillCardDataResponseDto> {
     const deck = await this.databaseService.deck.findUnique({
-      where: { id: fillCardDataDto.deckId },
+      where: { userId, id: fillCardDataDto.deckId },
       include: {
         languageWhatIKnow: true,
         languageWhatILearn: true,
