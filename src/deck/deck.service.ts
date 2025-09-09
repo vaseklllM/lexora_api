@@ -61,11 +61,30 @@ export class DeckService {
       );
     }
 
+    const checkLanguageCode = async (languageCode: string) => {
+      const language = await this.databaseService.language.findFirst({
+        where: { code: languageCode },
+      });
+
+      if (!language) {
+        throw new NotFoundException(
+          `Language with code '${languageCode}' not found`,
+        );
+      }
+
+      return language;
+    };
+
+    await checkLanguageCode(createDeckDto.languageWhatIKnowId);
+    await checkLanguageCode(createDeckDto.languageWhatILearnId);
+
     const deck = await this.databaseService.deck.create({
       data: {
         name: createDeckDto.name,
         userId,
         folderId: createDeckDto.folderId,
+        languageWhatIKnowId: createDeckDto.languageWhatIKnowId,
+        languageWhatILearnId: createDeckDto.languageWhatILearnId,
       },
     });
 

@@ -23,14 +23,18 @@ model User {
   avatar    String?
   folders   Folder[]
   decks     Deck[]
+  cards     Card[]
 }
 
 model Language {
-  code       String  @id 
-  name       String
-  nativeName String
-  iconSymbol String
+  code               String  @id @default(uuid())   
+  name               String
+  nativeName         String
+  iconSymbol         String
+  decksWhatIKnow     Deck[] @relation("LanguageWhatIKnow")
+  decksWhatILearn    Deck[] @relation("LanguageWhatILearn")
 }
+
 
 model Folder {
   id        String   @id @default(uuid())
@@ -49,11 +53,33 @@ model Folder {
 
 
 model Deck {
+  id                    String   @id @default(uuid())
+  name                  String
+  createdAt             DateTime @default(now())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id])
+  folderId              String?
+  folder                Folder?   @relation(fields: [folderId], references: [id])
+  languageWhatIKnowId   String 
+  languageWhatIKnow     Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowId], references: [code])
+  languageWhatILearnId  String 
+  languageWhatILearn    Language @relation("LanguageWhatILearn",fields: [languageWhatILearnId], references: [code])
+  cards                 Card[]
+}
+
+model Card {
   id        String   @id @default(uuid())
-  name      String
+  textInKnownLanguage     String  
+  textInLearningLanguage  String  
+  exampleInKnownLanguage     String?  
+  exampleInLearningLanguage  String?  
+  descriptionInKnownLanguage     String?  
+  descriptionInLearningLanguage  String?  
+  masteryScore Int @default(0) 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deckId    String
+  deck      Deck     @relation(fields: [deckId], references: [id])
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  folderId  String?
-  folder    Folder?   @relation(fields: [folderId], references: [id])
 }

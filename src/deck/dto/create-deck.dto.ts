@@ -18,4 +18,20 @@ export class CreateDeckDto {
   @IsString()
   @IsOptional()
   folderId?: string;
+
+  @ApiProperty({
+    example: 'en',
+    description: 'Language what I know id',
+  })
+  @IsString()
+  @IsNotEmpty()
+  languageWhatIKnowId: string;
+
+  @ApiProperty({
+    example: 'uk',
+    description: 'Language what I learn id',
+  })
+  @IsString()
+  @IsNotEmpty()
+  languageWhatILearnId: string;
 }
