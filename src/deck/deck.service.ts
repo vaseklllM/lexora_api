@@ -11,6 +11,7 @@ import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
+import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 
 @Injectable()
 export class DeckService {
@@ -31,6 +32,18 @@ export class DeckService {
       where: { deckId, isNew: false },
     });
 
+    const numberOfCardsNeedToReview = await this.databaseService.card.count({
+      where: {
+        deckId,
+        isNew: false,
+        lastReviewedAt: {
+          lt: new Date(
+            Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES,
+          ),
+        },
+      },
+    });
+
     return {
       id: findDeck.id,
       name: findDeck.name,
@@ -39,6 +52,7 @@ export class DeckService {
       numberOfCards: numberOfCards,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
+      numberOfCardsNeedToReview: numberOfCardsNeedToReview,
     };
   }
 

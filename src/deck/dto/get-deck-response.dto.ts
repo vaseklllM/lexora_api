@@ -57,4 +57,12 @@ export class GetDeckResponseDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCardsInProgress: number;
+
+  @ApiProperty({
+    example: 5,
+    description: 'Number of cards need to review',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  numberOfCardsNeedToReview: number;
 }
