@@ -76,8 +76,8 @@
 # development
 $ npm install
 $ docker compose up -d
-$ npm prisma generate
-$ npm prisma migrate dev --name init
+$ npx prisma generate
+$ npx prisma migrate dev --name init
 $ npm run seed  # Заповнення початкових даних (мови)
 $ npm run dev
 ```
