@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDateString,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -70,4 +71,12 @@ export class CreateCardResponseDto {
   @IsDateString()
   @IsNotEmpty()
   createdAt: string;
+
+  @ApiProperty({
+    example: 0,
+    description: 'Card mastery score',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  masteryScore: number;
 }
