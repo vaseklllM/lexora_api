@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/common/decorators/auth';
 import { CreateCardResponseDto } from './dto/create-response.dto';
@@ -12,6 +20,7 @@ import { CardService } from './card.service';
 import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
+import { DeleteCardResponseDto } from './dto/delete-response.dto';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -61,5 +70,20 @@ export class CardController {
     @CurrentUser() user: ICurrentUser,
   ): Promise<UpdateCardResponseDto> {
     return this.cardService.update(user.id, updateCardDto);
+  }
+
+  @Delete(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Delete a card' })
+  @ApiOkResponse({
+    description: 'Returns the message about deleted card',
+    type: DeleteCardResponseDto,
+  })
+  @ValidateResponse(DeleteCardResponseDto)
+  delete(
+    @Param('id') cardId: string,
+    @CurrentUser() user: ICurrentUser,
+  ): Promise<DeleteCardResponseDto> {
+    return this.cardService.delete(user.id, cardId);
   }
 }

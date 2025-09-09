@@ -6,6 +6,7 @@ import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { Card } from '@prisma/client';
+import { DeleteCardResponseDto } from './dto/delete-response.dto';
 
 @Injectable()
 export class CardService {
@@ -95,5 +96,17 @@ export class CardService {
     });
 
     return this.convertCardToGetCardResponseDto(card);
+  }
+
+  async delete(userId: string, cardId: string): Promise<DeleteCardResponseDto> {
+    await this.checkIsExistCard(userId, cardId);
+
+    const deletedCard = await this.databaseService.card.delete({
+      where: { id: cardId },
+    });
+
+    return {
+      message: `Card '${deletedCard.textInLearningLanguage}' deleted successfully`,
+    };
   }
 }
