@@ -8,6 +8,7 @@ import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
 import { LanguagesModule } from './languages/languages.module';
 import { FolderModule } from './folder/folder.module';
 import { DeckModule } from './deck/deck.module';
+import { CardModule } from './card/card.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DeckModule } from './deck/deck.module';
     LanguagesModule,
     FolderModule,
     DeckModule,
+    CardModule,
   ],
   providers: [
     {
