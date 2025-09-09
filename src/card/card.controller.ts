@@ -24,8 +24,8 @@ import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
 import { StartLearningSessionDto } from './dto/start-learning-session.dto';
-import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
-import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
+import { StartReviewSessionDto } from './dto/start-review-session.dto';
+import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -51,20 +51,20 @@ export class CardController {
     );
   }
 
-  @Get('get-cards-for-review')
+  @Get('start-review-session')
   @Auth()
-  @ApiOperation({ summary: 'Get cards for review' })
+  @ApiOperation({ summary: 'Start review session with learned cards' })
   @ApiOkResponse({
-    description: 'Returns the cards for review',
-    type: GetCardsForReviewResponseDto,
+    description: 'Returns cards for review session',
+    type: StartReviewSessionResponseDto,
     isArray: true,
   })
-  @ValidateResponse(GetCardsForReviewResponseDto)
-  getCardsForReview(
+  @ValidateResponse(StartReviewSessionResponseDto)
+  startReviewSession(
     @CurrentUser() user: ICurrentUser,
-    @Query() getCardsForReviewDto: GetCardsForReviewDto,
-  ): Promise<GetCardsForReviewResponseDto> {
-    return this.cardService.getCardsForReview(user.id, getCardsForReviewDto);
+    @Query() startReviewSessionDto: StartReviewSessionDto,
+  ): Promise<StartReviewSessionResponseDto> {
+    return this.cardService.startReviewSession(user.id, startReviewSessionDto);
   }
 
   @Get(':id')

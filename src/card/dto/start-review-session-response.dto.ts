@@ -1,3 +1,3 @@
 import { StartLearningSessionResponseDto } from './start-learning-session-response.dto';
 
-export class GetCardsForReviewResponseDto extends StartLearningSessionResponseDto {}
+export class StartReviewSessionResponseDto extends StartLearningSessionResponseDto {}

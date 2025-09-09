@@ -9,8 +9,8 @@ import { Card } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { StartLearningSessionDto } from './dto/start-learning-session.dto';
 import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
-import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
-import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
+import { StartReviewSessionDto } from './dto/start-review-session.dto';
+import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
 
 @Injectable()
 export class CardService {
@@ -131,15 +131,15 @@ export class CardService {
     };
   }
 
-  async getCardsForReview(
+  async startReviewSession(
     userId: string,
-    getCardsForReviewDto: GetCardsForReviewDto,
-  ): Promise<GetCardsForReviewResponseDto> {
-    await this.checkIsExistDeck(userId, getCardsForReviewDto.deckId);
+    startReviewSessionDto: StartReviewSessionDto,
+  ): Promise<StartReviewSessionResponseDto> {
+    await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
 
     const cards = await this.databaseService.card.findMany({
-      where: { userId, deckId: getCardsForReviewDto.deckId, isNew: false },
-      take: getCardsForReviewDto.count ?? 5,
+      where: { userId, deckId: startReviewSessionDto.deckId, isNew: false },
+      take: startReviewSessionDto.count ?? 5,
     });
 
     return {
