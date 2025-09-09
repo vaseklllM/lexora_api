@@ -9,6 +9,7 @@ import { LanguagesModule } from './languages/languages.module';
 import { FolderModule } from './folder/folder.module';
 import { DeckModule } from './deck/deck.module';
 import { CardModule } from './card/card.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CardModule } from './card/card.module';
     FolderModule,
     DeckModule,
     CardModule,
+    DashboardModule,
   ],
   providers: [
     {

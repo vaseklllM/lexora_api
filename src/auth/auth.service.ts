@@ -18,6 +18,10 @@ import type { User } from '@prisma/client';
 import { ICurrentUser, JwtPayload } from './decorators/current-user.decorator';
 import { v4 as uuidv4 } from 'uuid';
 import { RedisService } from 'src/redis/redis.service';
+import {
+  JWT_REFRESH_TOKEN_LIFETIME_DAYS,
+  JWT_TOKEN_LIFETIME_MINUTES,
+} from 'src/common/config';
 
 @Injectable()
 export class AuthService {
@@ -33,10 +37,10 @@ export class AuthService {
     return {
       token: this.jwtService.sign(payload, {
         secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
-        expiresIn: '1h',
+        expiresIn: `${JWT_TOKEN_LIFETIME_MINUTES}m`,
       }),
       refreshToken: this.jwtService.sign(payload, {
-        expiresIn: '7d',
+        expiresIn: `${JWT_REFRESH_TOKEN_LIFETIME_DAYS}d`,
         secret: Buffer.from(process.env.JWT_REFRESH_SECRET as string, 'utf-8'),
       }),
       expiresIn: 3600,

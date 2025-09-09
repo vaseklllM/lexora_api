@@ -12,10 +12,14 @@ import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 import { FolderResponseDto } from './dto/folder-response.dto';
 import { DeckDto } from 'src/deck/dto/deck.dto';
+import { DeckService } from 'src/deck/deck.service';
 
 @Injectable()
 export class FolderService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly deckService: DeckService,
+  ) {}
 
   private async checkIsExistFolder(userId: string, folderId: string) {
     const folder = await this.databaseService.folder.findFirst({
@@ -101,17 +105,12 @@ export class FolderService {
     }));
   }
 
-  async get(userId: string, folderId: string): Promise<FolderResponseDto> {
-    const folder = await this.checkIsExistFolder(userId, folderId);
-
+  async getFolders(userId: string, parentId?: string) {
     const parentFolders = await this.databaseService.folder.findMany({
-      where: { userId, parentId: folder.id },
+      where: { userId, parentId: parentId ?? null },
     });
 
-    const numberOfCards = await this.getNumberOfCardsInFolder(userId, folderId);
-
-    // Calculate numberOfCards for each child folder
-    const childFoldersWithCounts = await Promise.all(
+    return await Promise.all(
       parentFolders?.map(async (childFolder) => ({
         name: childFolder.name,
         id: childFolder.id,
@@ -123,6 +122,12 @@ export class FolderService {
         ),
       })) ?? [],
     );
+  }
+
+  async get(userId: string, folderId: string): Promise<FolderResponseDto> {
+    const folder = await this.checkIsExistFolder(userId, folderId);
+
+    const numberOfCards = await this.getNumberOfCardsInFolder(userId, folderId);
 
     return {
       name: folder.name,
@@ -130,8 +135,8 @@ export class FolderService {
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
       numberOfCards: numberOfCards,
-      childFolders: childFoldersWithCounts,
-      childDecks: await this.getDecksInFolder(userId, folder.id),
+      childFolders: await this.getFolders(userId, folder.id),
+      childDecks: await this.deckService.getDecks(userId, folder.id),
     };
   }
 

@@ -40,7 +40,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Param('id') deckId: string,
   ): Promise<GetDeckResponseDto> {
-    return this.deskService.get(user.id, deckId);
+    return this.deskService.getDeck(user.id, deckId);
   }
 
   @Post('create')

@@ -13,12 +13,58 @@ import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
 import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 import { CardDto } from 'src/card/dto/card.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class DeckService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async get(userId: string, deckId: string): Promise<GetDeckResponseDto> {
+  async getDecks(userId: string, folderId?: string) {
+    const folderCondition = folderId
+      ? Prisma.sql`d."folderId" = ${folderId}`
+      : Prisma.sql`d."folderId" IS NULL`;
+
+    const result = await this.databaseService.$queryRaw<
+      Array<{
+        id: string;
+        name: string;
+        languageWhatIKnowId: string;
+        languageWhatILearnId: string;
+        totalCards: bigint;
+        newCards: bigint;
+        cardsInProgress: bigint;
+        cardsNeedReview: bigint;
+      }>
+    >`
+    SELECT 
+      d.id,
+      d.name,
+      d."languageWhatIKnowId",
+      d."languageWhatILearnId",
+      COALESCE(COUNT(c.id), 0) as "totalCards",
+      COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * 60 * 60 * 24)} THEN 1 END), 0) as "cardsNeedReview"
+    FROM "Deck" d
+    LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
+    WHERE d."userId" = ${userId} AND ${folderCondition}
+    GROUP BY d.id, d.name, d."languageWhatIKnowId", d."languageWhatILearnId"
+    ORDER BY d."createdAt" ASC
+  `;
+
+    return result.map((deck) => ({
+      id: deck.id,
+      name: deck.name,
+      numberOfNewCards: Number(deck.newCards),
+      numberOfCardsInProgress: Number(deck.cardsInProgress),
+      numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
+      languageWhatIKnow: deck.languageWhatIKnowId,
+      languageWhatILearn: deck.languageWhatILearnId,
+      numberOfCards: Number(deck.totalCards),
+    }));
+  }
+
+  async getDeck(userId: string, deckId: string): Promise<GetDeckResponseDto> {
     const findDeck = await this.checkIsExistDeck(userId, deckId);
 
     const numberOfCards = await this.databaseService.card.count({

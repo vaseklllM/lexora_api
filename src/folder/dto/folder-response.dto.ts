@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { DeckDto, DeckExample } from 'src/deck/dto/deck.dto';
 
-export const folderExample: Folder = {
+export const folderExample: FolderDto = {
   name: 'Folder name',
   id: '550e8400-e29b-41d4-a716-446655440000',
   createdAt: '2023-01-01T00:00:00Z',
@@ -17,7 +17,7 @@ export const folderExample: Folder = {
   numberOfCards: 10,
 };
 
-class Folder {
+export class FolderDto {
   @ApiProperty({
     example: 'Folder name',
     description: 'Folder name',
@@ -60,14 +60,14 @@ class Folder {
   numberOfCards: number;
 }
 
-export class FolderResponseDto extends Folder {
+export class FolderResponseDto extends FolderDto {
   @ApiProperty({
     example: [folderExample],
     description: 'Child folders',
   })
   @IsArray()
   @IsNotEmpty()
-  childFolders: Folder[];
+  childFolders: FolderDto[];
 
   @ApiProperty({
     example: [DeckExample],

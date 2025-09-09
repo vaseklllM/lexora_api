@@ -6,5 +6,6 @@ import { DatabaseModule } from 'src/database/database.module';
   imports: [DatabaseModule],
   controllers: [DeckController],
   providers: [DeckService],
+  exports: [DeckService],
 })
 export class DeckModule {}
