@@ -52,8 +52,10 @@
 
 ```bash
 # development
-$ npm run dev
+$ npm prisma generate
+$ npm prisma migrate dev --name init
 $ docker compose up -d
+$ npm run dev
 ```
 
 ## Доступні сервіси
