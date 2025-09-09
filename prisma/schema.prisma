@@ -83,4 +83,5 @@ model Card {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   isNew     Boolean @default(true)
+  lastReviewedAt DateTime @default(now())
 }

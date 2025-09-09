@@ -13,6 +13,7 @@ import { StartReviewSessionDto } from './dto/start-review-session.dto';
 import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
 import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
 import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
+import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 
 @Injectable()
 export class CardService {
@@ -158,8 +159,16 @@ export class CardService {
     await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
 
     const cards = await this.databaseService.card.findMany({
-      where: { userId, deckId: startReviewSessionDto.deckId, isNew: false },
-      take: startReviewSessionDto.count ?? 5,
+      where: {
+        userId,
+        deckId: startReviewSessionDto.deckId,
+        isNew: false,
+        lastReviewedAt: {
+          lt: new Date(
+            Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES,
+          ),
+        },
+      },
     });
 
     return {

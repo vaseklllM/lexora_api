@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class StartReviewSessionDto {
   @ApiProperty({
@@ -10,16 +9,4 @@ export class StartReviewSessionDto {
   @IsString()
   @IsNotEmpty()
   deckId: string;
-
-  @ApiProperty({
-    example: 5,
-    description: 'Number of cards for review session',
-    required: false,
-  })
-  @Transform(({ value }) =>
-    typeof value === 'string' ? parseInt(value) : undefined,
-  )
-  @IsNumber()
-  @IsOptional()
-  count?: number;
 }
