@@ -1,3 +1,3 @@
-import { GetCardsToLearnResponseDto } from './get-cards-to-learn-response.dto';
+import { StartLearningSessionResponseDto } from './start-learning-session-response.dto';
 
-export class GetCardsForReviewResponseDto extends GetCardsToLearnResponseDto {}
+export class GetCardsForReviewResponseDto extends StartLearningSessionResponseDto {}

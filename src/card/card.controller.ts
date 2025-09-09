@@ -22,8 +22,8 @@ import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
-import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
-import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
+import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
+import { StartLearningSessionDto } from './dto/start-learning-session.dto';
 import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
 import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
 
@@ -32,20 +32,23 @@ import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-respons
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
-  @Get('get-cards-to-learn')
+  @Get('start-learning-session')
   @Auth()
-  @ApiOperation({ summary: 'Get cards to learn' })
+  @ApiOperation({ summary: 'Start learning session with new cards' })
   @ApiOkResponse({
-    description: 'Returns the cards to learn',
-    type: GetCardsToLearnResponseDto,
+    description: 'Returns new cards to start learning',
+    type: StartLearningSessionResponseDto,
     isArray: true,
   })
-  @ValidateResponse(GetCardsToLearnResponseDto)
-  getCardsToLearn(
+  @ValidateResponse(StartLearningSessionResponseDto)
+  startLearningSession(
     @CurrentUser() user: ICurrentUser,
-    @Query() getCardsToLearnDto: GetCardsToLearnDto,
-  ): Promise<GetCardsToLearnResponseDto> {
-    return this.cardService.getCardsToLearn(user.id, getCardsToLearnDto);
+    @Query() startLearningSessionDto: StartLearningSessionDto,
+  ): Promise<StartLearningSessionResponseDto> {
+    return this.cardService.startLearningSession(
+      user.id,
+      startLearningSessionDto,
+    );
   }
 
   @Get('get-cards-for-review')
@@ -53,10 +56,10 @@ export class CardController {
   @ApiOperation({ summary: 'Get cards for review' })
   @ApiOkResponse({
     description: 'Returns the cards for review',
-    type: GetCardsToLearnResponseDto,
+    type: GetCardsForReviewResponseDto,
     isArray: true,
   })
-  @ValidateResponse(GetCardsToLearnResponseDto)
+  @ValidateResponse(GetCardsForReviewResponseDto)
   getCardsForReview(
     @CurrentUser() user: ICurrentUser,
     @Query() getCardsForReviewDto: GetCardsForReviewDto,

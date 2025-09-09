@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class GetCardsToLearnDto {
+export class StartLearningSessionDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     description: 'Deck id',
@@ -13,7 +13,7 @@ export class GetCardsToLearnDto {
 
   @ApiProperty({
     example: 5,
-    description: 'Cards to learn count',
+    description: 'Number of new cards to start learning',
     required: false,
   })
   @Transform(({ value }) =>

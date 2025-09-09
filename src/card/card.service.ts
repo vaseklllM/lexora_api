@@ -7,8 +7,8 @@ import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { Card } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
-import { GetCardsToLearnDto } from './dto/get-cards-to-learn.dto';
-import { GetCardsToLearnResponseDto } from './dto/get-cards-to-learn-response.dto';
+import { StartLearningSessionDto } from './dto/start-learning-session.dto';
+import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
 import { GetCardsForReviewDto } from './dto/get-cards-for-review.dto';
 import { GetCardsForReviewResponseDto } from './dto/get-cards-for-review-response.dto';
 
@@ -115,15 +115,15 @@ export class CardService {
     };
   }
 
-  async getCardsToLearn(
+  async startLearningSession(
     userId: string,
-    getCardsToLearnDto: GetCardsToLearnDto,
-  ): Promise<GetCardsToLearnResponseDto> {
-    await this.checkIsExistDeck(userId, getCardsToLearnDto.deckId);
+    startLearningSessionDto: StartLearningSessionDto,
+  ): Promise<StartLearningSessionResponseDto> {
+    await this.checkIsExistDeck(userId, startLearningSessionDto.deckId);
 
     const cards = await this.databaseService.card.findMany({
-      where: { userId, deckId: getCardsToLearnDto.deckId, isNew: true },
-      take: getCardsToLearnDto.count ?? 5,
+      where: { userId, deckId: startLearningSessionDto.deckId, isNew: true },
+      take: startLearningSessionDto.count ?? 5,
     });
 
     return {

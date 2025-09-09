@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty } from 'class-validator';
 import { GetCardResponseDto } from './get-card-response.dto';
 
-export class GetCardsToLearnResponseDto {
+export class StartLearningSessionResponseDto {
   @ApiProperty({
     example: [
       {
@@ -16,7 +16,7 @@ export class GetCardsToLearnResponseDto {
         isNew: true,
       },
     ],
-    description: 'Cards to learn',
+    description: 'New cards for learning session',
   })
   @IsArray()
   @IsNotEmpty()
