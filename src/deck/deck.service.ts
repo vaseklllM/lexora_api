@@ -12,6 +12,7 @@ import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
 import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
+import { CardDto } from 'src/card/dto/card.dto';
 
 @Injectable()
 export class DeckService {
@@ -44,6 +45,10 @@ export class DeckService {
       },
     });
 
+    const cards = await this.databaseService.card.findMany({
+      where: { deckId },
+    });
+
     return {
       id: findDeck.id,
       name: findDeck.name,
@@ -53,7 +58,23 @@ export class DeckService {
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
-      cards: [],
+      cards: cards.map(
+        (card): CardDto => ({
+          id: card.id,
+          textInKnownLanguage: card.textInKnownLanguage,
+          textInLearningLanguage: card.textInLearningLanguage,
+          exampleInKnownLanguage: card.exampleInKnownLanguage ?? undefined,
+          exampleInLearningLanguage:
+            card.exampleInLearningLanguage ?? undefined,
+          createdAt: card.createdAt.toISOString(),
+          masteryScore: card.masteryScore,
+          isNew: card.isNew,
+          descriptionInKnownLanguage:
+            card.descriptionInKnownLanguage ?? undefined,
+          descriptionInLearningLanguage:
+            card.descriptionInLearningLanguage ?? undefined,
+        }),
+      ),
     };
   }
 
