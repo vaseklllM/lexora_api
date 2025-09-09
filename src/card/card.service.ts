@@ -14,6 +14,9 @@ import { StartReviewSessionResponseDto } from './dto/start-review-session-respon
 import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
 import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
 import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
+import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
+import { FinishReviewCardDto } from './dto/finish-review-card.dto';
+import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 
 @Injectable()
 export class CardService {
@@ -173,6 +176,72 @@ export class CardService {
 
     return {
       cards: cards.map((card) => this.convertCardToGetCardResponseDto(card)),
+    };
+  }
+
+  async finishReviewCard(
+    userId: string,
+    finishReviewCardDto: FinishReviewCardDto,
+  ): Promise<FinishReviewCardResponseDto> {
+    const card = await this.checkIsExistCard(
+      userId,
+      finishReviewCardDto.cardId,
+    );
+
+    function getCorrectWeight() {
+      switch (finishReviewCardDto.typeOfStrategy) {
+        case LearningStrategyType.PAIR_IT:
+          return 1;
+
+        case LearningStrategyType.GUESS_IT:
+          return 2;
+
+        case LearningStrategyType.RECALL_IT:
+          return 3;
+
+        case LearningStrategyType.TYPE_IT:
+          return 4;
+
+        default: {
+          const _check: never = finishReviewCardDto.typeOfStrategy;
+          throw new Error(`Unhandled learning strategy type: ${_check}`);
+        }
+      }
+    }
+
+    function getIncorrectWeight() {
+      switch (finishReviewCardDto.typeOfStrategy) {
+        case LearningStrategyType.PAIR_IT:
+          return 4;
+
+        case LearningStrategyType.GUESS_IT:
+          return 3;
+
+        case LearningStrategyType.RECALL_IT:
+          return 2;
+
+        case LearningStrategyType.TYPE_IT:
+          return 1;
+
+        default: {
+          const _check: never = finishReviewCardDto.typeOfStrategy;
+          throw new Error(`Unhandled learning strategy type: ${_check}`);
+        }
+      }
+    }
+
+    await this.databaseService.card.update({
+      where: { id: finishReviewCardDto.cardId },
+      data: finishReviewCardDto.isCorrectAnswer
+        ? {
+            lastReviewedAt: new Date(),
+            masteryScore: card.masteryScore + getCorrectWeight(),
+          }
+        : { masteryScore: card.masteryScore - getIncorrectWeight() },
+    });
+
+    return {
+      message: 'Review card finished successfully',
     };
   }
 }

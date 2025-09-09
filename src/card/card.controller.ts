@@ -29,6 +29,9 @@ import { StartReviewSessionDto } from './dto/start-review-session.dto';
 import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
 import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
 import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
+import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
+import { FinishReviewCardDto } from './dto/finish-review-card.dto';
+import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 
 @ApiTags('Cards')
 @Controller('card')
@@ -86,6 +89,24 @@ export class CardController {
     @Query() startReviewSessionDto: StartReviewSessionDto,
   ): Promise<StartReviewSessionResponseDto> {
     return this.cardService.startReviewSession(user.id, startReviewSessionDto);
+  }
+
+  @Patch('finish-review-card')
+  @Auth()
+  @ApiOperation({
+    summary: 'Finish review card',
+    description: `List of learning strategy types: ${Object.values(LearningStrategyType).join(', ')}`,
+  })
+  @ApiOkResponse({
+    description: 'Returns the message about finished review card',
+    type: FinishReviewCardResponseDto,
+  })
+  @ValidateResponse(FinishReviewCardResponseDto)
+  finishReviewCard(
+    @CurrentUser() user: ICurrentUser,
+    @Body() finishReviewCardDto: FinishReviewCardDto,
+  ): Promise<FinishReviewCardResponseDto> {
+    return this.cardService.finishReviewCard(user.id, finishReviewCardDto);
   }
 
   @Get(':id')
