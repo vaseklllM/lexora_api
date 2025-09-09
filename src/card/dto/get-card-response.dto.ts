@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsNotEmpty,
   IsNumber,
@@ -79,4 +80,12 @@ export class GetCardResponseDto {
   @IsNumber()
   @IsNotEmpty()
   masteryScore: number;
+
+  @ApiProperty({
+    example: true,
+    description: 'Is new card',
+  })
+  @IsBoolean()
+  @IsNotEmpty()
+  isNew: boolean;
 }

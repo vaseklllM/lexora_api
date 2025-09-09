@@ -24,6 +24,7 @@ export class CardService {
         card.descriptionInLearningLanguage ?? undefined,
       createdAt: card.createdAt.toISOString(),
       masteryScore: card.masteryScore,
+      isNew: card.isNew,
     };
   }
 
