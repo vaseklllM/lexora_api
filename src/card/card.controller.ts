@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from 'src/common/decorators/auth';
 import { CreateCardResponseDto } from './dto/create-response.dto';
@@ -9,11 +9,27 @@ import {
   type ICurrentUser,
 } from 'src/auth/decorators/current-user.decorator';
 import { CardService } from './card.service';
+import { GetCardResponseDto } from './dto/get-card-response.dto';
 
 @ApiTags('Cards')
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
+
+  @Get(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Get a card' })
+  @ApiOkResponse({
+    description: 'Returns the card',
+    type: GetCardResponseDto,
+  })
+  @ValidateResponse(GetCardResponseDto)
+  get(
+    @Param('id') cardId: string,
+    @CurrentUser() user: ICurrentUser,
+  ): Promise<GetCardResponseDto> {
+    return this.cardService.get(user.id, cardId);
+  }
 
   @Post('create')
   @Auth()
