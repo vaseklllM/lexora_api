@@ -1,7 +1,7 @@
 {
-  "name": "scan_spend_api",
+  "name": "lexora-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "API for Lexora app - language learning with flashcards",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
