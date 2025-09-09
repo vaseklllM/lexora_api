@@ -40,7 +40,14 @@ export class AiService {
     }
 
     return {
-      name: `${deck.name} (${languageWhatIKnow.name} - ${languageWhatILearn.name})`,
+      textInKnownLanguage: `Книга - deck: '${deck.name}' (${languageWhatIKnow.name} - ${languageWhatILearn.name})`,
+      textInLearningLanguage: 'Book',
+      exampleInKnownLanguage: 'Я читаю книгу',
+      exampleInLearningLanguage: 'I read a book',
+      descriptionInKnownLanguage:
+        'Книга - це друкований або електронний твір, що містить текст, зображення або інші матеріали для читання та навчання',
+      descriptionInLearningLanguage:
+        'A book is a printed or electronic work containing text, images, or other materials for reading and learning',
     };
   }
 }
