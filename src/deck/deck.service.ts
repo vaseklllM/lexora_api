@@ -23,12 +23,22 @@ export class DeckService {
       where: { deckId },
     });
 
+    const numberOfNewCards = await this.databaseService.card.count({
+      where: { deckId, isNew: true },
+    });
+
+    const numberOfCardsInProgress = await this.databaseService.card.count({
+      where: { deckId, isNew: false },
+    });
+
     return {
       id: findDeck.id,
       name: findDeck.name,
       languageWhatIKnow: findDeck.languageWhatIKnowId,
       languageWhatILearn: findDeck.languageWhatILearnId,
       numberOfCards: numberOfCards,
+      numberOfNewCards: numberOfNewCards,
+      numberOfCardsInProgress: numberOfCardsInProgress,
     };
   }
 

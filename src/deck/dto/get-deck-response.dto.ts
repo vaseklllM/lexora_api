@@ -41,4 +41,20 @@ export class GetDeckResponseDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCards: number;
+
+  @ApiProperty({
+    example: 10,
+    description: 'Number of new cards',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  numberOfNewCards: number;
+
+  @ApiProperty({
+    example: 5,
+    description: 'Number of cards in progress',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  numberOfCardsInProgress: number;
 }
