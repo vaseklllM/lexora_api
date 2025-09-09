@@ -5,7 +5,7 @@ import { CreateCardDto } from './dto/create.dto';
 import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
-import { Card } from '@prisma/client';
+import { Card, Deck } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { StartLearningSessionDto } from './dto/start-learning-session.dto';
 import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
@@ -35,7 +35,29 @@ export class CardService {
       createdAt: card.createdAt.toISOString(),
       masteryScore: card.masteryScore,
       isNew: card.isNew,
+      nativeSoundUrl: card.nativeSoundUrl ?? undefined,
     };
+  }
+
+  private async getNativeSoundUrl(
+    languageCode: string,
+    word: string,
+  ): Promise<string | undefined> {
+    switch (languageCode) {
+      case 'en': {
+        const response = await fetch(
+          `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
+        );
+
+        if (!response.ok) {
+          return undefined;
+        }
+
+        console.log(response);
+
+        return 'https://api.dictionaryapi.dev/media/pronunciations/en/queue-au.mp3';
+      }
+    }
   }
 
   async get(userId: string, cardId: string): Promise<GetCardResponseDto> {
@@ -65,7 +87,10 @@ export class CardService {
     return card;
   }
 
-  private async checkIsExistDeck(userId: string, deckId: string) {
+  private async checkIsExistDeck(
+    userId: string,
+    deckId: string,
+  ): Promise<Deck> {
     const deck = await this.databaseService.deck.findFirst({
       where: { userId, id: deckId },
     });
@@ -73,18 +98,29 @@ export class CardService {
     if (!deck) {
       throw new NotFoundException('Deck not found');
     }
+
+    return deck;
   }
 
   async create(
     userId: string,
     createCardDto: CreateCardDto,
   ): Promise<CreateCardResponseDto> {
-    await this.checkIsExistDeck(userId, createCardDto.deckId);
+    const deck: Deck = await this.checkIsExistDeck(
+      userId,
+      createCardDto.deckId,
+    );
+
+    const nativeSoundUrl: string | undefined = await this.getNativeSoundUrl(
+      deck.languageWhatILearnCode,
+      createCardDto.textInLearningLanguage,
+    );
 
     const card = await this.databaseService.card.create({
       data: {
         userId,
         ...createCardDto,
+        nativeSoundUrl,
       },
     });
 

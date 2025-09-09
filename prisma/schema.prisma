@@ -60,10 +60,10 @@ model Deck {
   user                  User     @relation(fields: [userId], references: [id])
   folderId              String?
   folder                Folder?   @relation(fields: [folderId], references: [id])
-  languageWhatIKnowId   String 
-  languageWhatIKnow     Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowId], references: [code])
-  languageWhatILearnId  String 
-  languageWhatILearn    Language @relation("LanguageWhatILearn",fields: [languageWhatILearnId], references: [code])
+  languageWhatIKnowCode   String 
+  languageWhatIKnow     Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowCode], references: [code])
+  languageWhatILearnCode  String 
+  languageWhatILearn    Language @relation("LanguageWhatILearn",fields: [languageWhatILearnCode], references: [code])
   cards                 Card[]
 }
 
@@ -84,5 +84,5 @@ model Card {
   user                            User     @relation(fields: [userId], references: [id])
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
-  nativeSoundUrl                  String?
+  nativeSoundUrl                  String? 
 }

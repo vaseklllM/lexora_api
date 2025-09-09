@@ -98,8 +98,8 @@ export class DeckService {
     return {
       id: findDeck.id,
       name: findDeck.name,
-      languageWhatIKnow: findDeck.languageWhatIKnowId,
-      languageWhatILearn: findDeck.languageWhatILearnId,
+      languageWhatIKnow: findDeck.languageWhatIKnowCode,
+      languageWhatILearn: findDeck.languageWhatILearnCode,
       numberOfCards: numberOfCards,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
@@ -184,16 +184,16 @@ export class DeckService {
       return language;
     };
 
-    await checkLanguageCode(createDeckDto.languageWhatIKnowId);
-    await checkLanguageCode(createDeckDto.languageWhatILearnId);
+    await checkLanguageCode(createDeckDto.languageWhatIKnowCode);
+    await checkLanguageCode(createDeckDto.languageWhatILearnCode);
 
     const deck = await this.databaseService.deck.create({
       data: {
         name: createDeckDto.name,
         userId,
         folderId: createDeckDto.folderId,
-        languageWhatIKnowId: createDeckDto.languageWhatIKnowId,
-        languageWhatILearnId: createDeckDto.languageWhatILearnId,
+        languageWhatIKnowCode: createDeckDto.languageWhatIKnowCode,
+        languageWhatILearnCode: createDeckDto.languageWhatILearnCode,
       },
     });
 

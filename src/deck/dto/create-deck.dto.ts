@@ -25,7 +25,7 @@ export class CreateDeckDto {
   })
   @IsString()
   @IsNotEmpty()
-  languageWhatIKnowId: string;
+  languageWhatIKnowCode: string;
 
   @ApiProperty({
     example: 'uk',
@@ -33,5 +33,5 @@ export class CreateDeckDto {
   })
   @IsString()
   @IsNotEmpty()
-  languageWhatILearnId: string;
+  languageWhatILearnCode: string;
 }

@@ -99,4 +99,13 @@ export class CardDto {
   @IsBoolean()
   @IsNotEmpty()
   isNew: boolean;
+
+  @ApiProperty({
+    example:
+      'https://api.dictionaryapi.dev/media/pronunciations/en/queue-au.mp3',
+    description: 'Native sound url',
+  })
+  @IsString()
+  @IsOptional()
+  nativeSoundUrl?: string;
 }
