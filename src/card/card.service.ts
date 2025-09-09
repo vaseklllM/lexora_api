@@ -3,20 +3,15 @@ import { DatabaseService } from 'src/database/database.service';
 import { CreateCardResponseDto } from './dto/create-response.dto';
 import { CreateCardDto } from './dto/create.dto';
 import { GetCardResponseDto } from './dto/get-card-response.dto';
+import { UpdateCardResponseDto } from './dto/update-response.dto';
+import { UpdateCardDto } from './dto/update.dto';
+import { Card } from '@prisma/client';
 
 @Injectable()
 export class CardService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async get(userId: string, cardId: string): Promise<GetCardResponseDto> {
-    const card = await this.databaseService.card.findFirst({
-      where: { userId, id: cardId },
-    });
-
-    if (!card) {
-      throw new NotFoundException('Card not found');
-    }
-
+  private convertCardToGetCardResponseDto(card: Card): GetCardResponseDto {
     return {
       id: card.id,
       textInKnownLanguage: card.textInKnownLanguage,
@@ -29,6 +24,33 @@ export class CardService {
       createdAt: card.createdAt.toISOString(),
       masteryScore: card.masteryScore,
     };
+  }
+
+  async get(userId: string, cardId: string): Promise<GetCardResponseDto> {
+    const card = await this.databaseService.card.findFirst({
+      where: { userId, id: cardId },
+    });
+
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+
+    return this.convertCardToGetCardResponseDto(card);
+  }
+
+  private async checkIsExistCard(
+    userId: string,
+    cardId: string,
+  ): Promise<Card> {
+    const card = await this.databaseService.card.findFirst({
+      where: { userId, id: cardId },
+    });
+
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+
+    return card;
   }
 
   private async checkIsExistDeck(userId: string, deckId: string) {
@@ -54,17 +76,24 @@ export class CardService {
       },
     });
 
-    return {
-      id: card.id,
-      textInKnownLanguage: card.textInKnownLanguage,
-      textInLearningLanguage: card.textInLearningLanguage,
-      exampleInKnownLanguage: card.exampleInKnownLanguage ?? undefined,
-      exampleInLearningLanguage: card.exampleInLearningLanguage ?? undefined,
-      descriptionInKnownLanguage: card.descriptionInKnownLanguage ?? undefined,
-      descriptionInLearningLanguage:
-        card.descriptionInLearningLanguage ?? undefined,
-      createdAt: card.createdAt.toISOString(),
-      masteryScore: card.masteryScore,
-    };
+    return this.convertCardToGetCardResponseDto(card);
+  }
+
+  async update(
+    userId: string,
+    updateCardDto: UpdateCardDto,
+  ): Promise<UpdateCardResponseDto> {
+    const { cardId, ...updateCardData } = updateCardDto;
+
+    await this.checkIsExistCard(userId, cardId);
+
+    const card = await this.databaseService.card.update({
+      where: { id: cardId },
+      data: {
+        ...updateCardData,
+      },
+    });
+
+    return this.convertCardToGetCardResponseDto(card);
   }
 }
