@@ -35,14 +35,14 @@ export class CardService {
       createdAt: card.createdAt.toISOString(),
       masteryScore: card.masteryScore,
       isNew: card.isNew,
-      nativeSoundUrl: card.nativeSoundUrl ?? undefined,
+      nativeSoundUrls: card.nativeSoundUrls ?? [],
     };
   }
 
-  private async getNativeSoundUrl(
+  private async getNativeSoundUrls(
     languageCode: string,
     word: string,
-  ): Promise<string | undefined> {
+  ): Promise<string[]> {
     try {
       switch (languageCode) {
         case 'en': {
@@ -51,7 +51,7 @@ export class CardService {
           );
 
           if (!response.ok) {
-            return undefined;
+            return [];
           }
 
           const data: { phonetics?: { audio?: string }[] }[] =
@@ -61,14 +61,19 @@ export class CardService {
             .flatMap((item) =>
               item.phonetics?.map((phonetic) => phonetic.audio),
             )
-            .filter((audio) => audio) as string[];
+            .filter((audio) => audio && audio.startsWith('https'))
+            .filter(
+              (audio, index, array) => array.indexOf(audio) === index,
+            ) as string[];
 
-          return audios[0];
+          return audios;
         }
+        default:
+          return [];
       }
     } catch (_error) {
       console.error(_error);
-      return undefined;
+      return [];
     }
   }
 
@@ -120,7 +125,7 @@ export class CardService {
   ): Promise<CreateCardResponseDto> {
     const deck = await this.checkIsExistDeck(userId, createCardDto.deckId);
 
-    const nativeSoundUrl = await this.getNativeSoundUrl(
+    const nativeSoundUrls = await this.getNativeSoundUrls(
       deck.languageWhatILearnCode,
       createCardDto.textInLearningLanguage,
     );
@@ -129,7 +134,7 @@ export class CardService {
       data: {
         userId,
         ...createCardDto,
-        nativeSoundUrl,
+        nativeSoundUrls,
       },
     });
 
@@ -145,16 +150,18 @@ export class CardService {
     const card = await this.checkIsExistCard(userId, cardId);
     const deck = await this.checkIsExistDeck(userId, card.deckId);
 
-    const nativeSoundUrl = await this.getNativeSoundUrl(
-      deck.languageWhatILearnCode,
-      updateCardData.textInLearningLanguage,
-    );
+    const nativeSoundUrls = updateCardData.textInLearningLanguage
+      ? await this.getNativeSoundUrls(
+          deck.languageWhatILearnCode,
+          updateCardData.textInLearningLanguage,
+        )
+      : card.nativeSoundUrls;
 
     const newCard = await this.databaseService.card.update({
       where: { id: cardId },
       data: {
         ...updateCardData,
-        nativeSoundUrl,
+        nativeSoundUrls,
       },
     });
 

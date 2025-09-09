@@ -17,6 +17,10 @@ export const CardExample: CardDto = {
   createdAt: '2023-01-01T00:00:00Z',
   masteryScore: 0,
   isNew: true,
+  nativeSoundUrls: [
+    'https://api.dictionaryapi.dev/media/pronunciations/en/book-au.mp3',
+    'https://api.dictionaryapi.dev/media/pronunciations/en/book-us.mp3',
+  ],
 };
 
 export class CardDto {
@@ -101,11 +105,13 @@ export class CardDto {
   isNew: boolean;
 
   @ApiProperty({
-    example:
+    example: [
       'https://api.dictionaryapi.dev/media/pronunciations/en/queue-au.mp3',
-    description: 'Native sound url',
+      'https://api.dictionaryapi.dev/media/pronunciations/en/queue-us.mp3',
+    ],
+    description: 'Native sound urls',
   })
-  @IsString()
+  @IsString({ each: true })
   @IsOptional()
-  nativeSoundUrl?: string;
+  nativeSoundUrls?: string[];
 }

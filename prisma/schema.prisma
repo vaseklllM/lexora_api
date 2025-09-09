@@ -84,5 +84,5 @@ model Card {
   user                            User     @relation(fields: [userId], references: [id])
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
-  nativeSoundUrl                  String? 
+  nativeSoundUrls                 String[] 
 }
