@@ -185,6 +185,10 @@ export class DeckService {
   ): Promise<DeleteDeckResponseDto> {
     const findDeck = await this.checkIsExistDeck(userId, deleteDeckDto.deckId);
 
+    await this.databaseService.card.deleteMany({
+      where: { deckId: deleteDeckDto.deckId, userId },
+    });
+
     await this.databaseService.deck.delete({
       where: { id: deleteDeckDto.deckId, userId },
     });
