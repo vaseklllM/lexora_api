@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { CardDto, CardExample } from 'src/card/dto/card.dto';
 
 export class GetDeckResponseDto {
   @ApiProperty({
@@ -65,4 +66,12 @@ export class GetDeckResponseDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCardsNeedToReview: number;
+
+  @ApiProperty({
+    example: [CardExample],
+    description: 'Cards',
+  })
+  @IsArray()
+  @IsNotEmpty()
+  cards: CardDto[];
 }

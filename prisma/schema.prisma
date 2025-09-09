@@ -68,20 +68,20 @@ model Deck {
 }
 
 model Card {
-  id        String   @id @default(uuid())
-  textInKnownLanguage     String  
-  textInLearningLanguage  String  
-  exampleInKnownLanguage     String?  
-  exampleInLearningLanguage  String?  
-  descriptionInKnownLanguage     String?  
-  descriptionInLearningLanguage  String?  
-  masteryScore Int @default(0) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deckId    String
-  deck      Deck     @relation(fields: [deckId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  isNew     Boolean @default(true)
-  lastReviewedAt DateTime @default(now())
+  id                              String   @id @default(uuid())
+  textInKnownLanguage             String  
+  textInLearningLanguage          String  
+  exampleInKnownLanguage          String?  
+  exampleInLearningLanguage       String?  
+  descriptionInKnownLanguage      String?  
+  descriptionInLearningLanguage   String?  
+  masteryScore                    Int @default(0) 
+  createdAt                       DateTime @default(now())
+  updatedAt                       DateTime @updatedAt
+  deckId                          String
+  deck                            Deck     @relation(fields: [deckId], references: [id])
+  userId                          String
+  user                            User     @relation(fields: [userId], references: [id])
+  isNew                           Boolean @default(true)
+  lastReviewedAt                  DateTime @default(now())
 }

@@ -53,6 +53,7 @@ export class DeckService {
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
+      cards: [],
     };
   }
 
