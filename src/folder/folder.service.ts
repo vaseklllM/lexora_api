@@ -61,19 +61,43 @@ export class FolderService {
     userId: string,
     folderId: string,
   ): Promise<DeckDto[]> {
-    const decks = await this.databaseService.deck.findMany({
-      where: { userId, folderId },
-    });
+    const result = await this.databaseService.$queryRaw<
+      Array<{
+        id: string;
+        name: string;
+        languageWhatIKnowId: string;
+        languageWhatILearnId: string;
+        totalCards: bigint;
+        newCards: bigint;
+        cardsInProgress: bigint;
+        cardsNeedReview: bigint;
+      }>
+    >`
+      SELECT 
+        d.id,
+        d.name,
+        d."languageWhatIKnowId",
+        d."languageWhatILearnId",
+        COALESCE(COUNT(c.id), 0) as "totalCards",
+        COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
+        COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
+        COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * 60 * 60 * 24)} THEN 1 END), 0) as "cardsNeedReview"
+      FROM "Deck" d
+      LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
+      WHERE d."userId" = ${userId} AND d."folderId" = ${folderId}
+      GROUP BY d.id, d.name, d."languageWhatIKnowId", d."languageWhatILearnId"
+      ORDER BY d."createdAt" ASC
+    `;
 
-    return decks.map((deck) => ({
+    return result.map((deck) => ({
       id: deck.id,
       name: deck.name,
-      numberOfNewCards: 0,
-      numberOfCardsInProgress: 0,
-      numberOfCardsNeedToReview: 0,
+      numberOfNewCards: Number(deck.newCards),
+      numberOfCardsInProgress: Number(deck.cardsInProgress),
+      numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
       languageWhatIKnow: deck.languageWhatIKnowId,
       languageWhatILearn: deck.languageWhatILearnId,
-      numberOfCards: 0,
+      numberOfCards: Number(deck.totalCards),
     }));
   }
 
