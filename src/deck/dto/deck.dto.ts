@@ -6,10 +6,11 @@ export const DeckExample: DeckDto = {
   name: 'Deck name',
   languageWhatIKnow: 'uk',
   languageWhatILearn: 'en',
-  numberOfCards: 10,
+  numberOfCards: 32,
   numberOfNewCards: 10,
   numberOfCardsInProgress: 10,
   numberOfCardsNeedToReview: 10,
+  numberOfCardsLearned: 2,
 };
 
 export class DeckDto {
@@ -76,4 +77,12 @@ export class DeckDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCardsNeedToReview: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Number of cards learned',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  numberOfCardsLearned: number;
 }

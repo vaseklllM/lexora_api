@@ -14,12 +14,13 @@ import { GetDeckResponseDto } from './dto/get-deck-response.dto';
 import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 import { CardDto } from 'src/card/dto/card.dto';
 import { Prisma } from '@prisma/client';
+import { DeckDto } from './dto/deck.dto';
 
 @Injectable()
 export class DeckService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getDecks(userId: string, folderId?: string) {
+  async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
     const folderCondition = folderId
       ? Prisma.sql`d."folderId" = ${folderId}`
       : Prisma.sql`d."folderId" IS NULL`;
@@ -34,6 +35,7 @@ export class DeckService {
         newCards: bigint;
         cardsInProgress: bigint;
         cardsNeedReview: bigint;
+        cardsLearned: bigint;
       }>
     >`
     SELECT 
@@ -44,7 +46,8 @@ export class DeckService {
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
-      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * 60 * 60 * 24)} THEN 1 END), 0) as "cardsNeedReview"
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES)} THEN 1 END), 0) as "cardsNeedReview",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned"
     FROM "Deck" d
     LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
     WHERE d."userId" = ${userId} AND ${folderCondition}
@@ -52,16 +55,19 @@ export class DeckService {
     ORDER BY d."createdAt" ASC
   `;
 
-    return result.map((deck) => ({
-      id: deck.id,
-      name: deck.name,
-      numberOfNewCards: Number(deck.newCards),
-      numberOfCardsInProgress: Number(deck.cardsInProgress),
-      numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
-      languageWhatIKnow: deck.languageWhatIKnowId,
-      languageWhatILearn: deck.languageWhatILearnId,
-      numberOfCards: Number(deck.totalCards),
-    }));
+    return result.map(
+      (deck): DeckDto => ({
+        id: deck.id,
+        name: deck.name,
+        numberOfNewCards: Number(deck.newCards),
+        numberOfCardsInProgress: Number(deck.cardsInProgress),
+        numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
+        languageWhatIKnow: deck.languageWhatIKnowId,
+        languageWhatILearn: deck.languageWhatILearnId,
+        numberOfCards: Number(deck.totalCards),
+        numberOfCardsLearned: Number(deck.cardsLearned),
+      }),
+    );
   }
 
   async getDeck(userId: string, deckId: string): Promise<GetDeckResponseDto> {
@@ -72,11 +78,11 @@ export class DeckService {
     });
 
     const numberOfNewCards = await this.databaseService.card.count({
-      where: { deckId, isNew: true },
+      where: { deckId, isNew: true, masteryScore: 0 },
     });
 
     const numberOfCardsInProgress = await this.databaseService.card.count({
-      where: { deckId, isNew: false },
+      where: { deckId, isNew: false, masteryScore: { gte: 0, lt: 100 } },
     });
 
     const numberOfCardsNeedToReview = await this.databaseService.card.count({
@@ -95,6 +101,10 @@ export class DeckService {
       where: { deckId },
     });
 
+    const numberOfCardsLearned = await this.databaseService.card.count({
+      where: { deckId, isNew: false, masteryScore: 100 },
+    });
+
     return {
       id: findDeck.id,
       name: findDeck.name,
@@ -104,6 +114,7 @@ export class DeckService {
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
+      numberOfCardsLearned: numberOfCardsLearned,
       cards: cards.map(
         (card): CardDto => ({
           id: card.id,

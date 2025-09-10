@@ -1,5 +1,5 @@
 /**
- * The interval in minutes between review sessions
+ * The interval in minutes between review sessions in minutes
  */
 export const REVIEW_SESSION_INTERVAL_MINUTES = 60 * 24;
 
