@@ -29,8 +29,8 @@ export class DeckService {
       Array<{
         id: string;
         name: string;
-        languageWhatIKnowId: string;
-        languageWhatILearnId: string;
+        languageWhatIKnowCode: string;
+        languageWhatILearnCode: string;
         totalCards: bigint;
         newCards: bigint;
         cardsInProgress: bigint;
@@ -41,8 +41,8 @@ export class DeckService {
     SELECT 
       d.id,
       d.name,
-      d."languageWhatIKnowId",
-      d."languageWhatILearnId",
+      d."languageWhatIKnowCode",
+      d."languageWhatILearnCode",
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
@@ -51,7 +51,7 @@ export class DeckService {
     FROM "Deck" d
     LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
     WHERE d."userId" = ${userId} AND ${folderCondition}
-    GROUP BY d.id, d.name, d."languageWhatIKnowId", d."languageWhatILearnId"
+    GROUP BY d.id, d.name, d."languageWhatIKnowCode", d."languageWhatILearnCode"
     ORDER BY d."createdAt" ASC
   `;
 
@@ -62,8 +62,8 @@ export class DeckService {
         numberOfNewCards: Number(deck.newCards),
         numberOfCardsInProgress: Number(deck.cardsInProgress),
         numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
-        languageWhatIKnow: deck.languageWhatIKnowId,
-        languageWhatILearn: deck.languageWhatILearnId,
+        languageWhatIKnow: deck.languageWhatIKnowCode,
+        languageWhatILearn: deck.languageWhatILearnCode,
         numberOfCards: Number(deck.totalCards),
         numberOfCardsLearned: Number(deck.cardsLearned),
       }),
