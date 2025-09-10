@@ -302,9 +302,19 @@ export class CardService {
       data: finishReviewCardDto.isCorrectAnswer
         ? {
             lastReviewedAt: new Date(),
-            masteryScore: card.masteryScore + getCorrectWeight(),
+            masteryScore: ((): number | undefined => {
+              const newScore: number = card.masteryScore + getCorrectWeight();
+
+              return newScore > 100 ? 100 : newScore;
+            })(),
           }
-        : { masteryScore: card.masteryScore - getIncorrectWeight() },
+        : {
+            masteryScore: ((): number | undefined => {
+              const newScore: number = card.masteryScore - getIncorrectWeight();
+
+              return newScore < 0 ? 0 : newScore;
+            })(),
+          },
     });
 
     return {
