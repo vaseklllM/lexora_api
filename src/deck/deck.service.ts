@@ -30,7 +30,13 @@ export class DeckService {
         id: string;
         name: string;
         languageWhatIKnowCode: string;
+        languageWhatIKnowName: string;
+        languageWhatIKnowNativeName: string;
+        languageWhatIKnowIconSymbol: string;
         languageWhatILearnCode: string;
+        languageWhatILearnName: string;
+        languageWhatILearnNativeName: string;
+        languageWhatILearnIconSymbol: string;
         totalCards: bigint;
         newCards: bigint;
         cardsInProgress: bigint;
@@ -41,8 +47,14 @@ export class DeckService {
     SELECT 
       d.id,
       d.name,
-      d."languageWhatIKnowCode",
-      d."languageWhatILearnCode",
+      l_k."code" as "languageWhatIKnowCode",
+      l_k."name" as "languageWhatIKnowName",
+      l_k."nativeName" as "languageWhatIKnowNativeName",
+      l_k."iconSymbol" as "languageWhatIKnowIconSymbol",
+      l_l."code" as "languageWhatILearnCode",
+      l_l."name" as "languageWhatILearnName",
+      l_l."nativeName" as "languageWhatILearnNativeName",
+      l_l."iconSymbol" as "languageWhatILearnIconSymbol",
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
@@ -50,8 +62,13 @@ export class DeckService {
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned"
     FROM "Deck" d
     LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
+    LEFT JOIN "Language" l_k ON d."languageWhatIKnowCode" = l_k."code"
+    LEFT JOIN "Language" l_l ON d."languageWhatILearnCode" = l_l."code"
     WHERE d."userId" = ${userId} AND ${folderCondition}
-    GROUP BY d.id, d.name, d."languageWhatIKnowCode", d."languageWhatILearnCode"
+    GROUP BY 
+      d.id, d.name,
+      l_k."code", l_k."name", l_k."nativeName", l_k."iconSymbol",
+      l_l."code", l_l."name", l_l."nativeName", l_l."iconSymbol"
     ORDER BY d."createdAt" ASC
   `;
 
@@ -62,8 +79,18 @@ export class DeckService {
         numberOfNewCards: Number(deck.newCards),
         numberOfCardsInProgress: Number(deck.cardsInProgress),
         numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
-        languageWhatIKnow: deck.languageWhatIKnowCode,
-        languageWhatILearn: deck.languageWhatILearnCode,
+        languageWhatIKnow: {
+          code: deck.languageWhatIKnowCode,
+          name: deck.languageWhatIKnowName,
+          nativeName: deck.languageWhatIKnowNativeName,
+          iconSymbol: deck.languageWhatIKnowIconSymbol,
+        },
+        languageWhatILearn: {
+          code: deck.languageWhatILearnCode,
+          name: deck.languageWhatILearnName,
+          nativeName: deck.languageWhatILearnNativeName,
+          iconSymbol: deck.languageWhatILearnIconSymbol,
+        },
         numberOfCards: Number(deck.totalCards),
         numberOfCardsLearned: Number(deck.cardsLearned),
       }),
@@ -72,6 +99,19 @@ export class DeckService {
 
   async getDeck(userId: string, deckId: string): Promise<GetDeckResponseDto> {
     const findDeck = await this.checkIsExistDeck(userId, deckId);
+
+    const [languageWhatIKnow, languageWhatILearn] = await Promise.all([
+      this.databaseService.language.findFirst({
+        where: { code: findDeck.languageWhatIKnowCode },
+      }),
+      this.databaseService.language.findFirst({
+        where: { code: findDeck.languageWhatILearnCode },
+      }),
+    ]);
+
+    if (!languageWhatIKnow || !languageWhatILearn) {
+      throw new NotFoundException('Language not found');
+    }
 
     const numberOfCards = await this.databaseService.card.count({
       where: { deckId },
@@ -108,8 +148,18 @@ export class DeckService {
     return {
       id: findDeck.id,
       name: findDeck.name,
-      languageWhatIKnow: findDeck.languageWhatIKnowCode,
-      languageWhatILearn: findDeck.languageWhatILearnCode,
+      languageWhatIKnow: {
+        code: languageWhatIKnow.code,
+        name: languageWhatIKnow.name,
+        nativeName: languageWhatIKnow.nativeName,
+        iconSymbol: languageWhatIKnow.iconSymbol,
+      },
+      languageWhatILearn: {
+        code: languageWhatILearn.code,
+        name: languageWhatILearn.name,
+        nativeName: languageWhatILearn.nativeName,
+        iconSymbol: languageWhatILearn.iconSymbol,
+      },
       numberOfCards: numberOfCards,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,

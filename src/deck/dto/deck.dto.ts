@@ -1,11 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  LanguageDto,
+  languageEnExample,
+  languageUkExample,
+} from 'src/languages/dto/language.dto';
 
 export const DeckExample: DeckDto = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   name: 'Deck name',
-  languageWhatIKnow: 'uk',
-  languageWhatILearn: 'en',
+  languageWhatIKnow: languageUkExample,
+  languageWhatILearn: languageEnExample,
   numberOfCards: 32,
   numberOfNewCards: 10,
   numberOfCardsInProgress: 10,
@@ -36,7 +41,7 @@ export class DeckDto {
   })
   @IsString()
   @IsNotEmpty()
-  languageWhatIKnow: string;
+  languageWhatIKnow: LanguageDto;
 
   @ApiProperty({
     example: 'en',
@@ -44,7 +49,7 @@ export class DeckDto {
   })
   @IsString()
   @IsNotEmpty()
-  languageWhatILearn: string;
+  languageWhatILearn: LanguageDto;
 
   @ApiProperty({
     example: 10,
