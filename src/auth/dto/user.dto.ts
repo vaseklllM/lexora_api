@@ -9,6 +9,15 @@ import {
   IsOptional,
 } from 'class-validator';
 
+export const userExample: UserDto = {
+  id: '550e8400-e29b-41d4-a716-446655440000',
+  email: 'user@example.com',
+  name: 'John Doe',
+  avatar: 'https://example.com/avatar.jpg',
+  createdAt: '2023-01-01T00:00:00Z',
+  updatedAt: '2023-01-01T00:00:00Z',
+};
+
 export class UserDto {
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',

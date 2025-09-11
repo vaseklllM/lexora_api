@@ -22,6 +22,8 @@ import {
   JWT_REFRESH_TOKEN_LIFETIME_DAYS,
   JWT_TOKEN_LIFETIME_MINUTES,
 } from 'src/common/config';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -47,11 +49,21 @@ export class AuthService {
     };
   }
 
-  login(user: LocalUser): JwtTokenDto {
-    return this.generateTokens(user);
+  login(user: LocalUser): LoginResponseDto {
+    return {
+      ...this.generateTokens(user),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+        avatar: user.avatar ?? undefined,
+      },
+    };
   }
 
-  async register(registerDto: RegisterDto): Promise<JwtTokenDto> {
+  async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
     // Check if user with this email already exists
     const existingUser = await this.databaseService.user.findUnique({
       where: { email: registerDto.email },
@@ -73,7 +85,17 @@ export class AuthService {
       },
     });
 
-    return this.generateTokens(res);
+    return {
+      ...this.generateTokens(res),
+      user: {
+        id: res.id,
+        email: res.email,
+        name: res.name,
+        createdAt: res.createdAt.toISOString(),
+        updatedAt: res.updatedAt.toISOString(),
+        avatar: res.avatar ?? undefined,
+      },
+    };
   }
 
   async logout(currentUser: ICurrentUser): Promise<LogoutResponseDto> {
