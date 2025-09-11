@@ -9,6 +9,7 @@ import {
 import { MatchPasswords } from '../validators/match-passwords.validator';
 
 const passwordExample = 'Password123!';
+const MIN_PASSWORD_LENGTH = 8;
 
 export class RegisterDto {
   @ApiProperty({
@@ -35,11 +36,11 @@ export class RegisterDto {
   @ApiProperty({
     example: passwordExample,
     description: 'User password',
-    minLength: 8,
+    minLength: MIN_PASSWORD_LENGTH,
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(8)
+  @MinLength(MIN_PASSWORD_LENGTH)
   @Matches(/.*[A-Z].*/, {
     message: 'Password must contain at least one uppercase letter',
   })
@@ -54,11 +55,13 @@ export class RegisterDto {
   @ApiProperty({
     example: passwordExample,
     description: 'Confirm password - must match password',
-    minLength: 8,
+    minLength: MIN_PASSWORD_LENGTH,
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(8)
+  @MinLength(MIN_PASSWORD_LENGTH, {
+    message: `Password repeat must be at least ${MIN_PASSWORD_LENGTH} characters long`,
+  })
   @MatchPasswords('password', { message: 'Passwords do not match' })
   confirmPassword: string;
 }
