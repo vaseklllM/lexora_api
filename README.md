@@ -107,6 +107,7 @@ $ npm run seed
 
 - **API сервер**: http://localhost:4000/api
 - **API сервер JSON**: http://localhost:4000/api-json
+- **API сервер YAML**: http://localhost:4000/api-yaml
 - **PostgreSQL**: localhost:5433
 - **pgAdmin**: http://localhost:5050 (admin@lexora.com / admin123)
 - **Redis**: localhost:6379
