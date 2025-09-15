@@ -12,3 +12,8 @@ export const JWT_TOKEN_LIFETIME_MINUTES = 60 * 3;
  * The lifetime of the JWT refresh token in days
  */
 export const JWT_REFRESH_TOKEN_LIFETIME_DAYS = 7;
+
+/**
+ * The maximum length of a folder name
+ */
+export const MAX_FOLDER_NAME_LENGTH = 50;

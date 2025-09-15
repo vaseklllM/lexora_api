@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { MAX_FOLDER_NAME_LENGTH } from 'src/common/config';
 
 export class RenameFolderDto {
   @ApiProperty({
@@ -8,6 +9,7 @@ export class RenameFolderDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(MAX_FOLDER_NAME_LENGTH)
   newName: string;
 
   @ApiProperty({

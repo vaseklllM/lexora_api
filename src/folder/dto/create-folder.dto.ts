@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { MAX_FOLDER_NAME_LENGTH } from 'src/common/config';
 
 export class CreateFolderDto {
   @ApiProperty({
@@ -8,6 +9,7 @@ export class CreateFolderDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(MAX_FOLDER_NAME_LENGTH)
   name: string;
 
   @ApiProperty({
