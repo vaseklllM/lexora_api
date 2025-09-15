@@ -63,6 +63,7 @@ export class FolderService {
   async getFolders(userId: string, parentId?: string) {
     const parentFolders = await this.databaseService.folder.findMany({
       where: { userId, parentId: parentId ?? null },
+      orderBy: { updatedAt: 'asc' },
     });
 
     return await Promise.all(
