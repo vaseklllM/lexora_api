@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { MAX_DECK_NAME_LENGTH } from 'src/common/config';
 
 export class RenameDeckDto {
   @ApiProperty({
@@ -8,6 +9,7 @@ export class RenameDeckDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(MAX_DECK_NAME_LENGTH)
   name: string;
 
   @ApiProperty({
