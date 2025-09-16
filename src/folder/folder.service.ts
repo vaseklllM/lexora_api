@@ -156,7 +156,7 @@ export class FolderService {
       const parentFolder = await this.databaseService.folder.findFirst({
         where: {
           parentId: findFolder.parentId,
-          name: renameFolderDto.newName,
+          name: renameFolderDto.name,
         },
       });
 
@@ -169,7 +169,7 @@ export class FolderService {
       const sameNameFolder = await this.databaseService.folder.findFirst({
         where: {
           userId,
-          name: renameFolderDto.newName,
+          name: renameFolderDto.name,
         },
       });
 
@@ -182,7 +182,7 @@ export class FolderService {
 
     await this.databaseService.folder.update({
       where: { id: renameFolderDto.id, userId },
-      data: { name: renameFolderDto.newName, updatedAt: new Date() },
+      data: { name: renameFolderDto.name, updatedAt: new Date() },
     });
 
     return { message: 'Folder renamed successfully' };
