@@ -10,8 +10,12 @@ import { RenameFolderDto } from './dto/rename-folder.dto';
 import { RenameFolderResponseDto } from './dto/rename-folder-response.dto';
 import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
-import { FolderResponseDto } from './dto/folder-response.dto';
+import {
+  FolderBreadcrumbDto,
+  FolderResponseDto,
+} from './dto/folder-response.dto';
 import { DeckService } from 'src/deck/deck.service';
+import { Folder } from '@prisma/client';
 
 @Injectable()
 export class FolderService {
@@ -80,17 +84,55 @@ export class FolderService {
     );
   }
 
-  async get(userId: string, folderId: string): Promise<FolderResponseDto> {
-    const folder = await this.checkIsExistFolder(userId, folderId);
+  private async getFolderBreadcrumbs(
+    userId: string,
+    folder: Folder,
+  ): Promise<FolderBreadcrumbDto[]> {
+    if (!folder.parentId) return [];
 
-    const numberOfCards = await this.getNumberOfCardsInFolder(userId, folderId);
+    const parentFolder = await this.databaseService.folder.findFirst({
+      where: { userId, id: folder.parentId },
+    });
+
+    if (!parentFolder) {
+      throw new NotFoundException('Parent folder not found');
+    }
+
+    const parentFolders = [
+      {
+        name: parentFolder.name,
+        id: parentFolder.id,
+      },
+    ];
+
+    if (parentFolder.parentId) {
+      parentFolders.unshift(
+        ...(await this.getFolderBreadcrumbs(userId, parentFolder)),
+      );
+    }
+
+    return parentFolders;
+  }
+
+  async getFolder(
+    userId: string,
+    folderId: string,
+  ): Promise<FolderResponseDto> {
+    const folder = await this.databaseService.folder.findFirst({
+      where: { userId, id: folderId },
+    });
+
+    if (!folder) {
+      throw new NotFoundException('Folder not found');
+    }
 
     return {
       name: folder.name,
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
-      numberOfCards: numberOfCards,
+      numberOfCards: await this.getNumberOfCardsInFolder(userId, folderId),
+      breadcrumbs: await this.getFolderBreadcrumbs(userId, folder),
       childFolders: await this.getFolders(userId, folder.id),
       childDecks: await this.deckService.getDecks(userId, folder.id),
     };
