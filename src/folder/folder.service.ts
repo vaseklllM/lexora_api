@@ -12,6 +12,7 @@ import { DeleteFolderDto } from './dto/delete-folder.dto';
 import { DeleteFolderResponseDto } from './dto/delete-folder-response.dto';
 import {
   FolderBreadcrumbDto,
+  FolderDto,
   FolderResponseDto,
 } from './dto/folder-response.dto';
 import { DeckService } from 'src/deck/deck.service';
@@ -71,16 +72,19 @@ export class FolderService {
     });
 
     return await Promise.all(
-      parentFolders?.map(async (childFolder) => ({
-        name: childFolder.name,
-        id: childFolder.id,
-        createdAt: childFolder.createdAt.toISOString(),
-        updatedAt: childFolder.updatedAt.toISOString(),
-        numberOfCards: await this.getNumberOfCardsInFolder(
-          userId,
-          childFolder.id,
-        ),
-      })) ?? [],
+      parentFolders?.map(
+        async (childFolder): Promise<FolderDto> => ({
+          id: childFolder.id,
+          name: childFolder.name,
+          createdAt: childFolder.createdAt.toISOString(),
+          updatedAt: childFolder.updatedAt.toISOString(),
+          numberOfCards: await this.getNumberOfCardsInFolder(
+            userId,
+            childFolder.id,
+          ),
+          parentFolderId: childFolder.parentId ?? undefined,
+        }),
+      ) ?? [],
     );
   }
 
@@ -131,6 +135,7 @@ export class FolderService {
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
+      parentFolderId: folder.parentId ?? undefined,
       numberOfCards: await this.getNumberOfCardsInFolder(userId, folderId),
       breadcrumbs: await this.getFolderBreadcrumbs(userId, folder),
       childFolders: await this.getFolders(userId, folder.id),

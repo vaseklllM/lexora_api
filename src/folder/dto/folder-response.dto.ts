@@ -15,17 +15,10 @@ export const folderExample: FolderDto = {
   createdAt: '2023-01-01T00:00:00Z',
   updatedAt: '2023-01-01T00:00:00Z',
   numberOfCards: 10,
+  parentFolderId: '550e8400-e29b-41d4-a716-446655440001',
 };
 
 export class FolderDto {
-  @ApiProperty({
-    example: 'Folder name',
-    description: 'Folder name',
-  })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     description: 'Folder id',
@@ -33,6 +26,14 @@ export class FolderDto {
   @IsString()
   @IsNotEmpty()
   id: string;
+
+  @ApiProperty({
+    example: 'Folder name',
+    description: 'Folder name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
   @ApiProperty({
     example: '2023-01-01T00:00:00Z',
@@ -58,6 +59,14 @@ export class FolderDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCards: number;
+
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440001',
+    description: 'Parent folder id',
+  })
+  @IsString()
+  @IsOptional()
+  parentFolderId?: string;
 }
 
 export class FolderBreadcrumbDto {
