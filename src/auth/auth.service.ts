@@ -24,6 +24,8 @@ import {
 } from 'src/common/config';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
+import { GoogleLoginDto } from './dto/google-login.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +52,75 @@ export class AuthService {
   }
 
   login(user: LocalUser): LoginResponseDto {
+    return {
+      ...this.generateTokens(user),
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+        avatar: user.avatar ?? undefined,
+      },
+    };
+  }
+
+  async googleLogin(googleLoginDto: GoogleLoginDto): Promise<LoginResponseDto> {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: googleLoginDto.idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload?.email) {
+      throw new UnauthorizedException('Google account email not available');
+    }
+
+    if (payload.email_verified === false) {
+      throw new UnauthorizedException('Google email is not verified');
+    }
+
+    if (
+      googleLoginDto.email &&
+      googleLoginDto.email.toLowerCase() !== payload.email.toLowerCase()
+    ) {
+      throw new UnauthorizedException('Email mismatch for Google login');
+    }
+
+    const user = await this.databaseService.user.findUnique({
+      where: { email: payload.email },
+    });
+
+    if (!user) {
+      // console.log('user -----> ', payload);
+      throw new NotFoundException('User not found');
+      // const newUser = await this.databaseService.user.create({
+      //   data: {
+      //     email: payload.email,
+      //     name: payload.name!,
+      //     avatar: payload.picture,
+      //     password: '',
+      //   },
+      // });
+
+      // const tempPayload = {
+      //   iss: 'https://accounts.google.com',
+      //   azp: '579734315372-5rd7agav232jontelpcepus4upddq3ru.apps.googleusercontent.com',
+      //   aud: '579734315372-5rd7agav232jontelpcepus4upddq3ru.apps.googleusercontent.com',
+      //   sub: '105365469645527716719',
+      //   email: 'vasia.motnin@gmail.com',
+      //   email_verified: true,
+      //   at_hash: 'lKYp926NxxJRgJKi4EY0SA',
+      //   name: 'Vasyl Motnin',
+      //   picture: 'https://lh3.googleusercontent.com/a/ACg8ocIc0Iyw_6gLKgT976UbU41oyfo_oPC36n_IBgiBw85_PQ4Qg0mDHg=s96-c',
+      //   given_name: 'Vasyl',
+      //   family_name: 'Motnin',
+      //   iat: 1758375019,
+      //   exp: 1758378619
+      // }
+    }
+
     return {
       ...this.generateTokens(user),
       user: {

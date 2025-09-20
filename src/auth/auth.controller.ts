@@ -24,6 +24,8 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { LocalUser } from './strategies/local.strategy';
 import { Throttle } from '@nestjs/throttler';
 import { Auth } from 'src/common/decorators/auth';
+import { GoogleLoginDto } from './dto/google-login.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -79,6 +81,19 @@ export class AuthController {
   @ValidateResponse(RefreshResponseDto)
   refresh(@Body() refreshDto: RefreshDto): Promise<RefreshResponseDto> {
     return this.authService.refresh(refreshDto);
+  }
+
+  @Post('google')
+  @ApiOperation({ summary: 'Google login' })
+  @ApiOkResponse({
+    description: 'Google login',
+    type: LoginResponseDto,
+  })
+  @ValidateResponse(LoginResponseDto)
+  googleLogin(
+    @Body() googleLoginDto: GoogleLoginDto,
+  ): Promise<LoginResponseDto> {
+    return this.authService.googleLogin(googleLoginDto);
   }
 
   @Get('me')

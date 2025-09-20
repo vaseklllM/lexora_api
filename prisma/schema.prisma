@@ -42,11 +42,11 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // Self-reference for hierarchical structure
   parentId  String?  
-  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Folder[] @relation("FolderHierarchy")
   decks     Deck[]
 }
@@ -57,9 +57,9 @@ model Deck {
   name                    String
   createdAt               DateTime @default(now())
   userId                  String
-  user                    User     @relation(fields: [userId], references: [id])
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   folderId                String?
-  folder                  Folder?   @relation(fields: [folderId], references: [id])
+  folder                  Folder?   @relation(fields: [folderId], references: [id], onDelete: Cascade)
   languageWhatIKnowCode   String 
   languageWhatIKnow       Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowCode], references: [code])
   languageWhatILearnCode  String 
@@ -79,9 +79,9 @@ model Card {
   createdAt                       DateTime @default(now())
   updatedAt                       DateTime @updatedAt
   deckId                          String
-  deck                            Deck     @relation(fields: [deckId], references: [id])
+  deck                            Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
   userId                          String
-  user                            User     @relation(fields: [userId], references: [id])
+  user                            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
   nativeSoundUrls                 String[] 
