@@ -33,11 +33,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = user;
-
     return {
-      ...userWithoutPassword,
+      ...user,
       jwt: {
         id: payload.jwtId,
         iat: payload.iat,

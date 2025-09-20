@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
-import { User } from '@prisma/client';
+import { AccountProvider, AccountType, User } from '@prisma/client';
 
 export type LocalUser = Omit<User, 'password'>;
 
@@ -28,17 +28,31 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       return null;
     }
 
-    const isPasswordValid = await argon2.verify(user.password, password, {
-      secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
+    const account = await this.databaseService.account.findFirst({
+      where: {
+        userId: user.id,
+        provider: AccountProvider.credentials,
+        type: AccountType.credentials,
+      },
     });
+
+    if (!account || !account.passwordHash) {
+      return null;
+    }
+
+    const isPasswordValid = await argon2.verify(
+      account.passwordHash,
+      password,
+      {
+        secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
+      },
+    );
 
     if (!isPasswordValid) {
       return null;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...result } = user;
-    return result;
+    return user;
   }
 
   async validate(email: string, password: string): Promise<LocalUser> {

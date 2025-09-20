@@ -14,7 +14,7 @@ import { LogoutResponseDto } from './dto/logout-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
 import { LocalUser } from './strategies/local.strategy';
-import type { User } from '@prisma/client';
+import { AccountProvider, AccountType, type User } from '@prisma/client';
 import { ICurrentUser, JwtPayload } from './decorators/current-user.decorator';
 import { v4 as uuidv4 } from 'uuid';
 import { RedisService } from 'src/redis/redis.service';
@@ -148,23 +148,40 @@ export class AuthService {
       secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
     });
 
-    const res = await this.databaseService.user.create({
+    const userCreated = await this.databaseService.user.create({
       data: {
         email: registerDto.email,
-        password: hash,
         name: registerDto.name,
       },
     });
 
+    const accountCreated = await this.databaseService.account.create({
+      data: {
+        userId: userCreated.id,
+        provider: AccountProvider.credentials,
+        type: AccountType.credentials,
+        passwordHash: hash,
+      },
+    });
+
+    await this.databaseService.user.update({
+      where: { id: userCreated.id },
+      data: {
+        accounts: {
+          connect: { id: accountCreated.id },
+        },
+      },
+    });
+
     return {
-      ...this.generateTokens(res),
+      ...this.generateTokens(userCreated),
       user: {
-        id: res.id,
-        email: res.email,
-        name: res.name,
-        createdAt: res.createdAt.toISOString(),
-        updatedAt: res.updatedAt.toISOString(),
-        avatar: res.avatar ?? undefined,
+        id: userCreated.id,
+        email: userCreated.email,
+        name: userCreated.name,
+        createdAt: userCreated.createdAt.toISOString(),
+        updatedAt: userCreated.updatedAt.toISOString(),
+        avatar: userCreated.avatar ?? undefined,
       },
     };
   }

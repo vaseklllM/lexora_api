@@ -16,14 +16,38 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   name      String
   avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accounts  Account[]
   folders   Folder[]
   decks     Deck[]
   cards     Card[]
+}
+
+enum AccountProvider {
+  google
+  credentials
+}
+
+enum AccountType {
+  oauth
+  credentials
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  AccountProvider
+  providerAccountId String?
+  type      AccountType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  passwordHash String?
+
+  @@unique([provider, providerAccountId])
 }
 
 model Language {
