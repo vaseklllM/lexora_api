@@ -247,36 +247,10 @@ export class FolderService {
       throw new NotFoundException('Folder not found');
     }
 
-    // Recursively delete folder and all its content
-    await this.deleteFolderRecursively(deleteFolderDto.id);
+    await this.databaseService.folder.delete({
+      where: { id: deleteFolderDto.id },
+    });
 
     return { message: 'Folder deleted successfully' };
-  }
-
-  private async deleteFolderRecursively(folderId: string): Promise<void> {
-    // 1. Find all child folders
-    const childFolders = await this.databaseService.folder.findMany({
-      where: { parentId: folderId },
-    });
-
-    // 2. Recursively delete all child folders
-    for (const childFolder of childFolders) {
-      await this.deleteFolderRecursively(childFolder.id);
-    }
-
-    // 3. Delete all cards from decks in this folder
-    await this.databaseService.card.deleteMany({
-      where: { deck: { folderId } },
-    });
-
-    // 4. Delete all decks in this folder
-    await this.databaseService.deck.deleteMany({
-      where: { folderId },
-    });
-
-    // 5. Delete the folder itself
-    await this.databaseService.folder.delete({
-      where: { id: folderId },
-    });
   }
 }
