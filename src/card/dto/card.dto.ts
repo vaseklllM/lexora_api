@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export const CardExample: CardDto = {
@@ -30,6 +31,7 @@ export class CardDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   id: string;
 
   @ApiProperty({

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateFolderResponseDto {
   @ApiProperty({
@@ -16,5 +16,6 @@ export class CreateFolderResponseDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   id: string;
 }

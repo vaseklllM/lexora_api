@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class StartLearningSessionDto {
@@ -9,6 +15,7 @@ export class StartLearningSessionDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   deckId: string;
 
   @ApiProperty({

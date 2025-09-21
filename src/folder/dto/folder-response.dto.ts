@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { DeckDto, DeckExample } from 'src/deck/dto/deck.dto';
@@ -27,6 +28,7 @@ export class FolderDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   id: string;
 
   @ApiProperty({
@@ -86,6 +88,7 @@ export class FolderBreadcrumbDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   id: string;
 }
 

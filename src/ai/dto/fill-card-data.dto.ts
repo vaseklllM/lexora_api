@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class FillCardDataDto {
   @ApiProperty({
@@ -8,6 +8,7 @@ export class FillCardDataDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   deckId: string;
 
   @ApiProperty({
