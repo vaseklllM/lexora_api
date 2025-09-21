@@ -6,8 +6,10 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { DeckDto, DeckExample } from 'src/deck/dto/deck.dto';
+import { Type } from 'class-transformer';
 
 export const folderExample: FolderDto = {
   name: 'Folder name',
@@ -89,26 +91,35 @@ export class FolderBreadcrumbDto {
 
 export class FolderResponseDto extends FolderDto {
   @ApiProperty({
+    type: [FolderDto],
     example: [folderExample],
     description: 'Child folders',
   })
   @IsArray()
   @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => FolderDto)
   childFolders: FolderDto[];
 
   @ApiProperty({
+    type: [DeckDto],
     example: [DeckExample],
     description: 'Child decks',
   })
   @IsArray()
   @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => DeckDto)
   childDecks: DeckDto[];
 
   @ApiProperty({
+    type: [FolderBreadcrumbDto],
     example: [folderExample],
     description: 'Parent folder',
   })
   @IsArray()
   @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => FolderBreadcrumbDto)
   breadcrumbs: FolderBreadcrumbDto[];
 }

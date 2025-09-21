@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 import {
   LanguageDto,
   languageEnExample,
@@ -26,6 +26,7 @@ export class DeckDto {
   })
   @IsString()
   @IsNotEmpty()
+  @IsUUID('4')
   id: string;
 
   @ApiProperty({
@@ -37,7 +38,7 @@ export class DeckDto {
   name: string;
 
   @ApiProperty({
-    example: 'uk',
+    example: languageUkExample,
     description: 'Language what I know',
   })
   @Type(() => LanguageDto)
@@ -45,7 +46,7 @@ export class DeckDto {
   languageWhatIKnow: LanguageDto;
 
   @ApiProperty({
-    example: 'en',
+    example: languageEnExample,
     description: 'Language what I learn',
   })
   @Type(() => LanguageDto)
