@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,26 +18,14 @@ import {
   FolderResponseDto,
 } from './dto/folder-response.dto';
 import { DeckService } from 'src/deck/deck.service';
-import { Folder } from '@prisma/client';
 
 @Injectable()
 export class FolderService {
   constructor(
     private readonly databaseService: DatabaseService,
+    @Inject(forwardRef(() => DeckService))
     private readonly deckService: DeckService,
   ) {}
-
-  private async checkIsExistFolder(userId: string, folderId: string) {
-    const folder = await this.databaseService.folder.findFirst({
-      where: { userId, id: folderId },
-    });
-
-    if (!folder) {
-      throw new NotFoundException('Folder not found');
-    }
-
-    return folder;
-  }
 
   private async getNumberOfCardsInFolder(
     userId: string,
@@ -88,14 +78,14 @@ export class FolderService {
     );
   }
 
-  private async getFolderBreadcrumbs(
+  public async getFolderBreadcrumbs(
     userId: string,
-    folder: Folder,
+    folderParentId?: string | null,
   ): Promise<FolderBreadcrumbDto[]> {
-    if (!folder.parentId) return [];
+    if (!folderParentId) return [];
 
     const parentFolder = await this.databaseService.folder.findFirst({
-      where: { userId, id: folder.parentId },
+      where: { userId, id: folderParentId },
     });
 
     if (!parentFolder) {
@@ -111,7 +101,7 @@ export class FolderService {
 
     if (parentFolder.parentId) {
       parentFolders.unshift(
-        ...(await this.getFolderBreadcrumbs(userId, parentFolder)),
+        ...(await this.getFolderBreadcrumbs(userId, parentFolder.parentId)),
       );
     }
 
@@ -137,7 +127,7 @@ export class FolderService {
       updatedAt: folder.updatedAt.toISOString(),
       parentFolderId: folder.parentId ?? undefined,
       numberOfCards: await this.getNumberOfCardsInFolder(userId, folderId),
-      breadcrumbs: await this.getFolderBreadcrumbs(userId, folder),
+      breadcrumbs: await this.getFolderBreadcrumbs(userId, folder.parentId),
       childFolders: await this.getFolders(userId, folder.id),
       childDecks: await this.deckService.getDecks(userId, folder.id),
     };

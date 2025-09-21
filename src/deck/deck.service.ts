@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,10 +17,15 @@ import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 import { CardDto } from 'src/card/dto/card.dto';
 import { Prisma } from '@prisma/client';
 import { DeckDto } from './dto/deck.dto';
+import { FolderService } from 'src/folder/folder.service';
 
 @Injectable()
 export class DeckService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    @Inject(forwardRef(() => FolderService))
+    private readonly folderService: FolderService,
+  ) {}
 
   async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
     const folderCondition = folderId
@@ -149,6 +156,10 @@ export class DeckService {
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
       numberOfCardsLearned: numberOfCardsLearned,
+      foldersBreadcrumbs: await this.folderService.getFolderBreadcrumbs(
+        userId,
+        deck.folderId,
+      ),
       cards: deck.cards.map(
         (card): CardDto => ({
           id: card.id,
