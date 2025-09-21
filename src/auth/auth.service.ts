@@ -90,35 +90,49 @@ export class AuthService {
 
     const user = await this.databaseService.user.findUnique({
       where: { email: payload.email },
+      include: {
+        accounts: true,
+      },
     });
 
     if (!user) {
-      // console.log('user -----> ', payload);
-      throw new NotFoundException('User not found');
-      // const newUser = await this.databaseService.user.create({
-      //   data: {
-      //     email: payload.email,
-      //     name: payload.name!,
-      //     avatar: payload.picture,
-      //     password: '',
-      //   },
-      // });
+      const newUser = await this.databaseService.user.create({
+        data: {
+          email: payload.email,
+          name: payload.name!,
+          avatar: payload.picture,
+          accounts: {
+            create: {
+              provider: AccountProvider.google,
+              type: AccountType.oauth,
+              providerAccountId: googleLoginDto.accountId,
+            },
+          },
+        },
+      });
 
-      // const tempPayload = {
-      //   iss: 'https://accounts.google.com',
-      //   azp: '579734315372-5rd7agav232jontelpcepus4upddq3ru.apps.googleusercontent.com',
-      //   aud: '579734315372-5rd7agav232jontelpcepus4upddq3ru.apps.googleusercontent.com',
-      //   sub: '105365469645527716719',
-      //   email: 'vasia.motnin@gmail.com',
-      //   email_verified: true,
-      //   at_hash: 'lKYp926NxxJRgJKi4EY0SA',
-      //   name: 'Vasyl Motnin',
-      //   picture: 'https://lh3.googleusercontent.com/a/ACg8ocIc0Iyw_6gLKgT976UbU41oyfo_oPC36n_IBgiBw85_PQ4Qg0mDHg=s96-c',
-      //   given_name: 'Vasyl',
-      //   family_name: 'Motnin',
-      //   iat: 1758375019,
-      //   exp: 1758378619
-      // }
+      return {
+        ...this.generateTokens(newUser),
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          createdAt: newUser.createdAt.toISOString(),
+          updatedAt: newUser.updatedAt.toISOString(),
+          avatar: newUser.avatar ?? undefined,
+        },
+      };
+    }
+
+    if (!user.accounts.some((i) => i.provider === AccountProvider.google)) {
+      await this.databaseService.account.create({
+        data: {
+          type: AccountType.oauth,
+          provider: AccountProvider.google,
+          providerAccountId: googleLoginDto.accountId,
+          userId: user.id,
+        },
+      });
     }
 
     return {
@@ -152,23 +166,12 @@ export class AuthService {
       data: {
         email: registerDto.email,
         name: registerDto.name,
-      },
-    });
-
-    const accountCreated = await this.databaseService.account.create({
-      data: {
-        userId: userCreated.id,
-        provider: AccountProvider.credentials,
-        type: AccountType.credentials,
-        passwordHash: hash,
-      },
-    });
-
-    await this.databaseService.user.update({
-      where: { id: userCreated.id },
-      data: {
         accounts: {
-          connect: { id: accountCreated.id },
+          create: {
+            provider: AccountProvider.credentials,
+            type: AccountType.credentials,
+            passwordHash: hash,
+          },
         },
       },
     });
