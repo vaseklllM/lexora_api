@@ -98,19 +98,17 @@ export class DeckService {
   }
 
   async getDeck(userId: string, deckId: string): Promise<GetDeckResponseDto> {
-    const findDeck = await this.checkIsExistDeck(userId, deckId);
+    const deck = await this.databaseService.deck.findFirst({
+      where: { id: deckId, userId },
+      include: {
+        languageWhatIKnow: true,
+        languageWhatILearn: true,
+        cards: true,
+      },
+    });
 
-    const [languageWhatIKnow, languageWhatILearn] = await Promise.all([
-      this.databaseService.language.findFirst({
-        where: { code: findDeck.languageWhatIKnowCode },
-      }),
-      this.databaseService.language.findFirst({
-        where: { code: findDeck.languageWhatILearnCode },
-      }),
-    ]);
-
-    if (!languageWhatIKnow || !languageWhatILearn) {
-      throw new NotFoundException('Language not found');
+    if (!deck) {
+      throw new NotFoundException('Deck not found');
     }
 
     const numberOfCards = await this.databaseService.card.count({
@@ -137,35 +135,21 @@ export class DeckService {
       },
     });
 
-    const cards = await this.databaseService.card.findMany({
-      where: { deckId },
-    });
-
     const numberOfCardsLearned = await this.databaseService.card.count({
       where: { deckId, isNew: false, masteryScore: 100 },
     });
 
     return {
-      id: findDeck.id,
-      name: findDeck.name,
-      languageWhatIKnow: {
-        code: languageWhatIKnow.code,
-        name: languageWhatIKnow.name,
-        nativeName: languageWhatIKnow.nativeName,
-        iconSymbol: languageWhatIKnow.iconSymbol,
-      },
-      languageWhatILearn: {
-        code: languageWhatILearn.code,
-        name: languageWhatILearn.name,
-        nativeName: languageWhatILearn.nativeName,
-        iconSymbol: languageWhatILearn.iconSymbol,
-      },
+      id: deck.id,
+      name: deck.name,
+      languageWhatIKnow: deck.languageWhatIKnow,
+      languageWhatILearn: deck.languageWhatILearn,
       numberOfCards: numberOfCards,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
       numberOfCardsLearned: numberOfCardsLearned,
-      cards: cards.map(
+      cards: deck.cards.map(
         (card): CardDto => ({
           id: card.id,
           textInKnownLanguage: card.textInKnownLanguage,
