@@ -26,6 +26,7 @@ import { Throttle } from '@nestjs/throttler';
 import { Auth } from 'src/common/decorators/auth';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -53,10 +54,10 @@ export class AuthController {
   @Throttle({ short: { limit: 5, ttl: 30000 } })
   @ApiOkResponse({
     description: 'Registers user and returns access token',
-    type: JwtTokenDto,
+    type: RegisterResponseDto,
   })
-  @ValidateResponse(JwtTokenDto)
-  register(@Body() registerDto: RegisterDto): Promise<JwtTokenDto> {
+  @ValidateResponse(RegisterResponseDto)
+  register(@Body() registerDto: RegisterDto): Promise<RegisterResponseDto> {
     return this.authService.register(registerDto);
   }
 

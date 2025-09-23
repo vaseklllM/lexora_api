@@ -86,6 +86,11 @@ export class FolderService {
 
     const parentFolder = await this.databaseService.folder.findFirst({
       where: { userId, id: folderParentId },
+      select: {
+        id: true,
+        name: true,
+        parentId: true,
+      },
     });
 
     if (!parentFolder) {
