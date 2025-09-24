@@ -5,8 +5,12 @@ import {
   IsString,
   IsUUID,
   Matches,
+  MaxLength,
   MinLength,
 } from 'class-validator';
+
+const MAX_WORD_LENGTH = 50;
+const MAX_DESCRIPTION_LENGTH = 200;
 
 export class CreateCardDto {
   @ApiProperty({
@@ -28,6 +32,9 @@ export class CreateCardDto {
     message: 'Cannot contain only spaces',
   })
   @IsNotEmpty({ message: 'Cannot be empty' })
+  @MaxLength(MAX_WORD_LENGTH, {
+    message: `Cannot be longer than ${MAX_WORD_LENGTH} characters`,
+  })
   textInKnownLanguage: string;
 
   @ApiProperty({
@@ -40,6 +47,9 @@ export class CreateCardDto {
     message: 'Cannot contain only spaces',
   })
   @IsNotEmpty({ message: 'Cannot be empty' })
+  @MaxLength(MAX_WORD_LENGTH, {
+    message: `Cannot be longer than ${MAX_WORD_LENGTH} characters`,
+  })
   textInLearningLanguage: string;
 
   @ApiProperty({
@@ -48,6 +58,9 @@ export class CreateCardDto {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(MAX_DESCRIPTION_LENGTH, {
+    message: `Cannot be longer than ${MAX_DESCRIPTION_LENGTH} characters`,
+  })
   descriptionInKnownLanguage?: string;
 
   @ApiProperty({
@@ -56,5 +69,8 @@ export class CreateCardDto {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(MAX_DESCRIPTION_LENGTH, {
+    message: `Cannot be longer than ${MAX_DESCRIPTION_LENGTH} characters`,
+  })
   descriptionInLearningLanguage?: string;
 }
