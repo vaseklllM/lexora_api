@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 export class CreateCardDto {
   @ApiProperty({
@@ -17,6 +24,10 @@ export class CreateCardDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
+  @Matches(/^(?!\s*$).+/, {
+    message: 'Cannot contain only spaces',
+  })
   textInKnownLanguage: string;
 
   @ApiProperty({
@@ -25,6 +36,10 @@ export class CreateCardDto {
   })
   @IsString()
   @IsNotEmpty()
+  @MinLength(2)
+  @Matches(/^(?!\s*$).+/, {
+    message: 'Cannot contain only spaces',
+  })
   textInLearningLanguage: string;
 
   @ApiProperty({
