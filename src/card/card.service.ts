@@ -131,7 +131,13 @@ export class CardService {
     const card = await this.databaseService.card.create({
       data: {
         userId,
-        ...createCardDto,
+        textInKnownLanguage: createCardDto.textInKnownLanguage.trim(),
+        textInLearningLanguage: createCardDto.textInLearningLanguage.trim(),
+        descriptionInKnownLanguage:
+          createCardDto.descriptionInKnownLanguage?.trim(),
+        descriptionInLearningLanguage:
+          createCardDto.descriptionInLearningLanguage?.trim(),
+        deckId: createCardDto.deckId,
         nativeSoundUrls,
       },
     });
