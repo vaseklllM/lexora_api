@@ -27,8 +27,6 @@ export class CardService {
       id: card.id,
       textInKnownLanguage: card.textInKnownLanguage,
       textInLearningLanguage: card.textInLearningLanguage,
-      exampleInKnownLanguage: card.exampleInKnownLanguage ?? undefined,
-      exampleInLearningLanguage: card.exampleInLearningLanguage ?? undefined,
       descriptionInKnownLanguage: card.descriptionInKnownLanguage ?? undefined,
       descriptionInLearningLanguage:
         card.descriptionInLearningLanguage ?? undefined,

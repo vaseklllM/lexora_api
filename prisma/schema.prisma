@@ -95,8 +95,6 @@ model Card {
   id                              String   @id @default(uuid())
   textInKnownLanguage             String  
   textInLearningLanguage          String  
-  exampleInKnownLanguage          String?  
-  exampleInLearningLanguage       String?  
   descriptionInKnownLanguage      String?  
   descriptionInLearningLanguage   String?  
   masteryScore                    Int @default(0) 

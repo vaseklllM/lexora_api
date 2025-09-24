@@ -165,9 +165,6 @@ export class DeckService {
           id: card.id,
           textInKnownLanguage: card.textInKnownLanguage,
           textInLearningLanguage: card.textInLearningLanguage,
-          exampleInKnownLanguage: card.exampleInKnownLanguage ?? undefined,
-          exampleInLearningLanguage:
-            card.exampleInLearningLanguage ?? undefined,
           createdAt: card.createdAt.toISOString(),
           masteryScore: card.masteryScore,
           isNew: card.isNew,

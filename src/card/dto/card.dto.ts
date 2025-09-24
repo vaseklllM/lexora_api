@@ -13,8 +13,6 @@ export const CardExample: CardDto = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   textInKnownLanguage: 'Книга',
   textInLearningLanguage: 'Book',
-  exampleInKnownLanguage: 'Я читаю книгу',
-  exampleInLearningLanguage: 'I read a book',
   createdAt: '2023-01-01T00:00:00Z',
   masteryScore: 0,
   isNew: true,
@@ -49,22 +47,6 @@ export class CardDto {
   @IsString()
   @IsNotEmpty()
   textInLearningLanguage: string;
-
-  @ApiProperty({
-    example: 'Я читаю книгу',
-    description: 'Example in known language',
-  })
-  @IsString()
-  @IsOptional()
-  exampleInKnownLanguage?: string;
-
-  @ApiProperty({
-    example: 'I read a book',
-    description: 'Example in learning language',
-  })
-  @IsString()
-  @IsOptional()
-  exampleInLearningLanguage?: string;
 
   @ApiProperty({
     example: 'Книга - это хорошо',
