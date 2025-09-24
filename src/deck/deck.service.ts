@@ -110,7 +110,11 @@ export class DeckService {
       include: {
         languageWhatIKnow: true,
         languageWhatILearn: true,
-        cards: true,
+        cards: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
       },
     });
 
