@@ -23,11 +23,11 @@ export class CreateCardDto {
     description: 'Text in known language',
   })
   @IsString()
-  @IsNotEmpty()
   @MinLength(2)
   @Matches(/^(?!\s*$).+/, {
     message: 'Cannot contain only spaces',
   })
+  @IsNotEmpty({ message: 'Cannot be empty' })
   textInKnownLanguage: string;
 
   @ApiProperty({
@@ -35,11 +35,11 @@ export class CreateCardDto {
     description: 'Text in learning language',
   })
   @IsString()
-  @IsNotEmpty()
   @MinLength(2)
   @Matches(/^(?!\s*$).+/, {
     message: 'Cannot contain only spaces',
   })
+  @IsNotEmpty({ message: 'Cannot be empty' })
   textInLearningLanguage: string;
 
   @ApiProperty({
