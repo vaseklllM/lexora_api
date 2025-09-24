@@ -172,6 +172,7 @@ export class DeckService {
             card.descriptionInKnownLanguage ?? undefined,
           descriptionInLearningLanguage:
             card.descriptionInLearningLanguage ?? undefined,
+          nativeSoundUrls: card.nativeSoundUrls ?? [],
         }),
       ),
     };

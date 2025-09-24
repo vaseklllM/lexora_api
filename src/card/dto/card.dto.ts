@@ -96,6 +96,5 @@ export class CardDto {
     description: 'Native sound urls',
   })
   @IsString({ each: true })
-  @IsOptional()
-  nativeSoundUrls?: string[];
+  nativeSoundUrls: string[];
 }
