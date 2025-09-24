@@ -8,9 +8,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-
-const MAX_WORD_LENGTH = 50;
-const MAX_DESCRIPTION_LENGTH = 200;
+import {
+  MAX_CARD_DESCRIPTION_LENGTH,
+  MAX_CARD_WORD_LENGTH,
+} from 'src/common/config';
 
 export class CreateCardDto {
   @ApiProperty({
@@ -32,8 +33,8 @@ export class CreateCardDto {
     message: 'Cannot contain only spaces',
   })
   @IsNotEmpty({ message: 'Cannot be empty' })
-  @MaxLength(MAX_WORD_LENGTH, {
-    message: `Cannot be longer than ${MAX_WORD_LENGTH} characters`,
+  @MaxLength(MAX_CARD_WORD_LENGTH, {
+    message: `Cannot be longer than ${MAX_CARD_WORD_LENGTH} characters`,
   })
   textInKnownLanguage: string;
 
@@ -47,8 +48,8 @@ export class CreateCardDto {
     message: 'Cannot contain only spaces',
   })
   @IsNotEmpty({ message: 'Cannot be empty' })
-  @MaxLength(MAX_WORD_LENGTH, {
-    message: `Cannot be longer than ${MAX_WORD_LENGTH} characters`,
+  @MaxLength(MAX_CARD_WORD_LENGTH, {
+    message: `Cannot be longer than ${MAX_CARD_WORD_LENGTH} characters`,
   })
   textInLearningLanguage: string;
 
@@ -58,8 +59,8 @@ export class CreateCardDto {
   })
   @IsString()
   @IsOptional()
-  @MaxLength(MAX_DESCRIPTION_LENGTH, {
-    message: `Cannot be longer than ${MAX_DESCRIPTION_LENGTH} characters`,
+  @MaxLength(MAX_CARD_DESCRIPTION_LENGTH, {
+    message: `Cannot be longer than ${MAX_CARD_DESCRIPTION_LENGTH} characters`,
   })
   descriptionInKnownLanguage?: string;
 
@@ -69,8 +70,8 @@ export class CreateCardDto {
   })
   @IsString()
   @IsOptional()
-  @MaxLength(MAX_DESCRIPTION_LENGTH, {
-    message: `Cannot be longer than ${MAX_DESCRIPTION_LENGTH} characters`,
+  @MaxLength(MAX_CARD_DESCRIPTION_LENGTH, {
+    message: `Cannot be longer than ${MAX_CARD_DESCRIPTION_LENGTH} characters`,
   })
   descriptionInLearningLanguage?: string;
 }

@@ -23,7 +23,12 @@ export const MAX_FOLDER_NAME_LENGTH = 50;
  */
 export const MAX_DECK_NAME_LENGTH = 50;
 
-// /**
-//  * The maximum length of a card name
-//  */
-// export const MAX_CARD_NAME_LENGTH = 50;
+/**
+ * The maximum length of a card word
+ */
+export const MAX_CARD_WORD_LENGTH = 50;
+
+/**
+ * The maximum length of a card description
+ */
+export const MAX_CARD_DESCRIPTION_LENGTH = 200;
