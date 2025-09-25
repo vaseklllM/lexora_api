@@ -28,21 +28,6 @@ import { FolderResponseDto } from './dto/folder-response.dto';
 export class FolderController {
   constructor(private readonly folderService: FolderService) {}
 
-  @Get(':id')
-  @Auth()
-  @ApiOperation({ summary: 'Get a folder' })
-  @ApiOkResponse({
-    description: 'Returns the folder',
-    type: FolderResponseDto,
-  })
-  @ValidateResponse(FolderResponseDto)
-  folder(
-    @CurrentUser() user: ICurrentUser,
-    @Param('id') folderId: string,
-  ): Promise<FolderResponseDto> {
-    return this.folderService.getFolder(user.id, folderId);
-  }
-
   @Post('create')
   @Auth()
   @ApiOperation({ summary: 'Create a new folder' })
@@ -86,5 +71,20 @@ export class FolderController {
     @CurrentUser() user: ICurrentUser,
   ): Promise<DeleteFolderResponseDto> {
     return this.folderService.delete(user.id, deleteFolderDto);
+  }
+
+  @Get(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Get a folder' })
+  @ApiOkResponse({
+    description: 'Returns the folder',
+    type: FolderResponseDto,
+  })
+  @ValidateResponse(FolderResponseDto)
+  folder(
+    @CurrentUser() user: ICurrentUser,
+    @Param('id') folderId: string,
+  ): Promise<FolderResponseDto> {
+    return this.folderService.getFolder(user.id, folderId);
   }
 }

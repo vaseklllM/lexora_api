@@ -27,21 +27,6 @@ import { DeleteCardResponseDto } from './dto/delete-response.dto';
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
-  @Get(':id')
-  @Auth()
-  @ApiOperation({ summary: 'Get a card' })
-  @ApiOkResponse({
-    description: 'Returns the card',
-    type: GetCardResponseDto,
-  })
-  @ValidateResponse(GetCardResponseDto)
-  get(
-    @Param('id') cardId: string,
-    @CurrentUser() user: ICurrentUser,
-  ): Promise<GetCardResponseDto> {
-    return this.cardService.get(user.id, cardId);
-  }
-
   @Post('create')
   @Auth()
   @ApiOperation({ summary: 'Create a new card' })
@@ -70,6 +55,21 @@ export class CardController {
     @CurrentUser() user: ICurrentUser,
   ): Promise<UpdateCardResponseDto> {
     return this.cardService.update(user.id, updateCardDto);
+  }
+
+  @Get(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Get a card' })
+  @ApiOkResponse({
+    description: 'Returns the card',
+    type: GetCardResponseDto,
+  })
+  @ValidateResponse(GetCardResponseDto)
+  get(
+    @Param('id') cardId: string,
+    @CurrentUser() user: ICurrentUser,
+  ): Promise<GetCardResponseDto> {
+    return this.cardService.get(user.id, cardId);
   }
 
   @Delete(':id')

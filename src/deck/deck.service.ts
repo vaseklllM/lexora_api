@@ -335,6 +335,7 @@ export class DeckService {
     userId: string,
     startLearningSessionDto: StartLearningSessionDto,
   ): Promise<StartLearningSessionResponseDto> {
+    console.log(startLearningSessionDto);
     await this.checkIsExistDeck(userId, startLearningSessionDto.deckId);
 
     const cards = await this.databaseService.card.findMany({

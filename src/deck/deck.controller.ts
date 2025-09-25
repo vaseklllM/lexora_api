@@ -38,21 +38,6 @@ import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 export class DeckController {
   constructor(private readonly deskService: DeckService) {}
 
-  @Get(':id')
-  @Auth()
-  @ApiOperation({ summary: 'Get a deck' })
-  @ApiOkResponse({
-    description: 'Returns the deck',
-    type: GetDeckResponseDto,
-  })
-  @ValidateResponse(GetDeckResponseDto)
-  get(
-    @CurrentUser() user: ICurrentUser,
-    @Param('id') deckId: string,
-  ): Promise<GetDeckResponseDto> {
-    return this.deskService.getDeck(user.id, deckId);
-  }
-
   @Post('create')
   @Auth()
   @ApiOperation({ summary: 'Create a new deck' })
@@ -111,6 +96,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Query() startLearningSessionDto: StartLearningSessionDto,
   ): Promise<StartLearningSessionResponseDto> {
+    console.log('user ----> ', user);
     return this.deskService.startLearningSession(
       user.id,
       startLearningSessionDto,
@@ -167,5 +153,20 @@ export class DeckController {
     @Body() finishReviewCardDto: FinishReviewCardDto,
   ): Promise<FinishReviewCardResponseDto> {
     return this.deskService.finishReviewCard(user.id, finishReviewCardDto);
+  }
+
+  @Get(':id')
+  @Auth()
+  @ApiOperation({ summary: 'Get a deck' })
+  @ApiOkResponse({
+    description: 'Returns the deck',
+    type: GetDeckResponseDto,
+  })
+  @ValidateResponse(GetDeckResponseDto)
+  get(
+    @CurrentUser() user: ICurrentUser,
+    @Param('id') deckId: string,
+  ): Promise<GetDeckResponseDto> {
+    return this.deskService.getDeck(user.id, deckId);
   }
 }
