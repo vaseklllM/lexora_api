@@ -13,11 +13,21 @@ import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
-import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
 import { CardDto } from 'src/card/dto/card.dto';
 import { Prisma } from '@prisma/client';
 import { DeckDto } from './dto/deck.dto';
 import { FolderService } from 'src/folder/folder.service';
+import { StartLearningSessionDto } from './dto/start-learning-session.dto';
+import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
+import { StartReviewSessionDto } from './dto/start-review-session.dto';
+import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
+import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
+import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
+import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
+import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
+import { FinishReviewCardDto } from './dto/finish-review-card.dto';
+import { LearningStrategyType } from 'src/common/types/learningStrategyType';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class DeckService {
@@ -25,6 +35,7 @@ export class DeckService {
     private readonly databaseService: DatabaseService,
     @Inject(forwardRef(() => FolderService))
     private readonly folderService: FolderService,
+    private readonly cardService: CardService,
   ) {}
 
   async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
@@ -317,6 +328,155 @@ export class DeckService {
 
     return {
       message: `Deck '${findDeck.name}' deleted successfully`,
+    };
+  }
+
+  async startLearningSession(
+    userId: string,
+    startLearningSessionDto: StartLearningSessionDto,
+  ): Promise<StartLearningSessionResponseDto> {
+    await this.checkIsExistDeck(userId, startLearningSessionDto.deckId);
+
+    const cards = await this.databaseService.card.findMany({
+      where: { userId, deckId: startLearningSessionDto.deckId, isNew: true },
+      take: startLearningSessionDto.count ?? 5,
+    });
+
+    if (cards.length === 0) {
+      throw new NotFoundException('No cards to learn');
+    }
+
+    return {
+      cards: cards.map((card) =>
+        this.cardService.convertCardToGetCardResponseDto(card),
+      ),
+    };
+  }
+
+  async finishLearningSession(
+    userId: string,
+    finishLearningSessionDto: FinishLearningSessionDto,
+  ): Promise<FinishLearningSessionResponseDto> {
+    await this.databaseService.card.updateMany({
+      where: {
+        userId,
+        isNew: true,
+        id: { in: finishLearningSessionDto.cardIds },
+      },
+      data: { isNew: false },
+    });
+
+    return {
+      message: 'Learning session finished successfully',
+    };
+  }
+
+  async startReviewSession(
+    userId: string,
+    startReviewSessionDto: StartReviewSessionDto,
+  ): Promise<StartReviewSessionResponseDto> {
+    await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
+
+    const cards = await this.databaseService.card.findMany({
+      where: {
+        userId,
+        deckId: startReviewSessionDto.deckId,
+        isNew: false,
+        lastReviewedAt: {
+          lt: new Date(
+            Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES,
+          ),
+        },
+      },
+    });
+
+    if (cards.length === 0) {
+      throw new NotFoundException('No cards to review');
+    }
+
+    return {
+      cards: cards.map((card) =>
+        this.cardService.convertCardToGetCardResponseDto(card),
+      ),
+    };
+  }
+
+  async finishReviewCard(
+    userId: string,
+    finishReviewCardDto: FinishReviewCardDto,
+  ): Promise<FinishReviewCardResponseDto> {
+    const card = await this.databaseService.card.findFirst({
+      where: { userId, id: finishReviewCardDto.cardId },
+    });
+
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+
+    function getCorrectWeight() {
+      switch (finishReviewCardDto.typeOfStrategy) {
+        case LearningStrategyType.PAIR_IT:
+          return 1;
+
+        case LearningStrategyType.GUESS_IT:
+          return 2;
+
+        case LearningStrategyType.RECALL_IT:
+          return 3;
+
+        case LearningStrategyType.TYPE_IT:
+          return 4;
+
+        default: {
+          const _check: never = finishReviewCardDto.typeOfStrategy;
+          throw new Error(`Unhandled learning strategy type: ${_check}`);
+        }
+      }
+    }
+
+    function getIncorrectWeight() {
+      switch (finishReviewCardDto.typeOfStrategy) {
+        case LearningStrategyType.PAIR_IT:
+          return 4;
+
+        case LearningStrategyType.GUESS_IT:
+          return 3;
+
+        case LearningStrategyType.RECALL_IT:
+          return 2;
+
+        case LearningStrategyType.TYPE_IT:
+          return 1;
+
+        default: {
+          const _check: never = finishReviewCardDto.typeOfStrategy;
+          throw new Error(`Unhandled learning strategy type: ${_check}`);
+        }
+      }
+    }
+
+    await this.databaseService.card.update({
+      where: { id: finishReviewCardDto.cardId },
+      data: finishReviewCardDto.isCorrectAnswer
+        ? {
+            lastReviewedAt: new Date(),
+            masteryScore: ((): number | undefined => {
+              const newScore: number = card.masteryScore + getCorrectWeight();
+
+              return newScore > 100 ? 100 : newScore;
+            })(),
+          }
+        : {
+            masteryScore: ((): number | undefined => {
+              const newScore: number = card.masteryScore - getIncorrectWeight();
+
+              return newScore < 0 ? 0 : newScore;
+            })(),
+          },
+    });
+
+    return {
+      message: 'Review card finished successfully',
     };
   }
 }

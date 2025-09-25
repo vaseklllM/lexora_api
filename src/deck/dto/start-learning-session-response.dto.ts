@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator';
-import { CardDto, CardExample } from './card.dto';
 import { Type } from 'class-transformer';
+import { CardDto, CardExample } from 'src/card/dto/card.dto';
 
 export class StartLearningSessionResponseDto {
   @ApiProperty({
