@@ -12,6 +12,18 @@ export class TtsService {
       mkdirSync(audioDir, { recursive: true });
     }
 
+    const key = crypto
+      .createHash('sha256')
+      .update(`${text}-${languageCode}`)
+      .digest('hex');
+
+    const fileName = `${key}.mp3`;
+    const filePath = join(audioDir, fileName);
+
+    if (existsSync(filePath)) {
+      return fileName;
+    }
+
     const res = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_API}`,
       {
@@ -39,14 +51,10 @@ export class TtsService {
 
     const bufferFile = Buffer.from(data.audioContent, 'base64');
 
-    const key = crypto
-      .createHash('sha256')
-      .update(`${text}-${languageCode}`)
-      .digest('hex');
-    const path = `./public/tts/${key}.mp3`;
+    const path = `./public/tts/${fileName}`;
 
     await fs.writeFile(path, bufferFile);
 
-    return `${key}.mp3`;
+    return fileName;
   }
 }
