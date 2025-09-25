@@ -30,24 +30,6 @@ export class FillCardDataDto {
   textInLearningLanguage?: string;
 
   @ApiProperty({
-    example: 'Я читаю книгу',
-    description: 'Example in known language',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  exampleInKnownLanguage?: string;
-
-  @ApiProperty({
-    example: 'I read a book',
-    description: 'Example in learning language',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  exampleInLearningLanguage?: string;
-
-  @ApiProperty({
     example: 'Книга - это хорошо',
     description: 'Description in known language',
     required: false,

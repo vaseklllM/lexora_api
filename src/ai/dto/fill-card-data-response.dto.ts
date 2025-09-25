@@ -19,22 +19,6 @@ export class FillCardDataResponseDto {
   textInLearningLanguage: string;
 
   @ApiProperty({
-    example: 'Я читаю книгу',
-    description: 'Example in known language',
-  })
-  @IsString()
-  @IsNotEmpty()
-  exampleInKnownLanguage: string;
-
-  @ApiProperty({
-    example: 'I read a book',
-    description: 'Example in learning language',
-  })
-  @IsString()
-  @IsNotEmpty()
-  exampleInLearningLanguage: string;
-
-  @ApiProperty({
     example: 'Книга - это хорошо',
     description: 'Description in known language',
   })

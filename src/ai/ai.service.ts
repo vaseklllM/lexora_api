@@ -42,8 +42,6 @@ export class AiService {
     return {
       textInKnownLanguage: `Книга - deck: '${deck.name}' (${languageWhatIKnow.name} - ${languageWhatILearn.name})`,
       textInLearningLanguage: 'Book',
-      exampleInKnownLanguage: 'Я читаю книгу',
-      exampleInLearningLanguage: 'I read a book',
       descriptionInKnownLanguage:
         'Книга - це друкований або електронний твір, що містить текст, зображення або інші матеріали для читання та навчання',
       descriptionInLearningLanguage:
