@@ -96,7 +96,6 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Query() startLearningSessionDto: StartLearningSessionDto,
   ): Promise<StartLearningSessionResponseDto> {
-    console.log('user ----> ', user);
     return this.deskService.startLearningSession(
       user.id,
       startLearningSessionDto,
