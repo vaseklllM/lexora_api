@@ -54,7 +54,7 @@ export class CardService {
               (audio, index, array) => array.indexOf(audio) === index,
             ) as string[];
 
-          return audios;
+          return audios.filter((_, idx) => idx < 3);
         }
         default:
           return [];
