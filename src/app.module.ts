@@ -11,6 +11,7 @@ import { DeckModule } from './deck/deck.module';
 import { CardModule } from './card/card.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AiModule } from './ai/ai.module';
+import { TtsModule } from './tts/tts.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AiModule } from './ai/ai.module';
     CardModule,
     DashboardModule,
     AiModule,
+    TtsModule,
   ],
   providers: [
     {

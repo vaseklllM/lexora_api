@@ -7,10 +7,14 @@ import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
 import { Card, Deck } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
+import { TtsService } from 'src/tts/tts.service';
 
 @Injectable()
 export class CardService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly ttsService: TtsService,
+  ) {}
 
   public convertCardToGetCardResponseDto(card: Card): GetCardResponseDto {
     return {
@@ -32,33 +36,37 @@ export class CardService {
     word: string,
   ): Promise<string[]> {
     try {
-      switch (languageCode) {
-        case 'en': {
-          const response = await fetch(
-            `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
-          );
+      const url = await this.ttsService.synthesizeText(word, languageCode);
 
-          if (!response.ok) {
-            return [];
-          }
+      return [url];
 
-          const data: { phonetics?: { audio?: string }[] }[] =
-            await response.json();
+      // switch (languageCode) {
+      //   case 'en': {
+      //     const response = await fetch(
+      //       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
+      //     );
 
-          const audios: string[] = data
-            .flatMap((item) =>
-              item.phonetics?.map((phonetic) => phonetic.audio),
-            )
-            .filter((audio) => audio && audio.startsWith('https'))
-            .filter(
-              (audio, index, array) => array.indexOf(audio) === index,
-            ) as string[];
+      //     if (!response.ok) {
+      //       return [];
+      //     }
 
-          return audios.filter((_, idx) => idx < 3);
-        }
-        default:
-          return [];
-      }
+      //     const data: { phonetics?: { audio?: string }[] }[] =
+      //       await response.json();
+
+      //     const audios: string[] = data
+      //       .flatMap((item) =>
+      //         item.phonetics?.map((phonetic) => phonetic.audio),
+      //       )
+      //       .filter((audio) => audio && audio.startsWith('https'))
+      //       .filter(
+      //         (audio, index, array) => array.indexOf(audio) === index,
+      //       ) as string[];
+
+      //     return audios.filter((_, idx) => idx < 3);
+      //   }
+      //   default:
+      //     return [];
+      // }
     } catch (_error) {
       console.error(_error);
       return [];
