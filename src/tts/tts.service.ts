@@ -83,6 +83,14 @@ export class TtsService {
     return fileName;
   }
 
+  // async saveTtsToFile(
+  //   text: string,
+  //   languageCode: string,
+  //   fileName: string,
+  // ): Promise<void> {
+
+  // }
+
   async deleteSoundUrl(soundUrl: string): Promise<void> {
     const path = `./public/tts/${soundUrl}`;
     if (existsSync(path)) {

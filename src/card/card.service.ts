@@ -5,7 +5,7 @@ import { CreateCardDto } from './dto/create.dto';
 import { GetCardResponseDto } from './dto/get-card-response.dto';
 import { UpdateCardResponseDto } from './dto/update-response.dto';
 import { UpdateCardDto } from './dto/update.dto';
-import { Card, Deck } from '@prisma/client';
+import { Card } from '@prisma/client';
 import { DeleteCardResponseDto } from './dto/delete-response.dto';
 import { TtsService } from 'src/tts/tts.service';
 
@@ -31,19 +31,6 @@ export class CardService {
     };
   }
 
-  private async getSoundUrls(
-    languageCode: string,
-    word: string,
-  ): Promise<string[]> {
-    try {
-      const url = await this.ttsService.synthesizeText(word, languageCode);
-      return [url];
-    } catch (_error) {
-      console.error(_error);
-      return [];
-    }
-  }
-
   async get(userId: string, cardId: string): Promise<GetCardResponseDto> {
     const card = await this.databaseService.card.findFirst({
       where: { userId, id: cardId },
@@ -54,36 +41,6 @@ export class CardService {
     }
 
     return this.convertCardToGetCardResponseDto(card);
-  }
-
-  private async checkIsExistCard(
-    userId: string,
-    cardId: string,
-  ): Promise<Card> {
-    const card = await this.databaseService.card.findFirst({
-      where: { userId, id: cardId },
-    });
-
-    if (!card) {
-      throw new NotFoundException('Card not found');
-    }
-
-    return card;
-  }
-
-  private async checkIsExistDeck(
-    userId: string,
-    deckId: string,
-  ): Promise<Deck> {
-    const deck = await this.databaseService.deck.findFirst({
-      where: { userId, id: deckId },
-    });
-
-    if (!deck) {
-      throw new NotFoundException('Deck not found');
-    }
-
-    return deck;
   }
 
   async create(
@@ -121,13 +78,15 @@ export class CardService {
       },
     );
 
+    const soundUrl = await this.ttsService.synthesizeText(
+      createCardDto.textInLearningLanguage,
+      transactionResult.deck.languageWhatILearnCode,
+    );
+
     const card = await this.databaseService.card.update({
       where: { id: transactionResult.card.id },
       data: {
-        soundUrls: await this.getSoundUrls(
-          transactionResult.deck.languageWhatILearnCode,
-          createCardDto.textInLearningLanguage,
-        ),
+        soundUrls: [soundUrl],
       },
     });
 
@@ -180,13 +139,16 @@ export class CardService {
 
     if (transactionResult.isUpdatedLearningText) {
       await this.deleteSoundUrls(transactionResult.deleteSoundUrls);
+
+      const newSoundUrl = await this.ttsService.synthesizeText(
+        updateCardData.textInLearningLanguage,
+        transactionResult.deck.languageWhatILearnCode,
+      );
+
       const newCard = await this.databaseService.card.update({
         where: { id: cardId },
         data: {
-          soundUrls: await this.getSoundUrls(
-            transactionResult.deck.languageWhatILearnCode,
-            updateCardData.textInLearningLanguage,
-          ),
+          soundUrls: [newSoundUrl],
         },
       });
 
