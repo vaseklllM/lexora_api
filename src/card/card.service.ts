@@ -37,36 +37,7 @@ export class CardService {
   ): Promise<string[]> {
     try {
       const url = await this.ttsService.synthesizeText(word, languageCode);
-
       return [url];
-
-      // switch (languageCode) {
-      //   case 'en': {
-      //     const response = await fetch(
-      //       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
-      //     );
-
-      //     if (!response.ok) {
-      //       return [];
-      //     }
-
-      //     const data: { phonetics?: { audio?: string }[] }[] =
-      //       await response.json();
-
-      //     const audios: string[] = data
-      //       .flatMap((item) =>
-      //         item.phonetics?.map((phonetic) => phonetic.audio),
-      //       )
-      //       .filter((audio) => audio && audio.startsWith('https'))
-      //       .filter(
-      //         (audio, index, array) => array.indexOf(audio) === index,
-      //       ) as string[];
-
-      //     return audios.filter((_, idx) => idx < 3);
-      //   }
-      //   default:
-      //     return [];
-      // }
     } catch (_error) {
       console.error(_error);
       return [];
@@ -152,12 +123,17 @@ export class CardService {
     const card = await this.checkIsExistCard(userId, cardId);
     const deck = await this.checkIsExistDeck(userId, card.deckId);
 
-    const soundUrls = updateCardData.textInLearningLanguage
-      ? await this.getSoundUrls(
-          deck.languageWhatILearnCode,
-          updateCardData.textInLearningLanguage,
-        )
-      : card.soundUrls;
+    let soundUrls: string[] = [];
+
+    if (updateCardDto.textInLearningLanguage === card.textInLearningLanguage) {
+      soundUrls = card.soundUrls;
+    } else {
+      await this.deleteSoundUrls(userId, cardId);
+      soundUrls = await this.getSoundUrls(
+        deck.languageWhatILearnCode,
+        updateCardData.textInLearningLanguage,
+      );
+    }
 
     const newCard = await this.databaseService.card.update({
       where: { id: cardId },
