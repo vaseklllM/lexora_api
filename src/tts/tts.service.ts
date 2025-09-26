@@ -24,6 +24,28 @@ export class TtsService {
       return fileName;
     }
 
+    // const res = await fetch(
+    //   `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent`,
+    //   {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'x-goog-api-key': process.env.GOOGLE_API!,
+    //     },
+    //     body: JSON.stringify({
+    //       contents: [{ parts: [{ text }] }],
+    //       generationConfig: {
+    //         responseModalities: ['AUDIO'],
+    //         speechConfig: {
+    //           voiceConfig: {
+    //             prebuiltVoiceConfig: { voiceName: 'Achernar' },
+    //           },
+    //         },
+    //       },
+    //     }),
+    //   },
+    // );
+
     const res = await fetch(
       `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_API}`,
       {
@@ -32,10 +54,10 @@ export class TtsService {
         body: JSON.stringify({
           input: {
             text,
-            // ssml: `<speak><emphasis level="strong">${text}</emphasis></speak>`,
           },
           voice: {
             languageCode,
+            // name: 'en-US-Wavenet-D',
           },
           audioConfig: {
             audioEncoding: 'MP3',
