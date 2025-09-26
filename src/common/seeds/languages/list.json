@@ -312,6 +312,12 @@
     "iconSymbol": "🇺🇦"
   },
   {
+    "code": "ru-RU",
+    "name": "Russian",
+    "nativeName": "Русский",
+    "iconSymbol": "🇷🇺"
+  },
+  {
     "code": "ja-JP",
     "name": "Japanese",
     "nativeName": "日本語",
