@@ -186,45 +186,47 @@ export class FolderService {
     userId: string,
     renameFolderDto: RenameFolderDto,
   ): Promise<RenameFolderResponseDto> {
-    const findFolder = await this.databaseService.folder.findFirst({
-      where: { id: renameFolderDto.id, userId },
-    });
-
-    if (!findFolder) {
-      throw new NotFoundException('Folder not found');
-    }
-
-    if (findFolder.parentId) {
-      const parentFolder = await this.databaseService.folder.findFirst({
-        where: {
-          parentId: findFolder.parentId,
-          name: renameFolderDto.name,
-        },
+    await this.databaseService.$transaction(async (tx) => {
+      const findFolder = await tx.folder.findFirst({
+        where: { id: renameFolderDto.id, userId },
       });
 
-      if (parentFolder) {
-        throw new ConflictException(
-          `Folder with name '${parentFolder.name}' already exists`,
-        );
+      if (!findFolder) {
+        throw new NotFoundException('Folder not found');
       }
-    } else {
-      const sameNameFolder = await this.databaseService.folder.findFirst({
-        where: {
-          userId,
-          name: renameFolderDto.name,
-        },
+
+      if (findFolder.parentId) {
+        const parentFolder = await tx.folder.findFirst({
+          where: {
+            parentId: findFolder.parentId,
+            name: renameFolderDto.name,
+          },
+        });
+
+        if (parentFolder) {
+          throw new ConflictException(
+            `Folder with name '${parentFolder.name}' already exists`,
+          );
+        }
+      } else {
+        const sameNameFolder = await tx.folder.findFirst({
+          where: {
+            userId,
+            name: renameFolderDto.name,
+          },
+        });
+
+        if (sameNameFolder) {
+          throw new ConflictException(
+            `Folder with name '${sameNameFolder.name}' already exists`,
+          );
+        }
+      }
+
+      await tx.folder.update({
+        where: { id: renameFolderDto.id, userId },
+        data: { name: renameFolderDto.name, updatedAt: new Date() },
       });
-
-      if (sameNameFolder) {
-        throw new ConflictException(
-          `Folder with name '${sameNameFolder.name}' already exists`,
-        );
-      }
-    }
-
-    await this.databaseService.folder.update({
-      where: { id: renameFolderDto.id, userId },
-      data: { name: renameFolderDto.name, updatedAt: new Date() },
     });
 
     return { message: 'Folder renamed successfully' };
