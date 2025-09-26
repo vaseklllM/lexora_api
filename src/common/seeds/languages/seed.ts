@@ -50,16 +50,28 @@ async function main() {
       return voice.languageCodes.includes(language.code);
     });
 
+    const isSupportGoogleTtsVoiceFemaleGender = languageVoices.some(
+      (voice) => voice.ssmlGender === 'FEMALE',
+    );
+
+    const isSupportGoogleTtsVoiceMaleGender = languageVoices.some(
+      (voice) => voice.ssmlGender === 'MALE',
+    );
+
+    if (
+      !isSupportGoogleTtsVoiceFemaleGender &&
+      !isSupportGoogleTtsVoiceMaleGender
+    ) {
+      console.log(`🧹 Skip language ${language.name} (${language.code})`);
+      continue;
+    }
+
     try {
       await prisma.language.create({
         data: {
           ...language,
-          isSupportGoogleTtsVoiceFemaleGender: languageVoices.some(
-            (voice) => voice.ssmlGender === 'FEMALE',
-          ),
-          isSupportGoogleTtsVoiceMaleGender: languageVoices.some(
-            (voice) => voice.ssmlGender === 'MALE',
-          ),
+          isSupportGoogleTtsVoiceFemaleGender,
+          isSupportGoogleTtsVoiceMaleGender,
         },
       });
       console.log(`✅ Language ${language.name} (${language.code}) seeded`);
