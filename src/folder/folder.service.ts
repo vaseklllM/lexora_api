@@ -142,44 +142,46 @@ export class FolderService {
     userId: string,
     createFolderDto: CreateFolderDto,
   ): Promise<CreateFolderResponseDto> {
-    if (createFolderDto.parentFolderId) {
-      const parentFolder = await this.databaseService.folder.findFirst({
+    return await this.databaseService.$transaction(async (tx) => {
+      if (createFolderDto.parentFolderId) {
+        const parentFolder = await tx.folder.findFirst({
+          where: {
+            id: createFolderDto.parentFolderId,
+          },
+        });
+
+        if (!parentFolder) {
+          throw new NotFoundException('Parent folder not found');
+        }
+      }
+
+      const findFolderByName = await tx.folder.findFirst({
         where: {
-          id: createFolderDto.parentFolderId,
+          userId,
+          name: createFolderDto.name,
+          parentId: createFolderDto.parentFolderId ?? null,
         },
       });
 
-      if (!parentFolder) {
-        throw new NotFoundException('Parent folder not found');
+      if (findFolderByName) {
+        throw new ConflictException(
+          `Folder with name '${findFolderByName.name}' already exists`,
+        );
       }
-    }
 
-    const findFolderByName = await this.databaseService.folder.findFirst({
-      where: {
-        userId,
-        name: createFolderDto.name,
-        parentId: createFolderDto.parentFolderId ?? null,
-      },
+      const folder = await tx.folder.create({
+        data: {
+          name: createFolderDto.name,
+          userId,
+          parentId: createFolderDto.parentFolderId,
+        },
+      });
+
+      return {
+        name: folder.name,
+        id: folder.id,
+      };
     });
-
-    if (findFolderByName) {
-      throw new ConflictException(
-        `Folder with name '${findFolderByName.name}' already exists`,
-      );
-    }
-
-    const folder = await this.databaseService.folder.create({
-      data: {
-        name: createFolderDto.name,
-        userId,
-        parentId: createFolderDto.parentFolderId,
-      },
-    });
-
-    return {
-      name: folder.name,
-      id: folder.id,
-    };
   }
 
   async rename(
