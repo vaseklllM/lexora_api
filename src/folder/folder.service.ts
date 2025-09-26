@@ -234,16 +234,18 @@ export class FolderService {
     userId: string,
     deleteFolderDto: DeleteFolderDto,
   ): Promise<DeleteFolderResponseDto> {
-    const folder = await this.databaseService.folder.findUnique({
-      where: { id: deleteFolderDto.id, userId },
-    });
+    await this.databaseService.$transaction(async (tx) => {
+      const folder = await tx.folder.findUnique({
+        where: { id: deleteFolderDto.id, userId },
+      });
 
-    if (!folder) {
-      throw new NotFoundException('Folder not found');
-    }
+      if (!folder) {
+        throw new NotFoundException('Folder not found');
+      }
 
-    await this.databaseService.folder.delete({
-      where: { id: deleteFolderDto.id },
+      await tx.folder.delete({
+        where: { id: deleteFolderDto.id },
+      });
     });
 
     return { message: 'Folder deleted successfully' };
