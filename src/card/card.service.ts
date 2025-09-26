@@ -120,48 +120,69 @@ export class CardService {
   ): Promise<UpdateCardResponseDto> {
     const { cardId, ...updateCardData } = updateCardDto;
 
-    const card = await this.checkIsExistCard(userId, cardId);
-    const deck = await this.checkIsExistDeck(userId, card.deckId);
+    const transactionResult = await this.databaseService.$transaction(
+      async (tx) => {
+        const card = await tx.card.findFirst({
+          where: { userId, id: cardId },
+        });
 
-    let soundUrls: string[] = [];
+        if (!card) {
+          throw new NotFoundException('Card not found');
+        }
 
-    if (updateCardDto.textInLearningLanguage === card.textInLearningLanguage) {
-      soundUrls = card.soundUrls;
-    } else {
-      await this.deleteSoundUrls(userId, cardId);
-      soundUrls = await this.getSoundUrls(
-        deck.languageWhatILearnCode,
-        updateCardData.textInLearningLanguage,
-      );
-    }
+        const deck = await tx.deck.findFirst({
+          where: { userId, id: card.deckId },
+        });
 
-    const newCard = await this.databaseService.card.update({
-      where: { id: cardId },
-      data: {
-        ...updateCardData,
-        soundUrls,
+        if (!deck) {
+          throw new NotFoundException('Deck not found');
+        }
+
+        const isUpdatedLearningText =
+          updateCardDto.textInLearningLanguage !== card.textInLearningLanguage;
+
+        const newCard = await tx.card.update({
+          where: { id: cardId },
+          data: {
+            ...updateCardData,
+            soundUrls: isUpdatedLearningText ? [] : card.soundUrls,
+          },
+        });
+
+        return {
+          isUpdatedLearningText,
+          deleteSoundUrls: isUpdatedLearningText ? card.soundUrls : [],
+          deck,
+          newCard,
+        };
       },
-    });
+    );
 
-    return this.convertCardToGetCardResponseDto(newCard);
-  }
-
-  public async deleteSoundUrls(userId: string, cardId: string): Promise<void> {
-    const card = await this.databaseService.card.findUnique({
-      where: { userId, id: cardId },
-      select: { soundUrls: true },
-    });
-
-    if (!card || !card.soundUrls || card.soundUrls.length === 0) {
-      return;
-    }
-
-    for (const soundUrl of card.soundUrls) {
-      const cardsWithSameSoundUrl = await this.databaseService.card.findMany({
-        where: { soundUrls: { has: soundUrl }, id: { not: cardId } },
+    if (transactionResult.isUpdatedLearningText) {
+      await this.deleteSoundUrls(transactionResult.deleteSoundUrls);
+      const newCard = await this.databaseService.card.update({
+        where: { id: cardId },
+        data: {
+          soundUrls: await this.getSoundUrls(
+            transactionResult.deck.languageWhatILearnCode,
+            updateCardData.textInLearningLanguage,
+          ),
+        },
       });
 
-      if (cardsWithSameSoundUrl.length > 0) {
+      return this.convertCardToGetCardResponseDto(newCard);
+    }
+
+    return this.convertCardToGetCardResponseDto(transactionResult.newCard);
+  }
+
+  public async deleteSoundUrls(soundUrls: string[]): Promise<void> {
+    for (const soundUrl of soundUrls) {
+      const cardWithSameSoundUrl = await this.databaseService.card.findFirst({
+        where: { soundUrls: { has: soundUrl } },
+      });
+
+      if (cardWithSameSoundUrl) {
         continue;
       }
 
@@ -170,16 +191,30 @@ export class CardService {
   }
 
   async delete(userId: string, cardId: string): Promise<DeleteCardResponseDto> {
-    await this.checkIsExistCard(userId, cardId);
+    const { textInLearningLanguage, soundUrls } =
+      await this.databaseService.$transaction(async (tx) => {
+        const card = await tx.card.findFirst({
+          where: { userId, id: cardId },
+        });
 
-    await this.deleteSoundUrls(userId, cardId);
+        if (!card) {
+          throw new NotFoundException('Card not found');
+        }
 
-    const deletedCard = await this.databaseService.card.delete({
-      where: { id: cardId },
-    });
+        const deletedCard = await tx.card.delete({
+          where: { id: cardId },
+        });
+
+        return {
+          textInLearningLanguage: deletedCard.textInLearningLanguage,
+          soundUrls: deletedCard.soundUrls,
+        };
+      });
+
+    await this.deleteSoundUrls(soundUrls);
 
     return {
-      message: `Card '${deletedCard.textInLearningLanguage}' deleted successfully`,
+      message: `Card '${textInLearningLanguage}' deleted successfully`,
     };
   }
 }

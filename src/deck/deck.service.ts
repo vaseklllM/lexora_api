@@ -320,14 +320,26 @@ export class DeckService {
     userId: string,
     deleteDeckDto: DeleteDeckDto,
   ): Promise<DeleteDeckResponseDto> {
-    const findDeck = await this.checkIsExistDeck(userId, deleteDeckDto.deckId);
+    const { deckName } = await this.databaseService.$transaction(async (tx) => {
+      const findDeck = await tx.deck.findFirst({
+        where: { id: deleteDeckDto.deckId, userId },
+      });
 
-    await this.databaseService.deck.delete({
-      where: { id: deleteDeckDto.deckId, userId },
+      if (!findDeck) {
+        throw new NotFoundException('Deck not found');
+      }
+
+      await tx.deck.delete({
+        where: { id: deleteDeckDto.deckId },
+      });
+
+      return {
+        deckName: findDeck.name,
+      };
     });
 
     return {
-      message: `Deck '${findDeck.name}' deleted successfully`,
+      message: `Deck '${deckName}' deleted successfully`,
     };
   }
 
