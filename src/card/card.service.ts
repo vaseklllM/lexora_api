@@ -43,6 +43,24 @@ export class CardService {
     return this.convertCardToGetCardResponseDto(card);
   }
 
+  private async generateSoundUrls(
+    text: string,
+    languageCode: string,
+  ): Promise<string[]> {
+    const soundFemaleUrl = await this.ttsService.synthesizeText({
+      text,
+      languageCode,
+    });
+
+    const soundMaleUrl = await this.ttsService.synthesizeText({
+      text,
+      languageCode,
+      gender: 'male',
+    });
+
+    return [soundFemaleUrl, soundMaleUrl];
+  }
+
   async create(
     userId: string,
     createCardDto: CreateCardDto,
@@ -78,7 +96,7 @@ export class CardService {
       },
     );
 
-    const soundUrl = await this.ttsService.synthesizeText(
+    const soundUrls = await this.generateSoundUrls(
       createCardDto.textInLearningLanguage,
       transactionResult.deck.languageWhatILearnCode,
     );
@@ -86,7 +104,7 @@ export class CardService {
     const card = await this.databaseService.card.update({
       where: { id: transactionResult.card.id },
       data: {
-        soundUrls: [soundUrl],
+        soundUrls,
       },
     });
 
@@ -140,7 +158,7 @@ export class CardService {
     if (transactionResult.isUpdatedLearningText) {
       await this.deleteUnuseSoundUrls(transactionResult.deleteSoundUrls);
 
-      const newSoundUrl = await this.ttsService.synthesizeText(
+      const soundUrls = await this.generateSoundUrls(
         updateCardData.textInLearningLanguage,
         transactionResult.deck.languageWhatILearnCode,
       );
@@ -148,7 +166,7 @@ export class CardService {
       const newCard = await this.databaseService.card.update({
         where: { id: cardId },
         data: {
-          soundUrls: [newSoundUrl],
+          soundUrls,
         },
       });
 
