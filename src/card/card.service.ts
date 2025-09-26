@@ -176,12 +176,21 @@ export class CardService {
       select: { soundUrls: true },
     });
 
-    console.log(card);
+    if (!card || !card.soundUrls || card.soundUrls.length === 0) {
+      return;
+    }
 
-    // await this.databaseService.card.update({
-    //   where: { id: cardId },
-    //   data: { soundUrls: [] },
-    // });
+    for (const soundUrl of card.soundUrls) {
+      const cardsWithSameSoundUrl = await this.databaseService.card.findMany({
+        where: { soundUrls: { has: soundUrl }, id: { not: cardId } },
+      });
+
+      if (cardsWithSameSoundUrl.length > 0) {
+        continue;
+      }
+
+      await this.ttsService.deleteSoundUrl(soundUrl);
+    }
   }
 
   async delete(userId: string, cardId: string): Promise<DeleteCardResponseDto> {

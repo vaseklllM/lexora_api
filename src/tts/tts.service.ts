@@ -60,4 +60,11 @@ export class TtsService {
 
     return fileName;
   }
+
+  async deleteSoundUrl(soundUrl: string): Promise<void> {
+    const path = `./public/tts/${soundUrl}`;
+    if (existsSync(path)) {
+      await fs.unlink(path);
+    }
+  }
 }
