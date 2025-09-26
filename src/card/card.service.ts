@@ -52,13 +52,13 @@ export class CardService {
       languageCode,
     });
 
-    const soundMaleUrl = await this.ttsService.synthesizeText({
-      text,
-      languageCode,
-      gender: 'male',
-    });
+    // const soundMaleUrl = await this.ttsService.synthesizeText({
+    //   text,
+    //   languageCode,
+    //   gender: 'male',
+    // });
 
-    return [soundFemaleUrl, soundMaleUrl];
+    return [soundFemaleUrl];
   }
 
   async create(

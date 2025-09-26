@@ -51,10 +51,14 @@ export class DeckService {
         languageWhatIKnowName: string;
         languageWhatIKnowNativeName: string;
         languageWhatIKnowIconSymbol: string;
+        languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender: boolean;
+        languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender: boolean;
         languageWhatILearnCode: string;
         languageWhatILearnName: string;
         languageWhatILearnNativeName: string;
         languageWhatILearnIconSymbol: string;
+        languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender: boolean;
+        languageWhatILearnIsSupportGoogleTtsVoiceMaleGender: boolean;
         totalCards: bigint;
         newCards: bigint;
         cardsInProgress: bigint;
@@ -69,10 +73,14 @@ export class DeckService {
       l_k."name" as "languageWhatIKnowName",
       l_k."nativeName" as "languageWhatIKnowNativeName",
       l_k."iconSymbol" as "languageWhatIKnowIconSymbol",
+      l_k."isSupportGoogleTtsVoiceFemaleGender" as "languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender",
+      l_k."isSupportGoogleTtsVoiceMaleGender" as "languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender",
       l_l."code" as "languageWhatILearnCode",
       l_l."name" as "languageWhatILearnName",
       l_l."nativeName" as "languageWhatILearnNativeName",
       l_l."iconSymbol" as "languageWhatILearnIconSymbol",
+      l_k."isSupportGoogleTtsVoiceFemaleGender" as "languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender",
+      l_k."isSupportGoogleTtsVoiceMaleGender" as "languageWhatILearnIsSupportGoogleTtsVoiceMaleGender",
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
@@ -85,8 +93,8 @@ export class DeckService {
     WHERE d."userId" = ${userId} AND ${folderCondition}
     GROUP BY 
       d.id, d.name,
-      l_k."code", l_k."name", l_k."nativeName", l_k."iconSymbol",
-      l_l."code", l_l."name", l_l."nativeName", l_l."iconSymbol"
+      l_k."code", l_k."name", l_k."nativeName", l_k."iconSymbol", l_k."isSupportGoogleTtsVoiceFemaleGender", l_k."isSupportGoogleTtsVoiceMaleGender",
+      l_l."code", l_l."name", l_l."nativeName", l_l."iconSymbol", l_l."isSupportGoogleTtsVoiceFemaleGender", l_l."isSupportGoogleTtsVoiceMaleGender"
     ORDER BY d."createdAt" ASC
   `;
 
@@ -102,12 +110,20 @@ export class DeckService {
           name: deck.languageWhatIKnowName,
           nativeName: deck.languageWhatIKnowNativeName,
           iconSymbol: deck.languageWhatIKnowIconSymbol,
+          isSupportGoogleTtsVoiceFemaleGender:
+            deck.languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender,
+          isSupportGoogleTtsVoiceMaleGender:
+            deck.languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender,
         },
         languageWhatILearn: {
           code: deck.languageWhatILearnCode,
           name: deck.languageWhatILearnName,
           nativeName: deck.languageWhatILearnNativeName,
           iconSymbol: deck.languageWhatILearnIconSymbol,
+          isSupportGoogleTtsVoiceFemaleGender:
+            deck.languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender,
+          isSupportGoogleTtsVoiceMaleGender:
+            deck.languageWhatILearnIsSupportGoogleTtsVoiceMaleGender,
         },
         numberOfCards: Number(deck.totalCards),
         numberOfCardsLearned: Number(deck.cardsLearned),

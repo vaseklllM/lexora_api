@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export const languageEnExample: LanguageDto = {
   code: 'en',
   name: 'English',
   nativeName: 'English',
   iconSymbol: '🇺🇸',
+  isSupportGoogleTtsVoiceFemaleGender: true,
+  isSupportGoogleTtsVoiceMaleGender: true,
 };
 
 export const languageUkExample: LanguageDto = {
@@ -13,6 +15,8 @@ export const languageUkExample: LanguageDto = {
   name: 'Ukrainian',
   nativeName: 'Українська',
   iconSymbol: '🇺🇦',
+  isSupportGoogleTtsVoiceFemaleGender: true,
+  isSupportGoogleTtsVoiceMaleGender: false,
 };
 
 export class LanguageDto {
@@ -47,4 +51,20 @@ export class LanguageDto {
   @IsString()
   @IsNotEmpty()
   iconSymbol: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Is support Google TTS female voice',
+  })
+  @IsBoolean()
+  @IsNotEmpty()
+  isSupportGoogleTtsVoiceFemaleGender: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Is support Google TTS male voice',
+  })
+  @IsBoolean()
+  @IsNotEmpty()
+  isSupportGoogleTtsVoiceMaleGender: boolean;
 }

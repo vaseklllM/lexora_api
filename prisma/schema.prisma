@@ -51,12 +51,14 @@ model Account {
 }
 
 model Language {
-  code               String  @id @default(uuid())   
-  name               String
-  nativeName         String
-  iconSymbol         String
-  decksWhatIKnow     Deck[] @relation("LanguageWhatIKnow")
-  decksWhatILearn    Deck[] @relation("LanguageWhatILearn")
+  code                                   String  @id @default(uuid())   
+  name                                   String
+  nativeName                             String
+  iconSymbol                             String
+  isSupportGoogleTtsVoiceFemaleGender    Boolean @default(false)
+  isSupportGoogleTtsVoiceMaleGender      Boolean @default(false)
+  decksWhatIKnow                         Deck[] @relation("LanguageWhatIKnow")
+  decksWhatILearn                        Deck[] @relation("LanguageWhatILearn")
 }
 
 
