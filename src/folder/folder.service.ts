@@ -18,6 +18,7 @@ import {
   FolderResponseDto,
 } from './dto/folder-response.dto';
 import { DeckService } from 'src/deck/deck.service';
+import { CardService } from 'src/card/card.service';
 
 @Injectable()
 export class FolderService {
@@ -25,6 +26,7 @@ export class FolderService {
     private readonly databaseService: DatabaseService,
     @Inject(forwardRef(() => DeckService))
     private readonly deckService: DeckService,
+    private readonly cardService: CardService,
   ) {}
 
   private async getNumberOfCardsInFolder(
@@ -238,19 +240,57 @@ export class FolderService {
     userId: string,
     deleteFolderDto: DeleteFolderDto,
   ): Promise<DeleteFolderResponseDto> {
-    await this.databaseService.$transaction(async (tx) => {
-      const folder = await tx.folder.findUnique({
-        where: { id: deleteFolderDto.id, userId },
-      });
+    const transactionResult = await this.databaseService.$transaction(
+      async (tx) => {
+        const folder = await tx.folder.findUnique({
+          where: { id: deleteFolderDto.id, userId },
+        });
 
-      if (!folder) {
-        throw new NotFoundException('Folder not found');
-      }
+        if (!folder) {
+          throw new NotFoundException('Folder not found');
+        }
 
-      await tx.folder.delete({
-        where: { id: deleteFolderDto.id },
-      });
-    });
+        async function getAllSoundUrlsInFolder(
+          folderId: string,
+        ): Promise<string[]> {
+          const folderDecks = await tx.deck.findMany({
+            where: { folderId },
+            include: { cards: true },
+          });
+
+          let soundUrls: string[] = [];
+
+          for (const deck of folderDecks) {
+            for (const card of deck.cards) {
+              soundUrls = [...soundUrls, ...card.soundUrls];
+            }
+          }
+
+          const folderChilds = await tx.folder.findMany({
+            where: { parentId: folderId },
+          });
+
+          for (const child of folderChilds) {
+            const childSoundUrls = await getAllSoundUrlsInFolder(child.id);
+            soundUrls = [...soundUrls, ...childSoundUrls];
+          }
+
+          return soundUrls;
+        }
+
+        const soundUrls = await getAllSoundUrlsInFolder(folder.id);
+
+        await tx.folder.delete({
+          where: { id: deleteFolderDto.id },
+        });
+
+        return {
+          soundUrls,
+        };
+      },
+    );
+
+    await this.cardService.deleteUnuseSoundUrls(transactionResult.soundUrls);
 
     return { message: 'Folder deleted successfully' };
   }

@@ -344,7 +344,7 @@ export class DeckService {
       },
     );
 
-    await this.cardService.deleteSoundUrls(transactionResult.soundUrls);
+    await this.cardService.deleteUnuseSoundUrls(transactionResult.soundUrls);
 
     return {
       message: `Deck '${transactionResult.deckName}' deleted successfully`,

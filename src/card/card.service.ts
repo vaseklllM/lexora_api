@@ -138,7 +138,7 @@ export class CardService {
     );
 
     if (transactionResult.isUpdatedLearningText) {
-      await this.deleteSoundUrls(transactionResult.deleteSoundUrls);
+      await this.deleteUnuseSoundUrls(transactionResult.deleteSoundUrls);
 
       const newSoundUrl = await this.ttsService.synthesizeText(
         updateCardData.textInLearningLanguage,
@@ -158,7 +158,7 @@ export class CardService {
     return this.convertCardToGetCardResponseDto(transactionResult.newCard);
   }
 
-  public async deleteSoundUrls(soundUrls: string[]): Promise<void> {
+  public async deleteUnuseSoundUrls(soundUrls: string[]): Promise<void> {
     for (const soundUrl of soundUrls) {
       const cardWithSameSoundUrl = await this.databaseService.card.findFirst({
         where: { soundUrls: { has: soundUrl } },
@@ -193,7 +193,7 @@ export class CardService {
         };
       });
 
-    await this.deleteSoundUrls(soundUrls);
+    await this.deleteUnuseSoundUrls(soundUrls);
 
     return {
       message: `Card '${textInLearningLanguage}' deleted successfully`,
