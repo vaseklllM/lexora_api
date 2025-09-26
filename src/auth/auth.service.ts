@@ -88,64 +88,66 @@ export class AuthService {
       throw new UnauthorizedException('Email mismatch for Google login');
     }
 
-    const user = await this.databaseService.user.findUnique({
-      where: { email: payload.email },
-      include: {
-        accounts: true,
-      },
-    });
+    return await this.databaseService.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { email: payload.email },
+        include: {
+          accounts: true,
+        },
+      });
 
-    if (!user) {
-      const newUser = await this.databaseService.user.create({
-        data: {
-          email: payload.email,
-          name: payload.name!,
-          avatar: payload.picture,
-          accounts: {
-            create: {
-              provider: AccountProvider.google,
-              type: AccountType.oauth,
-              providerAccountId: googleLoginDto.accountId,
+      if (!user) {
+        const newUser = await tx.user.create({
+          data: {
+            email: payload.email!,
+            name: payload.name!,
+            avatar: payload.picture,
+            accounts: {
+              create: {
+                provider: AccountProvider.google,
+                type: AccountType.oauth,
+                providerAccountId: googleLoginDto.accountId,
+              },
             },
           },
-        },
-      });
+        });
+
+        return {
+          ...this.generateTokens(newUser),
+          user: {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+            createdAt: newUser.createdAt.toISOString(),
+            updatedAt: newUser.updatedAt.toISOString(),
+            avatar: newUser.avatar ?? undefined,
+          },
+        };
+      }
+
+      if (!user.accounts.some((i) => i.provider === AccountProvider.google)) {
+        await this.databaseService.account.create({
+          data: {
+            type: AccountType.oauth,
+            provider: AccountProvider.google,
+            providerAccountId: googleLoginDto.accountId,
+            userId: user.id,
+          },
+        });
+      }
 
       return {
-        ...this.generateTokens(newUser),
+        ...this.generateTokens(user),
         user: {
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name,
-          createdAt: newUser.createdAt.toISOString(),
-          updatedAt: newUser.updatedAt.toISOString(),
-          avatar: newUser.avatar ?? undefined,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          createdAt: user.createdAt.toISOString(),
+          updatedAt: user.updatedAt.toISOString(),
+          avatar: user.avatar ?? undefined,
         },
       };
-    }
-
-    if (!user.accounts.some((i) => i.provider === AccountProvider.google)) {
-      await this.databaseService.account.create({
-        data: {
-          type: AccountType.oauth,
-          provider: AccountProvider.google,
-          providerAccountId: googleLoginDto.accountId,
-          userId: user.id,
-        },
-      });
-    }
-
-    return {
-      ...this.generateTokens(user),
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-        avatar: user.avatar ?? undefined,
-      },
-    };
+    });
   }
 
   async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {

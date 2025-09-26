@@ -20,28 +20,38 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     email: string,
     password: string,
   ): Promise<LocalUser | null> {
-    const user = await this.databaseService.user.findUnique({
-      where: { email },
-    });
+    const transactionResult = await this.databaseService.$transaction(
+      async (tx) => {
+        const user = await tx.user.findUnique({
+          where: { email },
+        });
 
-    if (!user) {
-      return null;
-    }
+        if (!user) {
+          return null;
+        }
 
-    const account = await this.databaseService.account.findFirst({
-      where: {
-        userId: user.id,
-        provider: AccountProvider.credentials,
-        type: AccountType.credentials,
+        const account = await tx.account.findFirst({
+          where: {
+            userId: user.id,
+            provider: AccountProvider.credentials,
+            type: AccountType.credentials,
+          },
+        });
+
+        if (!account || !account.passwordHash) {
+          return null;
+        }
+
+        return { user, passwordHash: account.passwordHash };
       },
-    });
+    );
 
-    if (!account || !account.passwordHash) {
+    if (!transactionResult) {
       return null;
     }
 
     const isPasswordValid = await argon2.verify(
-      account.passwordHash,
+      transactionResult.passwordHash,
       password,
       {
         secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
@@ -52,7 +62,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       return null;
     }
 
-    return user;
+    return transactionResult.user;
   }
 
   async validate(email: string, password: string): Promise<LocalUser> {
