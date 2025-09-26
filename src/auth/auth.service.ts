@@ -149,31 +149,34 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto): Promise<RegisterResponseDto> {
-    // Check if user with this email already exists
-    const existingUser = await this.databaseService.user.findUnique({
-      where: { email: registerDto.email },
-    });
+    const userCreated = await this.databaseService.$transaction(async (tx) => {
+      const existingUser = await tx.user.findUnique({
+        where: { email: registerDto.email },
+      });
 
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
 
-    const hash = await argon2.hash(registerDto.password, {
-      secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
-    });
+      const hash = await argon2.hash(registerDto.password, {
+        secret: Buffer.from(process.env.PASSWORD_SECRET as string, 'utf-8'),
+      });
 
-    const userCreated = await this.databaseService.user.create({
-      data: {
-        email: registerDto.email,
-        name: registerDto.name,
-        accounts: {
-          create: {
-            provider: AccountProvider.credentials,
-            type: AccountType.credentials,
-            passwordHash: hash,
+      const userCreated = await tx.user.create({
+        data: {
+          email: registerDto.email,
+          name: registerDto.name,
+          accounts: {
+            create: {
+              provider: AccountProvider.credentials,
+              type: AccountType.credentials,
+              passwordHash: hash,
+            },
           },
         },
-      },
+      });
+
+      return userCreated;
     });
 
     return {
