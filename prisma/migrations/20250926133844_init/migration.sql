@@ -21,7 +21,7 @@ CREATE TABLE "public"."Account" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "provider" "public"."AccountProvider" NOT NULL,
-    "providerAccountId" TEXT NOT NULL,
+    "providerAccountId" TEXT,
     "type" "public"."AccountType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -70,8 +70,6 @@ CREATE TABLE "public"."Card" (
     "id" TEXT NOT NULL,
     "textInKnownLanguage" TEXT NOT NULL,
     "textInLearningLanguage" TEXT NOT NULL,
-    "exampleInKnownLanguage" TEXT,
-    "exampleInLearningLanguage" TEXT,
     "descriptionInKnownLanguage" TEXT,
     "descriptionInLearningLanguage" TEXT,
     "masteryScore" INTEGER NOT NULL DEFAULT 0,
@@ -81,7 +79,7 @@ CREATE TABLE "public"."Card" (
     "userId" TEXT NOT NULL,
     "isNew" BOOLEAN NOT NULL DEFAULT true,
     "lastReviewedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "nativeSoundUrls" TEXT[],
+    "soundUrls" TEXT[],
 
     CONSTRAINT "Card_pkey" PRIMARY KEY ("id")
 );

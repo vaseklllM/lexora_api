@@ -27,11 +27,11 @@ export class CardService {
       createdAt: card.createdAt.toISOString(),
       masteryScore: card.masteryScore,
       isNew: card.isNew,
-      nativeSoundUrls: card.nativeSoundUrls ?? [],
+      soundUrls: card.soundUrls ?? [],
     };
   }
 
-  private async getNativeSoundUrls(
+  private async getSoundUrls(
     languageCode: string,
     word: string,
   ): Promise<string[]> {
@@ -121,7 +121,7 @@ export class CardService {
   ): Promise<CreateCardResponseDto> {
     const deck = await this.checkIsExistDeck(userId, createCardDto.deckId);
 
-    const nativeSoundUrls = await this.getNativeSoundUrls(
+    const soundUrls = await this.getSoundUrls(
       deck.languageWhatILearnCode,
       createCardDto.textInLearningLanguage,
     );
@@ -136,7 +136,7 @@ export class CardService {
         descriptionInLearningLanguage:
           createCardDto.descriptionInLearningLanguage?.trim(),
         deckId: createCardDto.deckId,
-        nativeSoundUrls,
+        soundUrls,
       },
     });
 
@@ -152,26 +152,42 @@ export class CardService {
     const card = await this.checkIsExistCard(userId, cardId);
     const deck = await this.checkIsExistDeck(userId, card.deckId);
 
-    const nativeSoundUrls = updateCardData.textInLearningLanguage
-      ? await this.getNativeSoundUrls(
+    const soundUrls = updateCardData.textInLearningLanguage
+      ? await this.getSoundUrls(
           deck.languageWhatILearnCode,
           updateCardData.textInLearningLanguage,
         )
-      : card.nativeSoundUrls;
+      : card.soundUrls;
 
     const newCard = await this.databaseService.card.update({
       where: { id: cardId },
       data: {
         ...updateCardData,
-        nativeSoundUrls,
+        soundUrls,
       },
     });
 
     return this.convertCardToGetCardResponseDto(newCard);
   }
 
+  public async deleteSoundUrls(userId: string, cardId: string): Promise<void> {
+    const card = await this.databaseService.card.findUnique({
+      where: { userId, id: cardId },
+      select: { soundUrls: true },
+    });
+
+    console.log(card);
+
+    // await this.databaseService.card.update({
+    //   where: { id: cardId },
+    //   data: { soundUrls: [] },
+    // });
+  }
+
   async delete(userId: string, cardId: string): Promise<DeleteCardResponseDto> {
     await this.checkIsExistCard(userId, cardId);
+
+    await this.deleteSoundUrls(userId, cardId);
 
     const deletedCard = await this.databaseService.card.delete({
       where: { id: cardId },

@@ -30,7 +30,10 @@ export class TtsService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { text },
+          input: {
+            text,
+            // ssml: `<speak><emphasis level="strong">${text}</emphasis></speak>`,
+          },
           voice: {
             languageCode,
           },

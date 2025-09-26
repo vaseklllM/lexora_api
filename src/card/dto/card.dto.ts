@@ -16,7 +16,7 @@ export const CardExample: CardDto = {
   createdAt: '2023-01-01T00:00:00Z',
   masteryScore: 0,
   isNew: true,
-  nativeSoundUrls: [
+  soundUrls: [
     'https://api.dictionaryapi.dev/media/pronunciations/en/book-au.mp3',
     'https://api.dictionaryapi.dev/media/pronunciations/en/book-us.mp3',
   ],
@@ -96,5 +96,5 @@ export class CardDto {
     description: 'Native sound urls',
   })
   @IsString({ each: true })
-  nativeSoundUrls: string[];
+  soundUrls: string[];
 }

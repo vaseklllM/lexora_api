@@ -106,5 +106,5 @@ model Card {
   user                            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
-  nativeSoundUrls                 String[] 
+  soundUrls                       String[]
 }
