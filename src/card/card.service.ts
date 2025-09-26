@@ -90,24 +90,44 @@ export class CardService {
     userId: string,
     createCardDto: CreateCardDto,
   ): Promise<CreateCardResponseDto> {
-    const deck = await this.checkIsExistDeck(userId, createCardDto.deckId);
+    const transactionResult = await this.databaseService.$transaction(
+      async (tx) => {
+        const deck = await tx.deck.findFirst({
+          where: { userId, id: createCardDto.deckId },
+        });
 
-    const soundUrls = await this.getSoundUrls(
-      deck.languageWhatILearnCode,
-      createCardDto.textInLearningLanguage,
+        if (!deck) {
+          throw new NotFoundException('Deck not found');
+        }
+
+        const card = await tx.card.create({
+          data: {
+            userId,
+            textInKnownLanguage: createCardDto.textInKnownLanguage.trim(),
+            textInLearningLanguage: createCardDto.textInLearningLanguage.trim(),
+            descriptionInKnownLanguage:
+              createCardDto.descriptionInKnownLanguage?.trim(),
+            descriptionInLearningLanguage:
+              createCardDto.descriptionInLearningLanguage?.trim(),
+            deckId: createCardDto.deckId,
+            soundUrls: [],
+          },
+        });
+
+        return {
+          deck,
+          card,
+        };
+      },
     );
 
-    const card = await this.databaseService.card.create({
+    const card = await this.databaseService.card.update({
+      where: { id: transactionResult.card.id },
       data: {
-        userId,
-        textInKnownLanguage: createCardDto.textInKnownLanguage.trim(),
-        textInLearningLanguage: createCardDto.textInLearningLanguage.trim(),
-        descriptionInKnownLanguage:
-          createCardDto.descriptionInKnownLanguage?.trim(),
-        descriptionInLearningLanguage:
-          createCardDto.descriptionInLearningLanguage?.trim(),
-        deckId: createCardDto.deckId,
-        soundUrls,
+        soundUrls: await this.getSoundUrls(
+          transactionResult.deck.languageWhatILearnCode,
+          createCardDto.textInLearningLanguage,
+        ),
       },
     });
 
