@@ -58,6 +58,7 @@ export class CardService {
     const result: string[] = [];
 
     function getName(names: string[]): string {
+      // name[1] is the best quality, name[0] is normal quality
       return names[1] ?? names[0];
     }
 

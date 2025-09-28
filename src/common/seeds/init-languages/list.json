@@ -72,6 +72,24 @@
     "iconSymbol": "🇸🇬"
   },
   {
+    "code": "cmn-CN",
+    "name": "Mandarin Chinese (China)",
+    "nativeName": "普通话（中国大陆）",
+    "iconSymbol": "🇨🇳"
+  },
+  {
+    "code": "cmn-TW",
+    "name": "Mandarin Chinese (Taiwan)",
+    "nativeName": "國語（臺灣）",
+    "iconSymbol": "🇹🇼"
+  },
+  {
+    "code": "yue-HK",
+    "name": "Cantonese (Hong Kong)",
+    "nativeName": "廣東話（香港）",
+    "iconSymbol": "🇭🇰"
+  },
+  {
     "code": "es-ES",
     "name": "Spanish (Spain)",
     "nativeName": "Español (España)",
@@ -238,6 +256,12 @@
     "name": "Arabic (Lebanon)",
     "nativeName": "العربية (لبنان)",
     "iconSymbol": "🇱🇧"
+  },
+  {
+    "code": "ar-XA",
+    "name": "Arabic (Middle East)",
+    "nativeName": "العربية (الشرق الأوسط)",
+    "iconSymbol": "🌍"
   },
   {
     "code": "pt-PT",
@@ -468,6 +492,12 @@
     "iconSymbol": "🇳🇴"
   },
   {
+    "code": "nb-NO",
+    "name": "Norwegian Bokmål (Norway)",
+    "nativeName": "Norsk Bokmål",
+    "iconSymbol": "🇳🇴"
+  },
+  {
     "code": "nn-NO",
     "name": "Norwegian (Nynorsk)",
     "nativeName": "Nynorsk",
@@ -596,6 +626,12 @@
   {
     "code": "tl-PH",
     "name": "Filipino",
+    "nativeName": "Filipino",
+    "iconSymbol": "🇵🇭"
+  },
+  {
+    "code": "fil-PH",
+    "name": "Filipino (Philippines)",
     "nativeName": "Filipino",
     "iconSymbol": "🇵🇭"
   },
