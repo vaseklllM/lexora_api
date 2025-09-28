@@ -9,8 +9,8 @@ export class TtsService {
   async synthesizeText(args: {
     text: string;
     languageCode: string;
-    gender?: 'male' | 'female';
-    name?: string;
+    gender: 'male' | 'female';
+    name: string;
   }): Promise<string> {
     const audioDir = join(process.cwd(), 'public', 'tts');
     if (!existsSync(audioDir)) {
@@ -19,7 +19,7 @@ export class TtsService {
 
     const key = crypto
       .createHash('sha256')
-      .update(`${args.text}-${args.languageCode}-${args.gender ?? 'female'}`)
+      .update(`${args.text}-${args.languageCode}-${args.gender}-${args.name}`)
       .digest('hex');
 
     const fileName = `${key}.mp3`;
