@@ -28,6 +28,7 @@ import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.d
 import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 import { CardService } from 'src/card/card.service';
+import { LanguagesService } from 'src/languages/languages.service';
 
 @Injectable()
 export class DeckService {
@@ -36,6 +37,7 @@ export class DeckService {
     @Inject(forwardRef(() => FolderService))
     private readonly folderService: FolderService,
     private readonly cardService: CardService,
+    private readonly languagesService: LanguagesService,
   ) {}
 
   async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
@@ -51,14 +53,14 @@ export class DeckService {
         languageWhatIKnowName: string;
         languageWhatIKnowNativeName: string;
         languageWhatIKnowIconSymbol: string;
-        languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender: boolean;
-        languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender: boolean;
+        languageWhatIKnowGoogleTtsVoiceFemaleName: string | null;
+        languageWhatIKnowGoogleTtsVoiceMaleName: string | null;
         languageWhatILearnCode: string;
         languageWhatILearnName: string;
         languageWhatILearnNativeName: string;
         languageWhatILearnIconSymbol: string;
-        languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender: boolean;
-        languageWhatILearnIsSupportGoogleTtsVoiceMaleGender: boolean;
+        languageWhatILearnGoogleTtsVoiceFemaleName: string | null;
+        languageWhatILearnGoogleTtsVoiceMaleName: string | null;
         totalCards: bigint;
         newCards: bigint;
         cardsInProgress: bigint;
@@ -73,14 +75,14 @@ export class DeckService {
       l_k."name" as "languageWhatIKnowName",
       l_k."nativeName" as "languageWhatIKnowNativeName",
       l_k."iconSymbol" as "languageWhatIKnowIconSymbol",
-      l_k."isSupportGoogleTtsVoiceFemaleGender" as "languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender",
-      l_k."isSupportGoogleTtsVoiceMaleGender" as "languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender",
+      l_k."googleTtsVoiceFemaleName" as "languageWhatIKnowGoogleTtsVoiceFemaleName",
+      l_k."googleTtsVoiceMaleName" as "languageWhatIKnowGoogleTtsVoiceMaleName",
       l_l."code" as "languageWhatILearnCode",
       l_l."name" as "languageWhatILearnName",
       l_l."nativeName" as "languageWhatILearnNativeName",
       l_l."iconSymbol" as "languageWhatILearnIconSymbol",
-      l_k."isSupportGoogleTtsVoiceFemaleGender" as "languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender",
-      l_k."isSupportGoogleTtsVoiceMaleGender" as "languageWhatILearnIsSupportGoogleTtsVoiceMaleGender",
+      l_k."googleTtsVoiceFemaleName" as "languageWhatILearnGoogleTtsVoiceFemaleName",
+      l_k."googleTtsVoiceMaleName" as "languageWhatILearnGoogleTtsVoiceMaleName",
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
@@ -93,8 +95,8 @@ export class DeckService {
     WHERE d."userId" = ${userId} AND ${folderCondition}
     GROUP BY 
       d.id, d.name,
-      l_k."code", l_k."name", l_k."nativeName", l_k."iconSymbol", l_k."isSupportGoogleTtsVoiceFemaleGender", l_k."isSupportGoogleTtsVoiceMaleGender",
-      l_l."code", l_l."name", l_l."nativeName", l_l."iconSymbol", l_l."isSupportGoogleTtsVoiceFemaleGender", l_l."isSupportGoogleTtsVoiceMaleGender"
+      l_k."code", l_k."name", l_k."nativeName", l_k."iconSymbol", l_k."googleTtsVoiceFemaleName", l_k."googleTtsVoiceMaleName",
+      l_l."code", l_l."name", l_l."nativeName", l_l."iconSymbol", l_l."googleTtsVoiceFemaleName", l_l."googleTtsVoiceMaleName"
     ORDER BY d."createdAt" ASC
   `;
 
@@ -105,26 +107,24 @@ export class DeckService {
         numberOfNewCards: Number(deck.newCards),
         numberOfCardsInProgress: Number(deck.cardsInProgress),
         numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
-        languageWhatIKnow: {
+        languageWhatIKnow: this.languagesService.convertLanguageToLanguageDto({
           code: deck.languageWhatIKnowCode,
           name: deck.languageWhatIKnowName,
           nativeName: deck.languageWhatIKnowNativeName,
           iconSymbol: deck.languageWhatIKnowIconSymbol,
-          isSupportGoogleTtsVoiceFemaleGender:
-            deck.languageWhatIKnowIsSupportGoogleTtsVoiceFemaleGender,
-          isSupportGoogleTtsVoiceMaleGender:
-            deck.languageWhatIKnowIsSupportGoogleTtsVoiceMaleGender,
-        },
-        languageWhatILearn: {
+          googleTtsVoiceFemaleName:
+            deck.languageWhatIKnowGoogleTtsVoiceFemaleName,
+          googleTtsVoiceMaleName: deck.languageWhatIKnowGoogleTtsVoiceMaleName,
+        }),
+        languageWhatILearn: this.languagesService.convertLanguageToLanguageDto({
           code: deck.languageWhatILearnCode,
           name: deck.languageWhatILearnName,
           nativeName: deck.languageWhatILearnNativeName,
           iconSymbol: deck.languageWhatILearnIconSymbol,
-          isSupportGoogleTtsVoiceFemaleGender:
-            deck.languageWhatILearnIsSupportGoogleTtsVoiceFemaleGender,
-          isSupportGoogleTtsVoiceMaleGender:
-            deck.languageWhatILearnIsSupportGoogleTtsVoiceMaleGender,
-        },
+          googleTtsVoiceFemaleName:
+            deck.languageWhatILearnGoogleTtsVoiceFemaleName,
+          googleTtsVoiceMaleName: deck.languageWhatILearnGoogleTtsVoiceMaleName,
+        }),
         numberOfCards: Number(deck.totalCards),
         numberOfCardsLearned: Number(deck.cardsLearned),
       }),
@@ -180,8 +180,12 @@ export class DeckService {
     return {
       id: deck.id,
       name: deck.name,
-      languageWhatIKnow: deck.languageWhatIKnow,
-      languageWhatILearn: deck.languageWhatILearn,
+      languageWhatIKnow: this.languagesService.convertLanguageToLanguageDto(
+        deck.languageWhatIKnow,
+      ),
+      languageWhatILearn: this.languagesService.convertLanguageToLanguageDto(
+        deck.languageWhatILearn,
+      ),
       numberOfCards: numberOfCards,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,

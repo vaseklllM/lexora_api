@@ -47,18 +47,38 @@ export class CardService {
     text: string,
     languageCode: string,
   ): Promise<string[]> {
-    const soundFemaleUrl = await this.ttsService.synthesizeText({
-      text,
-      languageCode,
+    const language = await this.databaseService.language.findUnique({
+      where: { code: languageCode },
+      select: {
+        googleTtsVoiceFemaleName: true,
+        googleTtsVoiceMaleName: true,
+      },
     });
 
-    // const soundMaleUrl = await this.ttsService.synthesizeText({
-    //   text,
-    //   languageCode,
-    //   gender: 'male',
-    // });
+    const result: string[] = [];
 
-    return [soundFemaleUrl];
+    if (language?.googleTtsVoiceFemaleName) {
+      const soundFemaleUrl = await this.ttsService.synthesizeText({
+        text,
+        languageCode,
+        gender: 'female',
+        name: language.googleTtsVoiceFemaleName,
+      });
+
+      result.push(soundFemaleUrl);
+    }
+
+    if (language?.googleTtsVoiceMaleName) {
+      const soundMaleUrl = await this.ttsService.synthesizeText({
+        text,
+        languageCode,
+        gender: 'male',
+        name: language.googleTtsVoiceMaleName,
+      });
+      result.push(soundMaleUrl);
+    }
+
+    return result;
   }
 
   async create(

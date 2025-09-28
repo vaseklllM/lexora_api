@@ -3,6 +3,13 @@ import languages from './list.json';
 
 const prisma = new PrismaClient();
 
+type IVoice = {
+  name: string;
+  languageCodes: string[];
+  ssmlGender: string;
+  naturalSampleRateHertz: number;
+};
+
 async function loadGoogleVoices() {
   const res = await fetch(
     `https://texttospeech.googleapis.com/v1/voices?key=${process.env.GOOGLE_API}`,
@@ -18,12 +25,7 @@ async function loadGoogleVoices() {
   }
 
   const data: {
-    voices: Array<{
-      name: string;
-      languageCodes: string[];
-      ssmlGender: string;
-      naturalSampleRateHertz: number;
-    }>;
+    voices: Array<IVoice>;
   } = await res.json();
 
   return data.voices;
@@ -50,28 +52,52 @@ async function main() {
       return voice.languageCodes.includes(language.code);
     });
 
-    const isSupportGoogleTtsVoiceFemaleGender = languageVoices.some(
+    const googleTtsVoiceFemaleName = languageVoices.filter(
       (voice) => voice.ssmlGender === 'FEMALE',
     );
 
-    const isSupportGoogleTtsVoiceMaleGender = languageVoices.some(
+    const googleTtsVoiceMaleName = languageVoices.filter(
       (voice) => voice.ssmlGender === 'MALE',
     );
 
     if (
-      !isSupportGoogleTtsVoiceFemaleGender &&
-      !isSupportGoogleTtsVoiceMaleGender
+      googleTtsVoiceFemaleName.length <= 0 &&
+      googleTtsVoiceMaleName.length <= 0
     ) {
       console.log(`🧹 Skip language ${language.name} (${language.code})`);
       continue;
+    }
+
+    const hightToLowQualityVoices = [
+      'preview',
+      'polyglot',
+      'studio',
+      'neural',
+      'wavenet',
+      'standard',
+    ];
+
+    function getVoiceQuality(voices: IVoice[]): string | undefined {
+      if (voices.length === 0) return undefined;
+      for (const quality of hightToLowQualityVoices) {
+        const found = voices.find((voice) =>
+          voice.name.toLowerCase().includes(quality),
+        );
+        if (found) {
+          return found.name;
+        }
+      }
+      return voices[voices.length - 1].name;
     }
 
     try {
       await prisma.language.create({
         data: {
           ...language,
-          isSupportGoogleTtsVoiceFemaleGender,
-          isSupportGoogleTtsVoiceMaleGender,
+          googleTtsVoiceFemaleName: getVoiceQuality(googleTtsVoiceFemaleName),
+          // googleTtsVoiceFemaleName[googleTtsVoiceFemaleName.length - 1]?.name,
+          googleTtsVoiceMaleName: getVoiceQuality(googleTtsVoiceMaleName),
+          // googleTtsVoiceMaleName[googleTtsVoiceMaleName.length - 1]?.name,
         },
       });
       console.log(`✅ Language ${language.name} (${language.code}) seeded`);

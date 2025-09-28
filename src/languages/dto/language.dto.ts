@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export const languageEnExample: LanguageDto = {
   code: 'en',
   name: 'English',
   nativeName: 'English',
   iconSymbol: '🇺🇸',
-  isSupportGoogleTtsVoiceFemaleGender: true,
-  isSupportGoogleTtsVoiceMaleGender: true,
+  googleTtsVoiceFemaleName: 'uk-UA-Chirp3-HD-Achird',
+  googleTtsVoiceMaleName: 'uk-UA-Chirp3-HD-Achird',
 };
 
 export const languageUkExample: LanguageDto = {
@@ -15,8 +15,8 @@ export const languageUkExample: LanguageDto = {
   name: 'Ukrainian',
   nativeName: 'Українська',
   iconSymbol: '🇺🇦',
-  isSupportGoogleTtsVoiceFemaleGender: true,
-  isSupportGoogleTtsVoiceMaleGender: false,
+  googleTtsVoiceFemaleName: 'uk-UA-Chirp3-HD-Achird',
+  googleTtsVoiceMaleName: 'uk-UA-Chirp3-HD-Achird',
 };
 
 export class LanguageDto {
@@ -53,18 +53,18 @@ export class LanguageDto {
   iconSymbol: string;
 
   @ApiProperty({
-    example: true,
-    description: 'Is support Google TTS female voice',
+    example: 'uk-UA-Chirp3-HD-Achird',
+    description: 'Google TTS female voice name',
   })
-  @IsBoolean()
-  @IsNotEmpty()
-  isSupportGoogleTtsVoiceFemaleGender: boolean;
+  @IsString()
+  @IsOptional()
+  googleTtsVoiceFemaleName?: string;
 
   @ApiProperty({
-    example: false,
-    description: 'Is support Google TTS male voice',
+    example: 'uk-UA-Chirp3-HD-Achird',
+    description: 'Google TTS male voice name',
   })
-  @IsBoolean()
-  @IsNotEmpty()
-  isSupportGoogleTtsVoiceMaleGender: boolean;
+  @IsString()
+  @IsOptional()
+  googleTtsVoiceMaleName?: string;
 }

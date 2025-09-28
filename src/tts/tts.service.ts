@@ -10,6 +10,7 @@ export class TtsService {
     text: string;
     languageCode: string;
     gender?: 'male' | 'female';
+    name?: string;
   }): Promise<string> {
     const audioDir = join(process.cwd(), 'public', 'tts');
     if (!existsSync(audioDir)) {
@@ -29,7 +30,7 @@ export class TtsService {
     }
 
     const res = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${process.env.GOOGLE_API}`,
+      `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${process.env.GOOGLE_API}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -40,6 +41,7 @@ export class TtsService {
           voice: {
             languageCode: args.languageCode,
             ssmlGender: args.gender,
+            name: args.name,
           },
           audioConfig: {
             audioEncoding: 'MP3',
