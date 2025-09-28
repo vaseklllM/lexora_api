@@ -45,7 +45,7 @@ export class TtsService {
           },
           audioConfig: {
             audioEncoding: 'MP3',
-            speakingRate: 0.9,
+            speakingRate: 0.8,
           },
         }),
       },
