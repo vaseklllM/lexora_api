@@ -57,23 +57,33 @@ export class CardService {
 
     const result: string[] = [];
 
-    if (language?.googleTtsVoiceFemaleName) {
+    function getName(names: string[]): string {
+      return names[1] ?? names[0];
+    }
+
+    if (
+      Array.isArray(language?.googleTtsVoiceFemaleName) &&
+      language?.googleTtsVoiceFemaleName.length > 0
+    ) {
       const soundFemaleUrl = await this.ttsService.synthesizeText({
         text,
         languageCode,
         gender: 'female',
-        name: language.googleTtsVoiceFemaleName,
+        name: getName(language.googleTtsVoiceFemaleName),
       });
 
       result.push(soundFemaleUrl);
     }
 
-    if (language?.googleTtsVoiceMaleName) {
+    if (
+      Array.isArray(language?.googleTtsVoiceMaleName) &&
+      language?.googleTtsVoiceMaleName.length > 0
+    ) {
       const soundMaleUrl = await this.ttsService.synthesizeText({
         text,
         languageCode,
         gender: 'male',
-        name: language.googleTtsVoiceMaleName,
+        name: getName(language.googleTtsVoiceMaleName),
       });
       result.push(soundMaleUrl);
     }

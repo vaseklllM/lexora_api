@@ -1,35 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import languages from './list.json';
+import { getVoiceQuality } from './getVoiceQuality';
+import { loadGoogleVoices } from './loadGoogleVoices';
 
 const prisma = new PrismaClient();
-
-type IVoice = {
-  name: string;
-  languageCodes: string[];
-  ssmlGender: string;
-  naturalSampleRateHertz: number;
-};
-
-async function loadGoogleVoices() {
-  const res = await fetch(
-    `https://texttospeech.googleapis.com/v1/voices?key=${process.env.GOOGLE_API}`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    },
-  );
-
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Get voices failed: ${errorText}`);
-  }
-
-  const data: {
-    voices: Array<IVoice>;
-  } = await res.json();
-
-  return data.voices;
-}
 
 async function main() {
   console.log('🌱 Starting seed...');
@@ -68,36 +42,12 @@ async function main() {
       continue;
     }
 
-    const hightToLowQualityVoices = [
-      'preview',
-      'polyglot',
-      'studio',
-      'neural',
-      'wavenet',
-      'standard',
-    ];
-
-    function getVoiceQuality(voices: IVoice[]): string | undefined {
-      if (voices.length === 0) return undefined;
-      for (const quality of hightToLowQualityVoices) {
-        const found = voices.find((voice) =>
-          voice.name.toLowerCase().includes(quality),
-        );
-        if (found) {
-          return found.name;
-        }
-      }
-      return voices[voices.length - 1].name;
-    }
-
     try {
       await prisma.language.create({
         data: {
           ...language,
           googleTtsVoiceFemaleName: getVoiceQuality(googleTtsVoiceFemaleName),
-          // googleTtsVoiceFemaleName[googleTtsVoiceFemaleName.length - 1]?.name,
           googleTtsVoiceMaleName: getVoiceQuality(googleTtsVoiceMaleName),
-          // googleTtsVoiceMaleName[googleTtsVoiceMaleName.length - 1]?.name,
         },
       });
       console.log(`✅ Language ${language.name} (${language.code}) seeded`);

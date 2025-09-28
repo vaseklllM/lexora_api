@@ -53,14 +53,14 @@ export class DeckService {
         languageWhatIKnowName: string;
         languageWhatIKnowNativeName: string;
         languageWhatIKnowIconSymbol: string;
-        languageWhatIKnowGoogleTtsVoiceFemaleName: string | null;
-        languageWhatIKnowGoogleTtsVoiceMaleName: string | null;
+        languageWhatIKnowGoogleTtsVoiceFemaleName: string[];
+        languageWhatIKnowGoogleTtsVoiceMaleName: string[];
         languageWhatILearnCode: string;
         languageWhatILearnName: string;
         languageWhatILearnNativeName: string;
         languageWhatILearnIconSymbol: string;
-        languageWhatILearnGoogleTtsVoiceFemaleName: string | null;
-        languageWhatILearnGoogleTtsVoiceMaleName: string | null;
+        languageWhatILearnGoogleTtsVoiceFemaleName: string[];
+        languageWhatILearnGoogleTtsVoiceMaleName: string[];
         totalCards: bigint;
         newCards: bigint;
         cardsInProgress: bigint;

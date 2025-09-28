@@ -55,8 +55,8 @@ model Language {
   name                       String
   nativeName                 String
   iconSymbol                 String
-  googleTtsVoiceFemaleName   String? 
-  googleTtsVoiceMaleName     String? 
+  googleTtsVoiceFemaleName   String[]
+  googleTtsVoiceMaleName     String[] 
   decksWhatIKnow             Deck[] @relation("LanguageWhatIKnow")
   decksWhatILearn            Deck[] @relation("LanguageWhatILearn")
 }

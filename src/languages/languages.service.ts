@@ -15,8 +15,8 @@ export class LanguagesService {
       name: language.name,
       nativeName: language.nativeName,
       iconSymbol: language.iconSymbol,
-      googleTtsVoiceFemaleName: language.googleTtsVoiceFemaleName ?? undefined,
-      googleTtsVoiceMaleName: language.googleTtsVoiceMaleName ?? undefined,
+      // googleTtsVoiceFemaleName: language.googleTtsVoiceFemaleName ?? undefined,
+      // googleTtsVoiceMaleName: language.googleTtsVoiceMaleName ?? undefined,
     };
   }
 
