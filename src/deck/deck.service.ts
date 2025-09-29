@@ -374,16 +374,38 @@ export class DeckService {
   }
 
   async move(userId: string, moveDto: MoveDto): Promise<MoveResponseDto> {
-    const deck = await this.databaseService.deck.findFirst({
-      where: { id: moveDto.deckId, userId },
+    await this.databaseService.$transaction(async (tx) => {
+      const deck = await tx.deck.findFirst({
+        where: { id: moveDto.deckId, userId },
+      });
+
+      if (!deck) {
+        throw new NotFoundException('Deck not found');
+      }
+
+      if (!moveDto.toFolderId) {
+        await tx.deck.update({
+          where: { id: moveDto.deckId },
+          data: { folderId: null },
+        });
+      } else {
+        const folder = await tx.folder.findFirst({
+          where: { id: moveDto.toFolderId, userId },
+        });
+
+        if (!folder) {
+          throw new NotFoundException('Folder not found');
+        }
+
+        await tx.deck.update({
+          where: { id: moveDto.deckId },
+          data: { folderId: moveDto.toFolderId },
+        });
+      }
     });
 
-    if (!deck) {
-      throw new NotFoundException('Deck not found');
-    }
-
     return {
-      message: 'Move functionality to be implemented',
+      message: 'Successfully moved deck to folder',
     };
   }
 

@@ -71,13 +71,13 @@ export class DeckController {
   }
 
   @Delete('delete')
-  @Auth()
   @ApiOperation({ summary: 'Delete a deck' })
   @ApiOkResponse({
     description: 'Returns the message about deleted deck',
     type: DeleteDeckResponseDto,
   })
   @ValidateResponse(DeleteDeckResponseDto)
+  @Auth()
   delete(
     @CurrentUser() user: ICurrentUser,
     @Body() deleteDeckDto: DeleteDeckDto,
@@ -86,6 +86,13 @@ export class DeckController {
   }
 
   @Patch('move')
+  @Auth()
+  @ApiOperation({ summary: 'Move a deck to a folder' })
+  @ApiOkResponse({
+    description: 'Returns the message about moved deck',
+    type: MoveResponseDto,
+  })
+  @ValidateResponse(MoveResponseDto)
   move(
     @CurrentUser() user: ICurrentUser,
     @Body() moveDto: MoveDto,
