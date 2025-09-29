@@ -32,6 +32,8 @@ import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
 import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
 import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
+import { MoveResponseDto } from './dto/move-response.dto';
+import { MoveDto } from './dto/move.dto';
 
 @ApiTags('Decks')
 @Controller('deck')
@@ -81,6 +83,14 @@ export class DeckController {
     @Body() deleteDeckDto: DeleteDeckDto,
   ): Promise<DeleteDeckResponseDto> {
     return this.deskService.delete(user.id, deleteDeckDto);
+  }
+
+  @Patch('move')
+  move(
+    @CurrentUser() user: ICurrentUser,
+    @Body() moveDto: MoveDto,
+  ): Promise<MoveResponseDto> {
+    return this.deskService.move(user.id, moveDto);
   }
 
   @Get('start-learning-session')

@@ -29,6 +29,8 @@ import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 import { CardService } from 'src/card/card.service';
 import { LanguagesService } from 'src/languages/languages.service';
+import { MoveResponseDto } from './dto/move-response.dto';
+import { MoveDto } from './dto/move.dto';
 
 @Injectable()
 export class DeckService {
@@ -368,6 +370,20 @@ export class DeckService {
 
     return {
       message: `Deck '${transactionResult.deckName}' deleted successfully`,
+    };
+  }
+
+  async move(userId: string, moveDto: MoveDto): Promise<MoveResponseDto> {
+    const deck = await this.databaseService.deck.findFirst({
+      where: { id: moveDto.deckId, userId },
+    });
+
+    if (!deck) {
+      throw new NotFoundException('Deck not found');
+    }
+
+    return {
+      message: 'Move functionality to be implemented',
     };
   }
 
