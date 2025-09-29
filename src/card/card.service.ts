@@ -62,31 +62,37 @@ export class CardService {
       return names[1] ?? names[0];
     }
 
+    const promises: Promise<string>[] = [];
+
     if (
       Array.isArray(language?.googleTtsVoiceFemaleName) &&
       language?.googleTtsVoiceFemaleName.length > 0
     ) {
-      const soundFemaleUrl = await this.ttsService.synthesizeText({
-        text,
-        languageCode,
-        gender: 'female',
-        name: getName(language.googleTtsVoiceFemaleName),
-      });
-
-      result.push(soundFemaleUrl);
+      promises.push(
+        this.ttsService.synthesizeText({
+          text,
+          languageCode,
+          gender: 'female',
+          name: getName(language.googleTtsVoiceFemaleName),
+        }),
+      );
     }
 
     if (
       Array.isArray(language?.googleTtsVoiceMaleName) &&
       language?.googleTtsVoiceMaleName.length > 0
     ) {
-      const soundMaleUrl = await this.ttsService.synthesizeText({
-        text,
-        languageCode,
-        gender: 'male',
-        name: getName(language.googleTtsVoiceMaleName),
-      });
-      result.push(soundMaleUrl);
+      promises.push(
+        this.ttsService.synthesizeText({
+          text,
+          languageCode,
+          gender: 'male',
+          name: getName(language.googleTtsVoiceMaleName),
+        }),
+      );
+
+      const results = await Promise.all(promises);
+      result.push(...results);
     }
 
     return result;
