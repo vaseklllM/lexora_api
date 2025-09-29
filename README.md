@@ -91,7 +91,7 @@
 - Сервіс перевіряє токен з використанням `GOOGLE_CLIENT_ID`, створює нового користувача (якщо email ще не зареєстрований) або прив’язує Google-акаунт до існуючого запису.
 - У відповіді повертаються JWT токени та дані користувача, як і під час локального входу.
 
-## Compile and run the project
+## Compile and run the project in dev mode
 
 ```bash
 # development
