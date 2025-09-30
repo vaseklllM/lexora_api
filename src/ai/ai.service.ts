@@ -8,7 +8,7 @@ import { SchemaType } from '@google-cloud/vertexai';
 @Injectable()
 export class AiService {
   constructor(
-    private readonly databaseService: DatabaseService,
+    private readonly database: DatabaseService,
     private readonly vertex: VertexProvider,
   ) {}
 
@@ -16,7 +16,7 @@ export class AiService {
     userId: string,
     fillCardDataDto: FillCardDataDto,
   ): Promise<FillCardDataResponseDto> {
-    const deck = await this.databaseService.deck.findUnique({
+    const deck = await this.database.deck.findUnique({
       where: { userId, id: fillCardDataDto.deckId },
       include: {
         languageWhatIKnow: true,
@@ -28,7 +28,7 @@ export class AiService {
       throw new NotFoundException('Deck not found');
     }
 
-    const languageWhatIKnow = await this.databaseService.language.findUnique({
+    const languageWhatIKnow = await this.database.language.findUnique({
       where: { code: deck.languageWhatIKnow.code },
     });
 
@@ -36,7 +36,7 @@ export class AiService {
       throw new NotFoundException('Language what I know not found');
     }
 
-    const languageWhatILearn = await this.databaseService.language.findUnique({
+    const languageWhatILearn = await this.database.language.findUnique({
       where: { code: deck.languageWhatILearn.code },
     });
 
