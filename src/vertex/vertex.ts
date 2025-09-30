@@ -1,4 +1,4 @@
-import { GenerationConfig, VertexAI } from '@google-cloud/vertexai';
+import { ResponseSchema, VertexAI } from '@google-cloud/vertexai';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { readFileSync } from 'fs';
 
@@ -25,7 +25,7 @@ export class VertexProvider implements OnModuleInit {
 
   public async generate<T>(options: {
     model?: 'gemini-2.5-flash' | 'gemini-2.5-pro';
-    generationConfig: GenerationConfig;
+    responseSchema: ResponseSchema;
     prompt: string;
   }): Promise<T> {
     const result = await this._vertex
@@ -33,7 +33,7 @@ export class VertexProvider implements OnModuleInit {
         model: options.model || 'gemini-2.5-flash',
         generationConfig: {
           responseMimeType: 'application/json',
-          ...options.generationConfig,
+          responseSchema: options.responseSchema,
         },
       })
       .generateContent({

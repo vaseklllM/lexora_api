@@ -46,51 +46,49 @@ export class AiService {
 
     const result = await this.vertex.generate({
       prompt: `Generate a CEFR-aligned dictionary card in JSON for "${fillCardDataDto.textInLearningLanguage}" (language: ${languageWhatILearn.code}). Keep definitions concise, 2 examples, sensible synonyms.`,
-      generationConfig: {
-        responseSchema: {
-          type: SchemaType.OBJECT,
-          properties: {
-            term: { type: SchemaType.STRING },
-            lang: { type: SchemaType.STRING },
-            pos: { type: SchemaType.STRING },
-            definition_short: { type: SchemaType.STRING },
-            definition_long: { type: SchemaType.STRING },
-            examples: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.STRING },
-            },
-            synonyms: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.STRING },
-            },
-            antonyms: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.STRING },
-            },
-            // ipa: { type: SchemaType.STRING },
-            cefr: {
-              type: SchemaType.STRING,
-              enum: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
-            },
-            translations: {
-              type: SchemaType.OBJECT,
-              properties: {
-                uk: { type: SchemaType.STRING },
-                es: { type: SchemaType.STRING },
-                nl: { type: SchemaType.STRING },
-              },
-            },
-            notes: { type: SchemaType.STRING },
+      responseSchema: {
+        type: SchemaType.OBJECT,
+        properties: {
+          term: { type: SchemaType.STRING },
+          lang: { type: SchemaType.STRING },
+          pos: { type: SchemaType.STRING },
+          definition_short: { type: SchemaType.STRING },
+          definition_long: { type: SchemaType.STRING },
+          examples: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
           },
-          required: [
-            'term',
-            'lang',
-            'pos',
-            'definition_short',
-            'examples',
-            'translations',
-          ],
+          synonyms: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
+          antonyms: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
+          // ipa: { type: SchemaType.STRING },
+          cefr: {
+            type: SchemaType.STRING,
+            enum: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+          },
+          translations: {
+            type: SchemaType.OBJECT,
+            properties: {
+              uk: { type: SchemaType.STRING },
+              es: { type: SchemaType.STRING },
+              nl: { type: SchemaType.STRING },
+            },
+          },
+          notes: { type: SchemaType.STRING },
         },
+        required: [
+          'term',
+          'lang',
+          'pos',
+          'definition_short',
+          'examples',
+          'translations',
+        ],
       },
     });
 
