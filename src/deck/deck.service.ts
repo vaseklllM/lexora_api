@@ -298,43 +298,54 @@ export class DeckService {
     userId: string,
     renameDeckDto: RenameDeckDto,
   ): Promise<RenameDeckResponseDto> {
-    const findDeck = await this.checkIsExistDeck(userId, renameDeckDto.deckId);
-
-    if (findDeck.folderId) {
-      const findDeckInFolder = await this.databaseService.deck.findFirst({
-        where: {
-          folderId: findDeck.folderId,
-          name: renameDeckDto.name,
-        },
+    const deckName = await this.databaseService.$transaction(async (tx) => {
+      const findDeck = await tx.deck.findFirst({
+        where: { id: renameDeckDto.deckId, userId: userId },
       });
 
-      if (findDeckInFolder) {
-        throw new ConflictException(
-          `Deck with name '${findDeckInFolder.name}' already exists`,
-        );
+      if (!findDeck) {
+        throw new NotFoundException('Deck not found');
       }
-    } else {
-      const findDeckInUser = await this.databaseService.deck.findFirst({
-        where: {
-          userId,
-          name: renameDeckDto.name,
-        },
+
+      if (findDeck.folderId) {
+        const findDeckInFolder = await tx.deck.findFirst({
+          where: {
+            folderId: findDeck.folderId,
+            name: renameDeckDto.name,
+          },
+        });
+
+        if (findDeckInFolder) {
+          throw new ConflictException(
+            `Deck with name '${findDeckInFolder.name}' already exists`,
+          );
+        }
+      } else {
+        const findDeckInUser = await tx.deck.findFirst({
+          where: {
+            userId,
+            name: renameDeckDto.name,
+            folderId: null,
+          },
+        });
+
+        if (findDeckInUser) {
+          throw new ConflictException(
+            `Deck with name '${findDeckInUser.name}' already exists`,
+          );
+        }
+      }
+
+      const deck = await tx.deck.update({
+        where: { id: renameDeckDto.deckId, userId },
+        data: { name: renameDeckDto.name },
       });
 
-      if (findDeckInUser) {
-        throw new ConflictException(
-          `Deck with name '${findDeckInUser.name}' already exists`,
-        );
-      }
-    }
-
-    const deck = await this.databaseService.deck.update({
-      where: { id: renameDeckDto.deckId, userId },
-      data: { name: renameDeckDto.name },
+      return deck.name;
     });
 
     return {
-      message: `Deck '${deck.name}' renamed successfully`,
+      message: `Deck '${deckName}' renamed successfully`,
     };
   }
 
