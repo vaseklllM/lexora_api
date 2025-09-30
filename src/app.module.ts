@@ -12,6 +12,7 @@ import { CardModule } from './card/card.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AiModule } from './ai/ai.module';
 import { TtsModule } from './tts/tts.module';
+import { VertexModule } from './vertex/vertex.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { TtsModule } from './tts/tts.module';
     DashboardModule,
     AiModule,
     TtsModule,
+    VertexModule,
   ],
   providers: [
     {
