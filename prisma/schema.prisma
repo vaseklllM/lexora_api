@@ -93,6 +93,15 @@ model Deck {
   cards                   Card[]
 }
 
+enum Cefr {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
 model Card {
   id                              String   @id @default(uuid())
   textInKnownLanguage             String  
@@ -109,4 +118,5 @@ model Card {
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
   soundUrls                       String[]
+  cefr                            Cefr?
 }
