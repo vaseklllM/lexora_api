@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Cefr } from '@prisma/client';
 import {
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -74,4 +76,12 @@ export class CreateCardDto {
     message: `Cannot be longer than ${MAX_CARD_DESCRIPTION_LENGTH} characters`,
   })
   descriptionInLearningLanguage?: string;
+
+  @ApiProperty({
+    example: Cefr.A1,
+    description: 'CEFR level',
+  })
+  @IsEnum(Cefr)
+  @IsOptional()
+  cefr?: Cefr;
 }

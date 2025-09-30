@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Cefr } from '@prisma/client';
 import {
   IsBoolean,
   IsDateString,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -97,4 +99,12 @@ export class CardDto {
   })
   @IsString({ each: true })
   soundUrls: string[];
+
+  @ApiProperty({
+    example: Cefr.A1,
+    description: 'CEFR level',
+  })
+  @IsEnum(Cefr)
+  @IsOptional()
+  cefr?: Cefr;
 }

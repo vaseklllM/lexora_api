@@ -210,6 +210,7 @@ export class DeckService {
           descriptionInLearningLanguage:
             card.descriptionInLearningLanguage ?? undefined,
           soundUrls: card.soundUrls ?? [],
+          cefr: card.cefr ?? undefined,
         }),
       ),
     };

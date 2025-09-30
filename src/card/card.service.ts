@@ -28,6 +28,7 @@ export class CardService {
       masteryScore: card.masteryScore,
       isNew: card.isNew,
       soundUrls: card.soundUrls ?? [],
+      cefr: card.cefr ?? undefined,
     };
   }
 
@@ -123,6 +124,7 @@ export class CardService {
               createCardDto.descriptionInLearningLanguage?.trim(),
             deckId: createCardDto.deckId,
             soundUrls: [],
+            cefr: createCardDto.cefr,
           },
         });
 
