@@ -395,6 +395,16 @@ export class DeckService {
       }
 
       if (!moveDto.toFolderId) {
+        const findDeckInHome = await tx.deck.findFirst({
+          where: { userId, name: deck.name, folderId: null },
+        });
+
+        if (findDeckInHome) {
+          throw new ConflictException(
+            `Deck with name '${findDeckInHome.name}' already exists in home folder`,
+          );
+        }
+
         await tx.deck.update({
           where: { id: moveDto.deckId },
           data: { folderId: null },
@@ -406,6 +416,16 @@ export class DeckService {
 
         if (!folder) {
           throw new NotFoundException('Folder not found');
+        }
+
+        const findDeckInFolder = await tx.deck.findFirst({
+          where: { folderId: moveDto.toFolderId, name: deck.name },
+        });
+
+        if (findDeckInFolder) {
+          throw new ConflictException(
+            `Deck with name '${findDeckInFolder.name}' already exists in folder '${folder.name}'`,
+          );
         }
 
         await tx.deck.update({

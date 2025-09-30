@@ -233,6 +233,7 @@ export class FolderService {
           where: {
             userId,
             name: renameFolderDto.name,
+            parentId: null,
           },
         });
 
