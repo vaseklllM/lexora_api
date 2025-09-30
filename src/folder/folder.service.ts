@@ -60,6 +60,9 @@ export class FolderService {
   async getFolders(userId: string, parentId?: string) {
     const parentFolders = await this.databaseService.folder.findMany({
       where: { userId, parentId: parentId ?? null },
+      include: {
+        parent: true,
+      },
       orderBy: { updatedAt: 'desc' },
     });
 
@@ -74,7 +77,6 @@ export class FolderService {
             userId,
             childFolder.id,
           ),
-          parentFolderId: childFolder.parentId ?? undefined,
         }),
       ) ?? [],
     );
@@ -121,6 +123,9 @@ export class FolderService {
   ): Promise<FolderResponseDto> {
     const folder = await this.databaseService.folder.findFirst({
       where: { userId, id: folderId },
+      include: {
+        parent: true,
+      },
     });
 
     if (!folder) {
@@ -132,7 +137,18 @@ export class FolderService {
       id: folder.id,
       createdAt: folder.createdAt.toISOString(),
       updatedAt: folder.updatedAt.toISOString(),
-      parentFolderId: folder.parentId ?? undefined,
+      parentFolder: folder.parent
+        ? {
+            name: folder.parent.name,
+            id: folder.parent.id,
+            createdAt: folder.parent.createdAt.toISOString(),
+            updatedAt: folder.parent.updatedAt.toISOString(),
+            numberOfCards: await this.getNumberOfCardsInFolder(
+              userId,
+              folder.parent.id,
+            ),
+          }
+        : undefined,
       numberOfCards: await this.getNumberOfCardsInFolder(userId, folderId),
       breadcrumbs: await this.getFolderBreadcrumbs(userId, folder.parentId),
       childFolders: await this.getFolders(userId, folder.id),

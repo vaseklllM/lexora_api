@@ -18,7 +18,6 @@ export const folderExample: FolderDto = {
   createdAt: '2023-01-01T00:00:00Z',
   updatedAt: '2023-01-01T00:00:00Z',
   numberOfCards: 10,
-  parentFolderId: '550e8400-e29b-41d4-a716-446655440001',
 };
 
 export class FolderDto {
@@ -63,14 +62,6 @@ export class FolderDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCards: number;
-
-  @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440001',
-    description: 'Parent folder id',
-  })
-  @IsString()
-  @IsOptional()
-  parentFolderId?: string;
 }
 
 export class FolderBreadcrumbDto {
@@ -125,4 +116,12 @@ export class FolderResponseDto extends FolderDto {
   @ValidateNested({ each: true })
   @Type(() => FolderBreadcrumbDto)
   breadcrumbs: FolderBreadcrumbDto[];
+
+  @ApiProperty({
+    example: folderExample,
+    description: 'Parent folder id',
+  })
+  @Type(() => FolderDto)
+  @IsOptional()
+  parentFolder?: FolderDto;
 }
