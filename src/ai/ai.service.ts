@@ -4,6 +4,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { FillCardDataDto } from './dto/fill-card-data.dto';
 import { VertexProvider } from 'src/vertex/vertex';
 import { SchemaType } from '@google-cloud/vertexai';
+import { Cefr } from '@prisma/client';
 
 @Injectable()
 export class AiService {
@@ -44,63 +45,58 @@ export class AiService {
       throw new NotFoundException('Language what I learn not found');
     }
 
-    const result = await this.vertex.generate({
-      prompt: `Generate a CEFR-aligned dictionary card in JSON for "${fillCardDataDto.textInLearningLanguage}" (language: ${languageWhatILearn.code}). Keep definitions concise, 2 examples, sensible synonyms.`,
+    const result = await this.vertex.generate<{
+      term: string;
+      cefr: Cefr;
+      example: string;
+      exampleTranslation: string;
+      translations: string[];
+    }>({
+      // prompt: `Generate a CEFR-aligned dictionary card in JSON for "${fillCardDataDto.textInLearningLanguage}" (language: ${languageWhatILearn.code}). Keep definitions concise, 2 examples, sensible synonyms.`,
+      prompt: `You are a CEFR-aligned dictionary assistant.
+
+        Generate a JSON object that matches exactly the given schema for the word "${fillCardDataDto.textInLearningLanguage}".
+        - The word is in language: ${languageWhatILearn.code}.
+        - The "translations" array must contain 2–5 good translations of "${fillCardDataDto.textInLearningLanguage}" into language ${languageWhatIKnow.code}.
+        - The "example" must be a simple sentence using "${fillCardDataDto.textInLearningLanguage}" in ${languageWhatILearn.code}.
+        - The "exampleTranslation" must be the translation of that example sentence into ${languageWhatIKnow.code}.
+        - The "cefr" level must be one of: A1, A2, B1, B2, C1, C2.
+        - The "term" field must be the original word "${fillCardDataDto.textInLearningLanguage}" exactly.
+
+        Return **only JSON**, strictly following the schema.
+        `,
       responseSchema: {
         type: SchemaType.OBJECT,
         properties: {
           term: { type: SchemaType.STRING },
-          lang: { type: SchemaType.STRING },
-          pos: { type: SchemaType.STRING },
-          definition_short: { type: SchemaType.STRING },
-          definition_long: { type: SchemaType.STRING },
-          examples: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
-          },
-          synonyms: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
-          },
-          antonyms: {
-            type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
-          },
-          // ipa: { type: SchemaType.STRING },
+          example: { type: SchemaType.STRING },
+          exampleTranslation: { type: SchemaType.STRING },
           cefr: {
             type: SchemaType.STRING,
             enum: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
           },
           translations: {
-            type: SchemaType.OBJECT,
-            properties: {
-              uk: { type: SchemaType.STRING },
-              es: { type: SchemaType.STRING },
-              nl: { type: SchemaType.STRING },
-            },
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
           },
-          notes: { type: SchemaType.STRING },
         },
         required: [
           'term',
-          'lang',
-          'pos',
-          'definition_short',
-          'examples',
+          'cefr',
+          'example',
+          'exampleTranslation',
           'translations',
         ],
       },
     });
 
-    console.log(result);
-
     return {
-      textInKnownLanguage: `Книга - deck: '${deck.name}' (${languageWhatIKnow.name} - ${languageWhatILearn.name})`,
-      textInLearningLanguage: 'Book',
-      descriptionInKnownLanguage:
-        'Книга - це друкований або електронний твір, що містить текст, зображення або інші матеріали для читання та навчання',
-      descriptionInLearningLanguage:
-        'A book is a printed or electronic work containing text, images, or other materials for reading and learning',
+      textInKnownLanguage: result.translations
+        .map((translation) => translation)
+        .join(', '),
+      textInLearningLanguage: result.term,
+      descriptionInKnownLanguage: result.exampleTranslation,
+      descriptionInLearningLanguage: result.example,
     };
   }
 }
