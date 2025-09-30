@@ -98,6 +98,7 @@ export class AiService {
       textInLearningLanguage: result.term,
       descriptionInKnownLanguage: result.exampleTranslation,
       descriptionInLearningLanguage: result.example,
+      cefr: result.cefr,
     };
   }
 }
