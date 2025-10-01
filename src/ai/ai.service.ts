@@ -29,17 +29,18 @@ export class AiService {
       throw new NotFoundException('Deck not found');
     }
 
-    const languageWhatIKnow = await this.database.language.findUnique({
-      where: { code: deck.languageWhatIKnow.code },
-    });
+    const [languageWhatIKnow, languageWhatILearn] = await Promise.all([
+      this.database.language.findUnique({
+        where: { code: deck.languageWhatIKnow.code },
+      }),
+      this.database.language.findUnique({
+        where: { code: deck.languageWhatILearn.code },
+      }),
+    ]);
 
     if (!languageWhatIKnow) {
       throw new NotFoundException('Language what I know not found');
     }
-
-    const languageWhatILearn = await this.database.language.findUnique({
-      where: { code: deck.languageWhatILearn.code },
-    });
 
     if (!languageWhatILearn) {
       throw new NotFoundException('Language what I learn not found');
