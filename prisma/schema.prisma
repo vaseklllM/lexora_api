@@ -118,5 +118,5 @@ model Card {
   isNew                           Boolean @default(true)
   lastReviewedAt                  DateTime @default(now())
   soundUrls                       String[]
-  cefr                            Cefr?
+  cefr                            Cefr
 }

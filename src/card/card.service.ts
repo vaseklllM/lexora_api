@@ -28,7 +28,7 @@ export class CardService {
       masteryScore: card.masteryScore,
       isNew: card.isNew,
       soundUrls: card.soundUrls ?? [],
-      cefr: card.cefr ?? undefined,
+      cefr: card.cefr,
     };
   }
 

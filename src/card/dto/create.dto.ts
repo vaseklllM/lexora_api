@@ -82,6 +82,6 @@ export class CreateCardDto {
     description: 'CEFR level',
   })
   @IsEnum(Cefr)
-  @IsOptional()
-  cefr?: Cefr;
+  @IsNotEmpty()
+  cefr: Cefr;
 }

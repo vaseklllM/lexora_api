@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Cefr } from '@prisma/client';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class UpdateCardDto {
   @ApiProperty({
@@ -42,4 +49,12 @@ export class UpdateCardDto {
   @IsString()
   @IsOptional()
   descriptionInLearningLanguage?: string;
+
+  @ApiProperty({
+    example: Cefr.A1,
+    description: 'CEFR level',
+  })
+  @IsEnum(Cefr)
+  @IsNotEmpty()
+  cefr: Cefr;
 }
