@@ -30,7 +30,7 @@ export class CreateCardDto {
     description: 'Text in known language',
   })
   @IsString()
-  @MinLength(2)
+  @MinLength(1)
   @Matches(/^(?!\s*$).+/, {
     message: 'Cannot contain only spaces',
   })
@@ -45,7 +45,7 @@ export class CreateCardDto {
     description: 'Text in learning language',
   })
   @IsString()
-  @MinLength(2)
+  @MinLength(1)
   @Matches(/^(?!\s*$).+/, {
     message: 'Cannot contain only spaces',
   })
