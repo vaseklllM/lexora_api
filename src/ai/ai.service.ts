@@ -52,7 +52,6 @@ export class AiService {
       exampleTranslation: string;
       translations: string[];
     }>({
-      // prompt: `Generate a CEFR-aligned dictionary card in JSON for "${fillCardDataDto.textInLearningLanguage}" (language: ${languageWhatILearn.code}). Keep definitions concise, 2 examples, sensible synonyms.`,
       prompt: `You are a CEFR-aligned dictionary assistant.
 
         Generate a JSON object that matches exactly the given schema for the word "${fillCardDataDto.textInLearningLanguage}".
