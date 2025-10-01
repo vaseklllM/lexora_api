@@ -57,7 +57,10 @@ export class AiService {
 
         Generate a JSON object that matches exactly the given schema for the word "${fillCardDataDto.textInLearningLanguage}".
         - The word is in language: ${languageWhatILearn.code}.
-        - IMPORTANT: the given term may contain spelling mistakes. Automatically correct the spelling and use the corrected form in the "term" field.
+        - IMPORTANT: 
+          * the given term may contain spelling mistakes. Automatically correct the spelling and use the corrected form in the "term" field.
+          * If the word cannot be recognized → return the closest valid word in ${languageWhatILearn.code}.
+          * If the word is written in another language → translate it into ${languageWhatILearn.code} and use that as the "term".
         - The "translations" array must contain 2–5 good translations of "${fillCardDataDto.textInLearningLanguage}" into language ${languageWhatIKnow.code}.
         - The "example" must be a simple sentence using "${fillCardDataDto.textInLearningLanguage}" in ${languageWhatILearn.code}.
         - The "exampleTranslation" must be the translation of that example sentence into ${languageWhatIKnow.code}.
