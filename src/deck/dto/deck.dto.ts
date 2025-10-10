@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 import {
   LanguageDto,
   languageEnExample,
@@ -17,6 +24,7 @@ export const DeckExample: DeckDto = {
   numberOfCardsInProgress: 10,
   numberOfCardsNeedToReview: 10,
   numberOfCardsLearned: 2,
+  masteryScore: 52,
 };
 
 export class DeckDto {
@@ -92,4 +100,14 @@ export class DeckDto {
   @IsNumber()
   @IsNotEmpty()
   numberOfCardsLearned: number;
+
+  @ApiProperty({
+    example: 23,
+    description: 'Deck mastery score',
+  })
+  @Min(0)
+  @Max(100)
+  @IsNumber()
+  @IsNotEmpty()
+  masteryScore: number;
 }

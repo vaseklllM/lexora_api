@@ -68,6 +68,7 @@ export class DeckService {
         cardsInProgress: bigint;
         cardsNeedReview: bigint;
         cardsLearned: bigint;
+        avgMasteryScore: number | null;
       }>
     >`
     SELECT 
@@ -89,7 +90,8 @@ export class DeckService {
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * REVIEW_SESSION_INTERVAL_MINUTES)} THEN 1 END), 0) as "cardsNeedReview",
-      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned"
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned",
+      COALESCE(AVG(c."masteryScore"), 0) as "avgMasteryScore"
     FROM "Deck" d
     LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
     LEFT JOIN "Language" l_k ON d."languageWhatIKnowCode" = l_k."code"
@@ -109,6 +111,7 @@ export class DeckService {
         numberOfNewCards: Number(deck.newCards),
         numberOfCardsInProgress: Number(deck.cardsInProgress),
         numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
+        masteryScore: Math.floor(deck.avgMasteryScore ?? 0),
         languageWhatIKnow: this.languagesService.convertLanguageToLanguageDto({
           code: deck.languageWhatIKnowCode,
           name: deck.languageWhatIKnowName,
@@ -179,6 +182,11 @@ export class DeckService {
       where: { deckId, isNew: false, masteryScore: 100 },
     });
 
+    const masteryScore = await this.databaseService.card.aggregate({
+      where: { deckId },
+      _avg: { masteryScore: true },
+    });
+
     return {
       id: deck.id,
       name: deck.name,
@@ -197,6 +205,7 @@ export class DeckService {
         userId,
         deck.folderId,
       ),
+      masteryScore: Math.floor(masteryScore._avg.masteryScore ?? 0),
       cards: deck.cards.map(
         (card): CardDto => ({
           id: card.id,
