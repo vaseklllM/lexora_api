@@ -14,16 +14,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  accounts  Account[]
-  folders   Folder[]
-  decks     Deck[]
-  cards     Card[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String
+  avatar        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  accounts      Account[]
+  folders       Folder[]
+  decks         Deck[]
+  cards         Card[]
+  languageCode  String @default("en-US")
+  language      Language @relation(fields: [languageCode], references: [code])
 }
 
 enum AccountProvider {
@@ -51,7 +53,7 @@ model Account {
 }
 
 model Language {
-  code                       String  @id @default(uuid())   
+  code                       String  @id
   name                       String
   nativeName                 String
   iconSymbol                 String
@@ -59,6 +61,7 @@ model Language {
   googleTtsVoiceMaleName     String[] 
   languagesWhatIKnow         Deck[] @relation("LanguageWhatIKnow")
   languagesWhatILearn        Deck[] @relation("LanguageWhatILearn")
+  users                      User[]
 }
 
 
