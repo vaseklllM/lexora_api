@@ -108,7 +108,7 @@ model Card {
   textInLearningLanguage          String  
   descriptionInKnownLanguage      String?  
   descriptionInLearningLanguage   String?  
-  masteryScore                    Int @default(0) 
+  masteryScore                    Float    @default(0) 
   createdAt                       DateTime @default(now())
   updatedAt                       DateTime @updatedAt
   deckId                          String

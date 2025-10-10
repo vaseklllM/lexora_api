@@ -23,7 +23,7 @@ import { StartReviewSessionDto } from './dto/start-review-session.dto';
 import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
 import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
 import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
-import { REVIEW_SESSION_INTERVAL_MINUTES } from 'src/common/config';
+import { REVIEW_SESSION_INTERVAL_MILLISECONDS } from 'src/common/config';
 import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
 import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
@@ -89,7 +89,7 @@ export class DeckService {
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
-      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * REVIEW_SESSION_INTERVAL_MINUTES)} THEN 1 END), 0) as "cardsNeedReview",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS)} THEN 1 END), 0) as "cardsNeedReview",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned",
       COALESCE(AVG(c."masteryScore"), 0) as "avgMasteryScore"
     FROM "Deck" d
@@ -171,9 +171,7 @@ export class DeckService {
         deckId,
         isNew: false,
         lastReviewedAt: {
-          lt: new Date(
-            Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES,
-          ),
+          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
         },
       },
     });
@@ -201,18 +199,18 @@ export class DeckService {
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
       numberOfCardsLearned: numberOfCardsLearned,
+      masteryScore: Math.floor(masteryScore._avg.masteryScore ?? 0),
       foldersBreadcrumbs: await this.folderService.getFolderBreadcrumbs(
         userId,
         deck.folderId,
       ),
-      masteryScore: Math.floor(masteryScore._avg.masteryScore ?? 0),
       cards: deck.cards.map(
         (card): CardDto => ({
           id: card.id,
           textInKnownLanguage: card.textInKnownLanguage,
           textInLearningLanguage: card.textInLearningLanguage,
           createdAt: card.createdAt.toISOString(),
-          masteryScore: card.masteryScore,
+          masteryScore: Math.floor(card.masteryScore),
           isNew: card.isNew,
           descriptionInKnownLanguage:
             card.descriptionInKnownLanguage ?? undefined,
@@ -479,7 +477,6 @@ export class DeckService {
     await this.databaseService.card.updateMany({
       where: {
         userId,
-        isNew: true,
         id: { in: finishLearningSessionDto.cardIds },
       },
       data: { isNew: false },
@@ -502,9 +499,7 @@ export class DeckService {
         deckId: startReviewSessionDto.deckId,
         isNew: false,
         lastReviewedAt: {
-          lt: new Date(
-            Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES,
-          ),
+          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
         },
       },
     });
@@ -557,16 +552,16 @@ export class DeckService {
       function getIncorrectWeight() {
         switch (finishReviewCardDto.typeOfStrategy) {
           case LearningStrategyType.PAIR_IT:
-            return 4;
+            return 1;
 
           case LearningStrategyType.GUESS_IT:
-            return 3;
+            return 0.5;
 
           case LearningStrategyType.RECALL_IT:
-            return 2;
+            return 0.3;
 
           case LearningStrategyType.TYPE_IT:
-            return 1;
+            return 0.1;
 
           default: {
             const _check: never = finishReviewCardDto.typeOfStrategy;
@@ -576,8 +571,8 @@ export class DeckService {
       }
 
       const isReviewSession =
-        card.lastReviewedAt >
-        new Date(Date.now() - 1000 * REVIEW_SESSION_INTERVAL_MINUTES);
+        card.lastReviewedAt <
+        new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS);
 
       await tx.card.update({
         where: { id: finishReviewCardDto.cardId },
@@ -586,9 +581,8 @@ export class DeckService {
               lastReviewedAt: new Date(),
               masteryScore: ((): number | undefined => {
                 const weight = getCorrectWeight();
-                const newScore: number = Math.round(
-                  card.masteryScore + (isReviewSession ? weight : weight / 5),
-                );
+                const newScore: number =
+                  card.masteryScore + (isReviewSession ? weight : weight / 5);
 
                 return newScore > 100 ? 100 : newScore;
               })(),
@@ -596,9 +590,7 @@ export class DeckService {
           : {
               masteryScore: ((): number | undefined => {
                 const weight = getIncorrectWeight();
-                const newScore: number = Math.round(
-                  card.masteryScore - (isReviewSession ? weight : weight / 2),
-                );
+                const newScore: number = card.masteryScore - weight;
 
                 return newScore < 0 ? 0 : newScore;
               })(),
