@@ -33,13 +33,13 @@ export class LanguagesService {
   async my(userId: string): Promise<GetMyLanguagesResponseDto> {
     const languagesWhatIKnow = await this.databaseService.language.findMany({
       where: {
-        decksWhatIKnow: { some: { userId } },
+        languagesWhatIKnow: { some: { userId } },
       },
     });
 
     const languagesWhatILearn = await this.databaseService.language.findMany({
       where: {
-        decksWhatILearn: { some: { userId } },
+        languagesWhatILearn: { some: { userId } },
       },
     });
 
