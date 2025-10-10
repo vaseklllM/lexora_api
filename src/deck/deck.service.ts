@@ -88,7 +88,7 @@ export class DeckService {
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
-      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * 60 * REVIEW_SESSION_INTERVAL_MINUTES)} THEN 1 END), 0) as "cardsNeedReview",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - 1000 * REVIEW_SESSION_INTERVAL_MINUTES)} THEN 1 END), 0) as "cardsNeedReview",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned"
     FROM "Deck" d
     LEFT JOIN "Card" c ON d.id = c."deckId" AND c."userId" = ${userId}
@@ -515,74 +515,86 @@ export class DeckService {
     userId: string,
     finishReviewCardDto: FinishReviewCardDto,
   ): Promise<FinishReviewCardResponseDto> {
-    const card = await this.databaseService.card.findFirst({
-      where: { userId, id: finishReviewCardDto.cardId },
-    });
+    await this.databaseService.$transaction(async (tx) => {
+      const card = await tx.card.findFirst({
+        where: { userId, id: finishReviewCardDto.cardId },
+      });
 
-    if (!card) {
-      throw new NotFoundException('Card not found');
-    }
-
-    function getCorrectWeight() {
-      switch (finishReviewCardDto.typeOfStrategy) {
-        case LearningStrategyType.PAIR_IT:
-          return 1;
-
-        case LearningStrategyType.GUESS_IT:
-          return 2;
-
-        case LearningStrategyType.RECALL_IT:
-          return 3;
-
-        case LearningStrategyType.TYPE_IT:
-          return 4;
-
-        default: {
-          const _check: never = finishReviewCardDto.typeOfStrategy;
-          throw new Error(`Unhandled learning strategy type: ${_check}`);
-        }
+      if (!card) {
+        throw new NotFoundException('Card not found');
       }
-    }
 
-    function getIncorrectWeight() {
-      switch (finishReviewCardDto.typeOfStrategy) {
-        case LearningStrategyType.PAIR_IT:
-          return 4;
+      function getCorrectWeight() {
+        switch (finishReviewCardDto.typeOfStrategy) {
+          case LearningStrategyType.PAIR_IT:
+            return 1;
 
-        case LearningStrategyType.GUESS_IT:
-          return 3;
+          case LearningStrategyType.GUESS_IT:
+            return 2;
 
-        case LearningStrategyType.RECALL_IT:
-          return 2;
+          case LearningStrategyType.RECALL_IT:
+            return 3;
 
-        case LearningStrategyType.TYPE_IT:
-          return 1;
+          case LearningStrategyType.TYPE_IT:
+            return 4;
 
-        default: {
-          const _check: never = finishReviewCardDto.typeOfStrategy;
-          throw new Error(`Unhandled learning strategy type: ${_check}`);
-        }
-      }
-    }
-
-    await this.databaseService.card.update({
-      where: { id: finishReviewCardDto.cardId },
-      data: finishReviewCardDto.isCorrectAnswer
-        ? {
-            lastReviewedAt: new Date(),
-            masteryScore: ((): number | undefined => {
-              const newScore: number = card.masteryScore + getCorrectWeight();
-
-              return newScore > 100 ? 100 : newScore;
-            })(),
+          default: {
+            const _check: never = finishReviewCardDto.typeOfStrategy;
+            throw new Error(`Unhandled learning strategy type: ${_check}`);
           }
-        : {
-            masteryScore: ((): number | undefined => {
-              const newScore: number = card.masteryScore - getIncorrectWeight();
+        }
+      }
 
-              return newScore < 0 ? 0 : newScore;
-            })(),
-          },
+      function getIncorrectWeight() {
+        switch (finishReviewCardDto.typeOfStrategy) {
+          case LearningStrategyType.PAIR_IT:
+            return 4;
+
+          case LearningStrategyType.GUESS_IT:
+            return 3;
+
+          case LearningStrategyType.RECALL_IT:
+            return 2;
+
+          case LearningStrategyType.TYPE_IT:
+            return 1;
+
+          default: {
+            const _check: never = finishReviewCardDto.typeOfStrategy;
+            throw new Error(`Unhandled learning strategy type: ${_check}`);
+          }
+        }
+      }
+
+      const isReviewSession =
+        card.lastReviewedAt >
+        new Date(Date.now() - 1000 * REVIEW_SESSION_INTERVAL_MINUTES);
+
+      await tx.card.update({
+        where: { id: finishReviewCardDto.cardId },
+        data: finishReviewCardDto.isCorrectAnswer
+          ? {
+              lastReviewedAt: new Date(),
+              masteryScore: ((): number | undefined => {
+                const weight = getCorrectWeight();
+                const newScore: number = Math.round(
+                  card.masteryScore + (isReviewSession ? weight : weight / 5),
+                );
+
+                return newScore > 100 ? 100 : newScore;
+              })(),
+            }
+          : {
+              masteryScore: ((): number | undefined => {
+                const weight = getIncorrectWeight();
+                const newScore: number = Math.round(
+                  card.masteryScore - (isReviewSession ? weight : weight / 2),
+                );
+
+                return newScore < 0 ? 0 : newScore;
+              })(),
+            },
+      });
     });
 
     return {
