@@ -552,7 +552,7 @@ export class DeckService {
       function getIncorrectWeight() {
         switch (finishReviewCardDto.typeOfStrategy) {
           case LearningStrategyType.PAIR_IT:
-            return 1;
+            return 0.7;
 
           case LearningStrategyType.GUESS_IT:
             return 0.5;
