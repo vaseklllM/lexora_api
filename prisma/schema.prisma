@@ -57,8 +57,8 @@ model Language {
   iconSymbol                 String
   googleTtsVoiceFemaleName   String[]
   googleTtsVoiceMaleName     String[] 
-  languagesWhatIKnow             Deck[] @relation("LanguageWhatIKnow")
-  languagesWhatILearn            Deck[] @relation("LanguageWhatILearn")
+  languagesWhatIKnow         Deck[] @relation("LanguageWhatIKnow")
+  languagesWhatILearn        Deck[] @relation("LanguageWhatILearn")
 }
 
 
@@ -87,9 +87,9 @@ model Deck {
   folderId                String?
   folder                  Folder?   @relation(fields: [folderId], references: [id], onDelete: Cascade)
   languageWhatIKnowCode   String 
-  languageWhatIKnow       Language @relation("LanguageWhatIKnow",fields: [languageWhatIKnowCode], references: [code])
+  languageWhatIKnow       Language @relation("LanguageWhatIKnow", fields: [languageWhatIKnowCode], references: [code])
   languageWhatILearnCode  String 
-  languageWhatILearn      Language @relation("LanguageWhatILearn",fields: [languageWhatILearnCode], references: [code])
+  languageWhatILearn      Language @relation("LanguageWhatILearn", fields: [languageWhatILearnCode], references: [code])
   cards                   Card[]
 }
 
