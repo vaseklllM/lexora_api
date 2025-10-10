@@ -65,6 +65,8 @@ export class CardService {
 
     const promises: Promise<string>[] = [];
 
+    // console.log(language);
+
     if (
       Array.isArray(language?.googleTtsVoiceFemaleName) &&
       language?.googleTtsVoiceFemaleName.length > 0
@@ -91,10 +93,10 @@ export class CardService {
           name: getName(language.googleTtsVoiceMaleName),
         }),
       );
-
-      const results = await Promise.all(promises);
-      result.push(...results);
     }
+
+    const results = await Promise.all(promises);
+    result.push(...results);
 
     return result;
   }
