@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LanguagesService } from './languages.service';
 import { LanguagesResponseDto } from './dto/languages-response.dto';
@@ -11,6 +12,7 @@ import {
 
 @ApiTags('Languages')
 @Controller('languages')
+@UseInterceptors(CacheInterceptor)
 export class LanguagesController {
   constructor(private readonly languagesService: LanguagesService) {}
 
@@ -20,6 +22,7 @@ export class LanguagesController {
     description: 'Returns all languages',
     type: [LanguagesResponseDto],
   })
+  @CacheTTL(24 * 60 * 60)
   all(): Promise<LanguagesResponseDto> {
     return this.languagesService.all();
   }
