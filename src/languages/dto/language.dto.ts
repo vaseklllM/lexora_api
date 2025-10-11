@@ -47,20 +47,4 @@ export class LanguageDto {
   @IsString()
   @IsNotEmpty()
   iconSymbol: string;
-
-  // @ApiProperty({
-  //   example: 'uk-UA-Chirp3-HD-Achird',
-  //   description: 'Google TTS female voice name',
-  // })
-  // @IsString()
-  // @IsOptional()
-  // googleTtsVoiceFemaleName: string[];
-
-  // @ApiProperty({
-  //   example: 'uk-UA-Chirp3-HD-Achird',
-  //   description: 'Google TTS male voice name',
-  // })
-  // @IsString()
-  // @IsOptional()
-  // googleTtsVoiceMaleName: string[];
 }

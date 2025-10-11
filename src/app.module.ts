@@ -23,11 +23,6 @@ import { SettingsModule } from './settings/settings.module';
         ttl: 1000,
         limit: 20,
       },
-      // {
-      //   name: 'medium',
-      //   ttl: 10000,
-      //   limit: 20,
-      // },
       {
         name: 'long',
         ttl: 60000,

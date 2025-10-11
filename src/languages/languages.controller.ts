@@ -12,7 +12,6 @@ import {
 
 @ApiTags('Languages')
 @Controller('languages')
-@UseInterceptors(CacheInterceptor)
 export class LanguagesController {
   constructor(private readonly languagesService: LanguagesService) {}
 
@@ -22,7 +21,8 @@ export class LanguagesController {
     description: 'Returns all languages',
     type: [LanguagesResponseDto],
   })
-  @CacheTTL(24 * 60 * 60)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(24 * 60 * 60) // 24 hours
   all(): Promise<LanguagesResponseDto> {
     return this.languagesService.all();
   }
