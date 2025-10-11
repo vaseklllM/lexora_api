@@ -17,7 +17,7 @@ export const languageUkExample: LanguageDto = {
 
 export class LanguageDto {
   @ApiProperty({
-    example: 'en',
+    example: 'en-US',
     description: 'Language code',
   })
   @IsString()
