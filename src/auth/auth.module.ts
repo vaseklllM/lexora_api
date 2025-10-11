@@ -7,6 +7,7 @@ import { DatabaseModule } from '../database/database.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RedisModule } from 'src/redis/redis.module';
+import { LanguagesModule } from 'src/languages/languages.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RedisModule } from 'src/redis/redis.module';
       secret: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
       signOptions: { expiresIn: '1h' },
     }),
+    LanguagesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, LocalStrategy],

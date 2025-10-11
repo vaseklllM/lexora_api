@@ -3,9 +3,9 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
 import { DatabaseService } from 'src/database/database.service';
 import * as argon2 from 'argon2';
-import { AccountProvider, AccountType, User } from '@prisma/client';
+import { AccountProvider, AccountType, Language, User } from '@prisma/client';
 
-export type LocalUser = Omit<User, 'password'>;
+export type LocalUser = Omit<User, 'password'> & { language: Language };
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -24,6 +24,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       async (tx) => {
         const user = await tx.user.findUnique({
           where: { email },
+          include: {
+            language: true,
+          },
         });
 
         if (!user) {

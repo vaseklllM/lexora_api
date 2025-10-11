@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -8,6 +9,7 @@ import {
   IsDateString,
   IsOptional,
 } from 'class-validator';
+import { LanguageDto, languageEnExample } from 'src/languages/dto/language.dto';
 
 export const userExample: UserDto = {
   id: '550e8400-e29b-41d4-a716-446655440000',
@@ -16,6 +18,7 @@ export const userExample: UserDto = {
   avatar: 'https://example.com/avatar.jpg',
   createdAt: '2023-01-01T00:00:00Z',
   updatedAt: '2023-01-01T00:00:00Z',
+  language: languageEnExample,
 };
 
 export class UserDto {
@@ -67,4 +70,12 @@ export class UserDto {
   @IsDateString()
   @IsNotEmpty()
   updatedAt: string;
+
+  @ApiProperty({
+    example: 'en-US',
+    description: 'User language code',
+  })
+  @Type(() => LanguageDto)
+  @IsNotEmpty()
+  language: LanguageDto;
 }

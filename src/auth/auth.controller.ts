@@ -43,7 +43,7 @@ export class AuthController {
   })
   @ValidateResponse(JwtTokenDto)
   login(
-    @Body() loginDto: LoginDto,
+    @Body() _loginDto: LoginDto,
     @Request() req: { user: LocalUser },
   ): JwtTokenDto {
     return this.authService.login(req.user);
