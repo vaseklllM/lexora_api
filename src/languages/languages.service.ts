@@ -33,7 +33,10 @@ export class LanguagesService {
   async my(userId: string): Promise<GetMyLanguagesResponseDto> {
     const languagesWhatIKnow = await this.databaseService.language.findMany({
       where: {
-        languagesWhatIKnow: { some: { userId } },
+        OR: [
+          { languagesWhatIKnow: { some: { userId } } },
+          { users: { some: { id: userId } } },
+        ],
       },
     });
 

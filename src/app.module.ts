@@ -13,6 +13,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { AiModule } from './ai/ai.module';
 import { TtsModule } from './tts/tts.module';
 import { VertexModule } from './vertex/vertex.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { VertexModule } from './vertex/vertex.module';
     AiModule,
     TtsModule,
     VertexModule,
+    SettingsModule,
   ],
   providers: [
     {
