@@ -62,10 +62,12 @@ export class AiService {
           * If the word cannot be recognized → return the closest valid word in ${languageWhatILearn.code}.
           * If the word is written in another language → translate it into ${languageWhatILearn.code} and use that as the "term".
         - The "translations" array must contain 2–5 good translations of "${fillCardDataDto.textInLearningLanguage}" into language ${languageWhatIKnow.code}.
+          * The first translation in the array must start with a capital letter.
+          * The rest of the translations should be lowercase.
         - The "example" must be a simple sentence using "${fillCardDataDto.textInLearningLanguage}" in ${languageWhatILearn.code}.
         - The "exampleTranslation" must be the translation of that example sentence into ${languageWhatIKnow.code}.
         - The "cefr" level must be one of: A1, A2, B1, B2, C1, C2.
-        - The "term" field must be the corrected version of "${fillCardDataDto.textInLearningLanguage}"
+        - The "term" field must be the corrected version of "${fillCardDataDto.textInLearningLanguage}", and it must always start with a capital letter (e.g. "Dog" not "dog").
 
         Return **only JSON**, strictly following the schema.
         `,
