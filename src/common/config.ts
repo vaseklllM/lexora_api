@@ -1,8 +1,8 @@
 /**
  * The interval in milliseconds between review sessions
  */
-// export const REVIEW_SESSION_INTERVAL_MILLISECONDS = 1000 * 60 * 60 * 12;
-export const REVIEW_SESSION_INTERVAL_MILLISECONDS = 1000;
+export const REVIEW_SESSION_INTERVAL_MILLISECONDS = 1000 * 60 * 60 * 12;
+// export const REVIEW_SESSION_INTERVAL_MILLISECONDS = 1000;
 
 /**
  * The lifetime of the JWT token in minutes
