@@ -89,7 +89,7 @@ export class DeckService {
       COALESCE(COUNT(c.id), 0) as "totalCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = true THEN 1 END), 0) as "newCards",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" > 0 AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsInProgress",
-      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS)} THEN 1 END), 0) as "cardsNeedReview",
+      COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."lastReviewedAt" < ${new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS)} AND c."masteryScore" < 100 THEN 1 END), 0) as "cardsNeedReview",
       COALESCE(COUNT(CASE WHEN c."isNew" = false AND c."masteryScore" = 100 THEN 1 END), 0) as "cardsLearned",
       COALESCE(AVG(c."masteryScore"), 0) as "avgMasteryScore"
     FROM "Deck" d
@@ -112,6 +112,8 @@ export class DeckService {
         numberOfCardsInProgress: Number(deck.cardsInProgress),
         numberOfCardsNeedToReview: Number(deck.cardsNeedReview),
         masteryScore: Math.floor(deck.avgMasteryScore ?? 0),
+        numberOfCards: Number(deck.totalCards),
+        numberOfCardsLearned: Number(deck.cardsLearned),
         languageWhatIKnow: this.languagesService.convertLanguageToLanguageDto({
           code: deck.languageWhatIKnowCode,
           name: deck.languageWhatIKnowName,
@@ -130,8 +132,6 @@ export class DeckService {
             deck.languageWhatILearnGoogleTtsVoiceFemaleName,
           googleTtsVoiceMaleName: deck.languageWhatILearnGoogleTtsVoiceMaleName,
         }),
-        numberOfCards: Number(deck.totalCards),
-        numberOfCardsLearned: Number(deck.cardsLearned),
       }),
     );
   }
@@ -172,6 +172,9 @@ export class DeckService {
         isNew: false,
         lastReviewedAt: {
           lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
+        },
+        masteryScore: {
+          lt: 100,
         },
       },
     });
@@ -500,6 +503,9 @@ export class DeckService {
         isNew: false,
         lastReviewedAt: {
           lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
+        },
+        masteryScore: {
+          lt: 100,
         },
       },
     });
