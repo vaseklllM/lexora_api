@@ -7,12 +7,12 @@ export const REVIEW_SESSION_INTERVAL_MILLISECONDS = 1000 * 60 * 60 * 2;
 /**
  * The lifetime of the JWT token in minutes
  */
-export const JWT_TOKEN_LIFETIME_MINUTES = 60 * 3;
+export const JWT_TOKEN_LIFETIME_MINUTES = 60 * 24 * 7;
 
 /**
  * The lifetime of the JWT refresh token in days
  */
-export const JWT_REFRESH_TOKEN_LIFETIME_DAYS = 7;
+export const JWT_REFRESH_TOKEN_LIFETIME_DAYS = 30;
 
 /**
  * The maximum length of a folder name
