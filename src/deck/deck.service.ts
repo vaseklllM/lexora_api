@@ -31,6 +31,8 @@ import { CardService } from 'src/card/card.service';
 import { LanguagesService } from 'src/languages/languages.service';
 import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
+import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
+import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
 
 @Injectable()
 export class DeckService {
@@ -606,6 +608,34 @@ export class DeckService {
 
     return {
       message: 'Review card finished successfully',
+    };
+  }
+
+  async startReviewAllCardsSession(
+    userId: string,
+    startReviewSessionDto: StartReviewAllCardsSessionDto,
+  ): Promise<StartReviewAllCardsSessionResponseDto> {
+    await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
+
+    const cards = await this.databaseService.card.findMany({
+      where: {
+        userId,
+        deckId: startReviewSessionDto.deckId,
+        isNew: false,
+        lastReviewedAt: {
+          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
+        },
+      },
+    });
+
+    if (cards.length === 0) {
+      throw new NotFoundException('No cards to review');
+    }
+
+    return {
+      cards: cards.map((card) =>
+        this.cardService.convertCardToGetCardResponseDto(card),
+      ),
     };
   }
 }

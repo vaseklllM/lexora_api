@@ -34,6 +34,8 @@ import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
+import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
+import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
 
 @ApiTags('Decks')
 @Controller('deck')
@@ -169,6 +171,25 @@ export class DeckController {
     @Body() finishReviewCardDto: FinishReviewCardDto,
   ): Promise<FinishReviewCardResponseDto> {
     return this.deskService.finishReviewCard(user.id, finishReviewCardDto);
+  }
+
+  @Get('start-review-all-cards-session')
+  @Auth()
+  @ApiOperation({ summary: 'Start review session with all cards' })
+  @ApiOkResponse({
+    description: 'Returns all cards for review session',
+    type: StartReviewAllCardsSessionResponseDto,
+    isArray: true,
+  })
+  @ValidateResponse(StartReviewAllCardsSessionResponseDto)
+  startReviewAllCardsSession(
+    @CurrentUser() user: ICurrentUser,
+    @Query() startReviewSessionDto: StartReviewAllCardsSessionDto,
+  ): Promise<StartReviewAllCardsSessionResponseDto> {
+    return this.deskService.startReviewAllCardsSession(
+      user.id,
+      startReviewSessionDto,
+    );
   }
 
   @Get(':id')
