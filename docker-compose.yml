@@ -1,33 +1,33 @@
 services:
-  # db:
-  #   image: postgres:16
-  #   container_name: lexora_db
-  #   environment:
-  #     POSTGRES_USER: admin
-  #     POSTGRES_PASSWORD: 1234
-  #     POSTGRES_DB: lexora
-  #   ports:
-  #     - '127.0.0.1:5433:5432'
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ['CMD-SHELL', 'pg_isready -U admin -d lexora']
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 10
+  db:
+    image: postgres:16
+    container_name: lexora_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d lexora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: lexora_pgadmin
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: admin@lexora.com
-  #     PGADMIN_DEFAULT_PASSWORD: admin123
-  #   ports:
-  #     - '127.0.0.1:5050:80' # UI pgAdmin
-  #   depends_on:
-  #     - db
-  #   volumes:
-  #     - pgadmin:/var/lib/pgadmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: lexora_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@lexora.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "127.0.0.1:5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin:/var/lib/pgadmin
 
   redis:
     image: redis:7-alpine
