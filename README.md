@@ -1,114 +1,114 @@
 # Lexora API
 
-**Lexora** - це додаток для вивчення мов за допомогою карточок (flashcards). API надає функціонал для створення та організації карточок у колоди та папки, з підтримкою різних мов та AI-сервісів для автоматичного заповнення даних.
+**Lexora** is a language learning application using flashcards. The API provides functionality for creating and organizing flashcards into decks and folders, with support for different languages and AI services for automatic data filling.
 
-## Основні функції
+## Main Features
 
-- 🃏 **Карточки (Cards)** - створення та управління карточками для вивчення слів
-- 📚 **Колоди (Decks)** - організація карточок у тематичні групи
-- 📁 **Папки (Folders)** - ієрархічна структура для організації колод
-- 🌍 **Мови (Languages)** - підтримка різних мов вивчення з кешуванням списку мов
-- 🤖 **AI Сервіси** - автоматичне заповнення даних карточок через Google Vertex AI (Gemini)
-- 🔊 **Озвучка (Text-to-Speech)** - генерація аудіо для карток через Google Cloud TTS
-- 🔐 **OAuth (Google)** - авторизація через Google акаунт
-- 👤 **Аутентифікація** - реєстрація, вхід, JWT токени, refresh токени
-- 📊 **Дашборд** - головна сторінка з переглядом папок та колод (в майбутньому буде статистика)
-- 🎓 **Система навчання** - сесії вивчення нових карток та повторення з підтримкою різних стратегій (pair_it, guess_it, recall_it, type_it)
-- 📈 **Tracking прогресу** - система мастерства (mastery score 0-100), CEFR рівні складності
-- ⚙️ **Налаштування** - зміна мови інтерфейсу користувача
-- 🛡️ **Rate Limiting** - захист від зловживань API (20 запитів/сек, 100 запитів/хв)
+- 🃏 **Cards** - creation and management of flashcards for learning words
+- 📚 **Decks** - organization of cards into thematic groups
+- 📁 **Folders** - hierarchical structure for organizing decks
+- 🌍 **Languages** - support for different learning languages with language list caching
+- 🤖 **AI Services** - automatic card data filling via Google Vertex AI (Gemini)
+- 🔊 **Text-to-Speech** - audio generation for cards via Google Cloud TTS
+- 🔐 **OAuth (Google)** - authorization via Google account
+- 👤 **Authentication** - registration, login, JWT tokens, refresh tokens
+- 📊 **Dashboard** - main page with folders and decks view (statistics coming in the future)
+- 🎓 **Learning System** - learning sessions for new cards and review sessions with support for different strategies (pair_it, guess_it, recall_it, type_it)
+- 📈 **Progress Tracking** - mastery system (mastery score 0-100), CEFR difficulty levels
+- ⚙️ **Settings** - user interface language change
+- 🛡️ **Rate Limiting** - protection against API abuse (20 requests/sec, 100 requests/min)
 
-## Технології проекту
+## Project Technologies
 
 ### Backend Framework
 
-- **NestJS** - прогресивний Node.js фреймворк для створення ефективних та масштабованих серверних додатків
-- **TypeScript** - типізована надмножина JavaScript
-- **Node.js 20** - середовище виконання JavaScript
+- **NestJS** - a progressive Node.js framework for building efficient and scalable server-side applications
+- **TypeScript** - typed superset of JavaScript
+- **Node.js 20** - JavaScript runtime environment
 
-### База даних та ORM
+### Database and ORM
 
-- **PostgreSQL 16** - реляційна база даних
-- **Prisma** - сучасний ORM для TypeScript/JavaScript
-- **Redis 7** - in-memory база даних для кешування та сесій
-- **Cache Manager** - система кешування з підтримкою TTL для оптимізації продуктивності API
+- **PostgreSQL 16** - relational database
+- **Prisma** - modern ORM for TypeScript/JavaScript
+- **Redis 7** - in-memory database for caching and sessions
+- **Cache Manager** - caching system with TTL support for API performance optimization
 
-### Аутентифікація та авторизація
+### Authentication and Authorization
 
-- **Passport.js** - middleware для аутентифікації
-- **JWT (JSON Web Tokens)** - для токенів доступу
-- **Argon2** - для хешування паролів
-- **Local Strategy** - для аутентифікації логін/пароль
-- **JWT Strategy** - для перевірки JWT токенів
+- **Passport.js** - authentication middleware
+- **JWT (JSON Web Tokens)** - for access tokens
+- **Argon2** - for password hashing
+- **Local Strategy** - for login/password authentication
+- **JWT Strategy** - for JWT token verification
 
-### Валідація та документація
+### Validation and Documentation
 
-- **Class Validator** - для валідації вхідних даних
-- **Class Transformer** - для трансформації та серіалізації даних
-- **Swagger** - автоматична генерація API документації з підтримкою Bearer токенів
+- **Class Validator** - for input data validation
+- **Class Transformer** - for data transformation and serialization
+- **Swagger** - automatic API documentation generation with Bearer token support
 
-### DevOps та контейнеризація
+### DevOps and Containerization
 
-- **Docker** - контейнеризація додатку
-- **Docker Compose** - оркестрація контейнерів
-- **pgAdmin** - веб-інтерфейс для управління PostgreSQL
+- **Docker** - application containerization
+- **Docker Compose** - container orchestration
+- **pgAdmin** - web interface for PostgreSQL management
 
-### Інструменти розробки
+### Development Tools
 
-- **ESLint** - лінтер для JavaScript/TypeScript
-- **Prettier** - форматування коду
-- **Jest** - фреймворк для тестування
-- **Husky** - Git hooks для pre-commit перевірок
-- **lint-staged** - запуск лінтерів на staged файлах
-- **Morgan** - HTTP request logger для відстеження запитів у development режимі
+- **ESLint** - linter for JavaScript/TypeScript
+- **Prettier** - code formatting
+- **Jest** - testing framework
+- **Husky** - Git hooks for pre-commit checks
+- **lint-staged** - run linters on staged files
+- **Morgan** - HTTP request logger for tracking requests in development mode
 
-### Безпека та обмеження
+### Security and Limitations
 
-- **Throttler** - обмеження кількості запитів (rate limiting)
-- **Custom Guards** - кастомні охоронці для додаткового захисту
+- **Throttler** - request rate limiting
+- **Custom Guards** - custom guards for additional protection
 
-### AI та машинне навчання
+### AI and Machine Learning
 
-- **Google Vertex AI** - платформа для роботи з AI моделями
-- **Gemini 2.5** - модель штучного інтелекту для генерації контенту карточок
-- **Structured Generation** - генерація структурованих JSON відповідей
+- **Google Vertex AI** - platform for working with AI models
+- **Gemini 2.5** - artificial intelligence model for card content generation
+- **Structured Generation** - generation of structured JSON responses
 
-### Додаткові бібліотеки
+### Additional Libraries
 
-- **UUID** - генерація унікальних ідентифікаторів
-- **IORedis** - клієнт для Redis
-- **Reflect Metadata** - підтримка метаданих для декораторів
-- **Google Auth Library** - бібліотека для верифікації Google OAuth токенів
-- **Express Static** - сервінг статичних файлів з папки `/public` (аудіо файли озвучки)
+- **UUID** - unique identifier generation
+- **IORedis** - Redis client
+- **Reflect Metadata** - metadata support for decorators
+- **Google Auth Library** - library for verifying Google OAuth tokens
+- **Express Static** - serving static files from `/public` folder (audio files for pronunciation)
 
-## Змінні оточення
+## Environment Variables
 
-Створіть файл `.env` у корені проекту з наступними змінними:
+Create a `.env` file in the project root with the following variables:
 
-### База даних та кешування
+### Database and Caching
 
-- `DATABASE_URL` — URL підключення до PostgreSQL бази даних (наприклад: `postgresql://admin:1234@localhost:5433/lexora`)
-- `REDIS_HOST` — хост Redis сервера (за замовчуванням: `localhost`)
-- `REDIS_PORT` — порт Redis сервера (за замовчуванням: `6379`)
+- `DATABASE_URL` — PostgreSQL database connection URL (e.g.: `postgresql://admin:1234@localhost:5433/lexora`)
+- `REDIS_HOST` — Redis server host (default: `localhost`)
+- `REDIS_PORT` — Redis server port (default: `6379`)
 
-### Безпека та аутентифікація
+### Security and Authentication
 
-- `JWT_SECRET` — секретний ключ для підпису JWT access токенів
-- `JWT_REFRESH_SECRET` — секретний ключ для підпису JWT refresh токенів
-- `PASSWORD_SECRET` — секретний ключ для додаткового хешування паролів разом з Argon2
+- `JWT_SECRET` — secret key for signing JWT access tokens
+- `JWT_REFRESH_SECRET` — secret key for signing JWT refresh tokens
+- `PASSWORD_SECRET` — secret key for additional password hashing along with Argon2
 
-### Google Cloud сервіси
+### Google Cloud Services
 
-- `GOOGLE_API` — API ключ Google Cloud Project з увімкненим Text-to-Speech API (використовується для синтезу та отримання списку голосів)
-- `GOOGLE_CLIENT_ID` — OAuth 2.0 Client ID з Google Cloud Console (використовується для перевірки Google ID Token у `/auth/google`)
-- `GOOGLE_VERTEX_AI_JSON_PATH` — шлях до JSON файлу з ключами доступу Google Vertex AI (наприклад, `./keys/lexora-vertex-ai.json`)
-- `GOOGLE_VERTEX_AI_JSON_PATH_REGION` — регіон Google Vertex AI (за замовчуванням: `europe-west4`)
+- `GOOGLE_API` — Google Cloud Project API key with Text-to-Speech API enabled (used for synthesis and getting voice lists)
+- `GOOGLE_CLIENT_ID` — OAuth 2.0 Client ID from Google Cloud Console (used for verifying Google ID Token in `/auth/google`)
+- `GOOGLE_VERTEX_AI_JSON_PATH` — path to JSON file with Google Vertex AI access keys (e.g., `./keys/lexora-vertex-ai.json`)
+- `GOOGLE_VERTEX_AI_JSON_PATH_REGION` — Google Vertex AI region (default: `europe-west4`)
 
-### Сервер
+### Server
 
-- `PORT` — порт для запуску API сервера (за замовчуванням: `4000`)
+- `PORT` — port for running the API server (default: `4000`)
 
-### Приклад .env файлу
+### Example .env File
 
 ```env
 # Database
@@ -131,141 +131,141 @@ GOOGLE_VERTEX_AI_JSON_PATH_REGION=europe-west4
 PORT=4000
 ```
 
-## Озвучка карток (Google Cloud Text-to-Speech)
+## Card Pronunciation (Google Cloud Text-to-Speech)
 
-- При створенні або зміні карточки сервіс автоматично генерує озвучку мовою, яку користувач вивчає. Для кожної мови можуть створюватися жіночий та чоловічий варіанти озвучки.
-- Згенеровані файли кешуються і зберігаються у `public/tts` з хешованою назвою, тому повторний синтез для однакових параметрів не виконується.
-- Перед записом нового аудіо попередні файли без використання автоматично видаляються.
+- When creating or modifying a card, the service automatically generates pronunciation in the language the user is learning. For each language, both female and male pronunciation variants can be created.
+- Generated files are cached and stored in `public/tts` with a hashed name, so repeated synthesis for the same parameters is not performed.
+- Before writing new audio, previous unused files are automatically deleted.
 
-### Налаштування голосів
+### Voice Configuration
 
-1. Отримайте API ключ у Google Cloud Console та додайте його в змінну `GOOGLE_API`.
-2. Виконайте `npm run seed` — скрипт автоматично підтягне необхідні голоси з Google Cloud.
+1. Get an API key in Google Cloud Console and add it to the `GOOGLE_API` variable.
+2. Run `npm run seed` — the script will automatically fetch the necessary voices from Google Cloud.
 
-## AI Сервіси (Google Vertex AI)
+## AI Services (Google Vertex AI)
 
-- Сервіс автоматично генерує структуровані дані для карточок використовуючи модель Gemini 2.5
-- AI аналізує текст у мові, яку користувач вивчає, та створює детальну інформацію:
-  - Визначення слова (коротке та довге)
-  - Частина мови (noun, verb, adjective тощо)
-  - Приклади використання
-  - Синоніми та антоніми
-  - Переклади на різні мови
-  - CEFR рівень складності
-- Генерація відбувається з використанням структурованого JSON схеми для забезпечення консистентності даних
+- The service automatically generates structured data for cards using the Gemini 2.5 model
+- AI analyzes text in the language the user is learning and creates detailed information:
+  - Word definition (short and long)
+  - Part of speech (noun, verb, adjective, etc.)
+  - Usage examples
+  - Synonyms and antonyms
+  - Translations to different languages
+  - CEFR difficulty level
+- Generation occurs using a structured JSON schema to ensure data consistency
 
-### Налаштування Vertex AI
+### Vertex AI Configuration
 
-1. Створіть проект у Google Cloud Console та увімкніть Vertex AI API
-2. Створіть Service Account та завантажте JSON ключ у папку `keys/`
-3. Додайте шлях до ключа в змінну `GOOGLE_VERTEX_AI_JSON_PATH`
-4. Встановіть регіон у змінній `GOOGLE_VERTEX_AI_JSON_PATH_REGION` (за замовчуванням: `europe-west4`)
+1. Create a project in Google Cloud Console and enable Vertex AI API
+2. Create a Service Account and download the JSON key to the `keys/` folder
+3. Add the path to the key in the `GOOGLE_VERTEX_AI_JSON_PATH` variable
+4. Set the region in the `GOOGLE_VERTEX_AI_JSON_PATH_REGION` variable (default: `europe-west4`)
 
-## Система навчання карток
+## Card Learning System
 
-### Процес навчання
+### Learning Process
 
-Lexora використовує інтервальну систему повторень для ефективного запам'ятовування:
+Lexora uses a spaced repetition system for effective memorization:
 
-1. **Нові картки** - позначаються як `isNew: true`, не розпочато навчання
-2. **Картки в процесі** - `isNew: false`, `masteryScore` від 0 до 99
-3. **Вивчені картки** - `masteryScore: 100`, повністю засвоєні
+1. **New cards** - marked as `isNew: true`, learning not started
+2. **Cards in progress** - `isNew: false`, `masteryScore` from 0 to 99
+3. **Learned cards** - `masteryScore: 100`, fully mastered
 
-### Сесії навчання
+### Learning Sessions
 
-- **Learning Session** - вивчення нових карток (GET `/deck/start-learning-session`)
-- **Review Session** - повторення вивчених карток (GET `/deck/start-review-session`)
-- Картки потребують повторення кожні **12 годин** після останнього перегляду
+- **Learning Session** - learning new cards (GET `/deck/start-learning-session`)
+- **Review Session** - reviewing learned cards (GET `/deck/start-review-session`)
+- Cards need review every **12 hours** after the last view
 
-### Стратегії навчання
+### Learning Strategies
 
-При завершенні повторення картки (`PATCH /deck/finish-review-card`) можна використовувати різні стратегії:
+When finishing a card review (`PATCH /deck/finish-review-card`), different strategies can be used:
 
-- `pair_it` - підбір пар (слово-переклад)
-- `guess_it` - вгадування за підказками
-- `recall_it` - вільне згадування
-- `type_it` - друкування слова
+- `pair_it` - matching pairs (word-translation)
+- `guess_it` - guessing with hints
+- `recall_it` - free recall
+- `type_it` - typing the word
 
-### CEFR рівні складності
+### CEFR Difficulty Levels
 
-Картки автоматично класифікуються за рівнями складності Європейської шкали:
+Cards are automatically classified by European Framework difficulty levels:
 
-- `A1`, `A2` - початковий рівень
-- `B1`, `B2` - середній рівень
-- `C1`, `C2` - просунутий рівень
+- `A1`, `A2` - beginner level
+- `B1`, `B2` - intermediate level
+- `C1`, `C2` - advanced level
 
-## Вхід через Google (OAuth 2.0)
+## Google Sign-In (OAuth 2.0)
 
-- Клієнтська частина отримує ID Token через Google Sign-In та передає його в `POST /auth/google` разом із `accountId`.
-- Сервіс перевіряє токен з використанням `GOOGLE_CLIENT_ID`, створює нового користувача (якщо email ще не зареєстрований) або прив'язує Google-акаунт до існуючого запису.
-- У відповіді повертаються JWT токени та дані користувача, як і під час локального входу.
+- The client side gets an ID Token through Google Sign-In and passes it to `POST /auth/google` along with `accountId`.
+- The service verifies the token using `GOOGLE_CLIENT_ID`, creates a new user (if the email is not yet registered) or links the Google account to an existing record.
+- The response returns JWT tokens and user data, as with local login.
 
-## Аутентифікація та безпека
+## Authentication and Security
 
-### JWT токени
+### JWT Tokens
 
-- **Access Token** - термін дії: **3 години** (180 хвилин)
-- **Refresh Token** - термін дії: **7 днів**
-- Токени підписуються окремими секретними ключами (`JWT_SECRET`, `JWT_REFRESH_SECRET`)
-- При logout токен додається до чорного списку в Redis до закінчення терміну дії
+- **Access Token** - expiry time: **3 hours** (180 minutes)
+- **Refresh Token** - expiry time: **7 days**
+- Tokens are signed with separate secret keys (`JWT_SECRET`, `JWT_REFRESH_SECRET`)
+- On logout, the token is added to a blacklist in Redis until expiration
 
-### Хешування паролів
+### Password Hashing
 
-- Використовується **Argon2** - одна з найбезпечніших функцій хешування
-- Додатковий секретний ключ `PASSWORD_SECRET` для підвищення безпеки
+- Uses **Argon2** - one of the most secure hashing functions
+- Additional secret key `PASSWORD_SECRET` for increased security
 
-## Кешування (Cache Manager)
+## Caching (Cache Manager)
 
-- Система кешування використовується для оптимізації продуктивності API
-- Список всіх мов (`GET /languages/all`) кешується на 24 години, оскільки ці дані рідко змінюються
-- Кеш автоматично очищується після закінчення TTL або при перезапуску сервера
-- Для персоналізованих даних користувача (`GET /languages/my`) кешування не використовується, щоб завжди повертати актуальні дані
-- Redis також використовується для зберігання чорного списку JWT токенів після logout
+- The caching system is used to optimize API performance
+- The list of all languages (`GET /languages/all`) is cached for 24 hours, as this data rarely changes
+- Cache is automatically cleared after TTL expiration or server restart
+- For personalized user data (`GET /languages/my`), caching is not used to always return current data
+- Redis is also used to store the JWT token blacklist after logout
 
-## Структура бази даних
+## Database Structure
 
-### Основні моделі
+### Main Models
 
-- **User** - користувачі системи
-  - Зв'язок з мовою інтерфейсу за замовчуванням (`languageCode`)
-  - Може мати декілька `Account` (credentials, Google OAuth)
-- **Account** - облікові записи користувачів
-  - Підтримка різних провайдерів: `credentials` (email/password), `google` (OAuth)
-  - Зберігає `passwordHash` тільки для credentials типу
+- **User** - system users
+  - Link to default interface language (`languageCode`)
+  - Can have multiple `Account` (credentials, Google OAuth)
+- **Account** - user accounts
+  - Support for different providers: `credentials` (email/password), `google` (OAuth)
+  - Stores `passwordHash` only for credentials type
 
-- **Language** - підтримувані мови
-  - Код мови як primary key (наприклад: `en-US`, `uk-UA`)
-  - Масиви голосів Google TTS для чоловічого та жіночого озвучення
+- **Language** - supported languages
+  - Language code as primary key (e.g.: `en-US`, `uk-UA`)
+  - Arrays of Google TTS voices for male and female pronunciation
 
-- **Folder** - папки для організації колод
-  - Підтримка ієрархічної структури (самопосилання через `parentId`)
-  - Каскадне видалення дочірніх папок та колод
+- **Folder** - folders for organizing decks
+  - Support for hierarchical structure (self-referencing via `parentId`)
+  - Cascading deletion of child folders and decks
 
-- **Deck** - колоди карток
-  - Зв'язок з двома мовами: `languageWhatIKnow` та `languageWhatILearn`
-  - Можуть бути в папці або на корневому рівні (`folderId` nullable)
+- **Deck** - card decks
+  - Link to two languages: `languageWhatIKnow` and `languageWhatILearn`
+  - Can be in a folder or at root level (`folderId` nullable)
 
-- **Card** - картки для вивчення
-  - Текст та опис на обох мовах
-  - `masteryScore` (0-100) для tracking прогресу
-  - `isNew` для відслідковування початку навчання
-  - `lastReviewedAt` для інтервального повторення
-  - `soundUrls` - масив URL озвучки
-  - `cefr` - рівень складності (A1-C2)
+- **Card** - learning cards
+  - Text and description in both languages
+  - `masteryScore` (0-100) for progress tracking
+  - `isNew` for tracking learning start
+  - `lastReviewedAt` for spaced repetition
+  - `soundUrls` - array of pronunciation URLs
+  - `cefr` - difficulty level (A1-C2)
 
-## API документація та валідація
+## API Documentation and Validation
 
 ### Swagger UI
 
-- Доступний за адресою: http://localhost:4000/api
-- Експорт в форматі JSON: http://localhost:4000/api-json
-- Експорт в форматі YAML: http://localhost:4000/api-yaml
-- Підтримка Bearer токенів (автоматичне додавання до всіх авторизованих запитів)
-- Збереження токену в LocalStorage браузера (persistAuthorization)
+- Available at: http://localhost:4000/api
+- Export in JSON format: http://localhost:4000/api-json
+- Export in YAML format: http://localhost:4000/api-yaml
+- Bearer token support (automatic addition to all authorized requests)
+- Token persistence in browser LocalStorage (persistAuthorization)
 
-### Формат помилок валідації
+### Validation Error Format
 
-При невалідних даних API повертає структуровану відповідь:
+With invalid data, the API returns a structured response:
 
 ```json
 {
@@ -282,25 +282,25 @@ Lexora використовує інтервальну систему повто
 }
 ```
 
-### Обмеження довжини полів
+### Field Length Limits
 
-- Назва папки: максимум **50 символів**
-- Назва колоди: максимум **50 символів**
-- Текст картки: максимум **100 символів**
-- Опис картки: максимум **100 символів**
+- Folder name: maximum **50 characters**
+- Deck name: maximum **50 characters**
+- Card text: maximum **100 characters**
+- Card description: maximum **100 characters**
 
 ## Rate Limiting (Throttling)
 
-Система має два рівні обмежень запитів:
+The system has two levels of request limits:
 
-- **Short** - 20 запитів за 1 секунду (1000 мс)
-- **Long** - 100 запитів за 1 хвилину (60000 мс)
+- **Short** - 20 requests per 1 second (1000 ms)
+- **Long** - 100 requests per 1 minute (60000 ms)
 
-Окремі ендпоінти можуть мати посилені обмеження:
+Individual endpoints can have stricter limits:
 
-- Логін та реєстрація: максимум **5 запитів за 30 секунд**
+- Login and registration: maximum **5 requests per 30 seconds**
 
-При перевищенні ліміту повертається помилка:
+When the limit is exceeded, an error is returned:
 
 ```json
 {
@@ -311,64 +311,64 @@ Lexora використовує інтервальну систему повто
 
 ## API Endpoints
 
-API має наступні основні групи ендпоінтів:
+The API has the following main endpoint groups:
 
 ### Authentication (`/auth`)
 
-- `POST /auth/register` - реєстрація нового користувача
-- `POST /auth/login` - вхід через email/password
-- `POST /auth/google` - вхід через Google OAuth
-- `POST /auth/logout` - вихід (додавання токену до чорного списку)
-- `POST /auth/refresh` - оновлення access токену через refresh token
-- `GET /auth/me` - отримання інформації про поточного користувача
+- `POST /auth/register` - register a new user
+- `POST /auth/login` - login via email/password
+- `POST /auth/google` - login via Google OAuth
+- `POST /auth/logout` - logout (add token to blacklist)
+- `POST /auth/refresh` - refresh access token via refresh token
+- `GET /auth/me` - get current user information
 
 ### Dashboard (`/dashboard`)
 
-- `GET /dashboard` - головна сторінка з папками та колодами
+- `GET /dashboard` - main page with folders and decks
 
 ### Folders (`/folder`)
 
-- `POST /folder/create` - створення папки
-- `PATCH /folder/rename` - перейменування папки
-- `DELETE /folder/delete` - видалення папки
+- `POST /folder/create` - create folder
+- `PATCH /folder/rename` - rename folder
+- `DELETE /folder/delete` - delete folder
 
 ### Decks (`/deck`)
 
-- `POST /deck/create` - створення колоди
-- `GET /deck/:id` - отримання колоди з статистикою
-- `PATCH /deck/rename` - перейменування колоди
-- `DELETE /deck/delete` - видалення колоди
-- `PATCH /deck/move` - переміщення колоди в папку
-- `GET /deck/start-learning-session` - початок сесії вивчення нових карток
-- `PATCH /deck/finish-learning-session` - завершення сесії вивчення
-- `GET /deck/start-review-session` - початок сесії повторення
-- `PATCH /deck/finish-review-card` - завершення повторення картки
+- `POST /deck/create` - create deck
+- `GET /deck/:id` - get deck with statistics
+- `PATCH /deck/rename` - rename deck
+- `DELETE /deck/delete` - delete deck
+- `PATCH /deck/move` - move deck to folder
+- `GET /deck/start-learning-session` - start learning session for new cards
+- `PATCH /deck/finish-learning-session` - finish learning session
+- `GET /deck/start-review-session` - start review session
+- `PATCH /deck/finish-review-card` - finish card review
 
 ### Cards (`/card`)
 
-- `POST /card/create` - створення картки
-- `GET /card/:id` - отримання картки
-- `PATCH /card/update` - оновлення картки
-- `DELETE /card/delete` - видалення картки
+- `POST /card/create` - create card
+- `GET /card/:id` - get card
+- `PATCH /card/update` - update card
+- `DELETE /card/delete` - delete card
 
 ### Languages (`/languages`)
 
-- `GET /languages/all` - список всіх підтримуваних мов (кешується на 24 години)
-- `GET /languages/my` - список мов користувача
+- `GET /languages/all` - list of all supported languages (cached for 24 hours)
+- `GET /languages/my` - list of user's languages
 
 ### AI (`/ai`)
 
-- `POST /ai/fill-card-data` - автоматичне заповнення даних картки через Gemini AI
+- `POST /ai/fill-card-data` - automatic card data filling via Gemini AI
 
 ### Settings (`/settings`)
 
-- `PATCH /settings/set-language` - зміна мови інтерфейсу користувача
+- `PATCH /settings/set-language` - change user interface language
 
 ### Static Files
 
-- `GET /public/tts/*` - доступ до згенерованих аудіо файлів озвучки
+- `GET /public/tts/*` - access to generated pronunciation audio files
 
-## Compile and run the project in dev mode
+## Compile and Run the Project in Dev Mode
 
 ```bash
 # development
@@ -376,106 +376,106 @@ $ npm install
 $ docker compose up -d
 $ npx prisma generate
 $ npx prisma migrate dev --name init
-$ npm run seed  # Заповнення початкових даних (мови)
+$ npm run seed  # Fill initial data (languages)
 $ npm run dev
 ```
 
-## Додаткові скрипти
+## Additional Scripts
 
 ```bash
-# Перевірка типів без компіляції
+# Type checking without compilation
 $ npm run type-check
 
-# Форматування коду
+# Code formatting
 $ npm run format
 
-# Лінтинг
+# Linting
 $ npm run lint
 
-# Тестування
+# Testing
 $ npm run test
 $ npm run test:watch
 $ npm run test:cov
 
-# Заповнення БД початковими даними
+# Fill DB with initial data
 $ npm run seed
 ```
 
-## Production build and run
+## Production Build and Run
 
 ```bash
-# Компіляція проекту
+# Build the project
 $ npm run build
 
-# Запуск в production режимі
+# Run in production mode
 $ npm run start:prod
 ```
 
-Скомпільовані файли будуть у папці `dist/`.
+Compiled files will be in the `dist/` folder.
 
 ## Docker
 
 ### Development
 
-Проект містить `Dockerfile.dev` для розробки з hot reload:
+The project contains `Dockerfile.dev` for development with hot reload:
 
 ```bash
-# У docker-compose.yml розкоментуйте секцію backend
+# In docker-compose.yml, uncomment the backend section
 $ docker compose up -d
 ```
 
-Backend контейнер буде автоматично перезапускатися при зміні файлів у папці `src/`.
+The backend container will automatically restart when files in the `src/` folder change.
 
-### Основні Docker команди
+### Main Docker Commands
 
 ```bash
-# Запуск всіх сервісів
+# Start all services
 $ docker compose up -d
 
-# Зупинка всіх сервісів
+# Stop all services
 $ docker compose down
 
-# Перегляд логів
+# View logs
 $ docker compose logs -f
 
-# Перегляд логів конкретного сервісу
+# View logs of a specific service
 $ docker compose logs -f db
 $ docker compose logs -f redis
 
-# Перезапуск сервісу
+# Restart a service
 $ docker compose restart db
 ```
 
-## Важливі примітки
+## Important Notes
 
-### Безпека
+### Security
 
-⚠️ **ВАЖЛИВО**: Перед деплоєм у production:
+⚠️ **IMPORTANT**: Before deploying to production:
 
-1. Змініть всі секретні ключі (`JWT_SECRET`, `JWT_REFRESH_SECRET`, `PASSWORD_SECRET`)
-2. Використовуйте сильні паролі для бази даних
-3. Налаштуйте CORS для обмеження доступу тільки з дозволених доменів
-4. Розгляньте використання HTTPS
-5. Встановіть обмеження rate limiting відповідно до ваших потреб
+1. Change all secret keys (`JWT_SECRET`, `JWT_REFRESH_SECRET`, `PASSWORD_SECRET`)
+2. Use strong passwords for the database
+3. Configure CORS to restrict access only from allowed domains
+4. Consider using HTTPS
+5. Set rate limiting according to your needs
 
-### Розширення проекту
+### Project Extension
 
-Структура проекту підтримує легке розширення:
+The project structure supports easy extension:
 
-- Додавання нових модулів через NestJS CLI: `nest generate module module-name`
-- Prisma міграції для змін в структурі БД: `npx prisma migrate dev --name migration-name`
-- Swagger автоматично оновлюється при додаванні нових ендпоінтів з декораторами
+- Adding new modules via NestJS CLI: `nest generate module module-name`
+- Prisma migrations for database structure changes: `npx prisma migrate dev --name migration-name`
+- Swagger automatically updates when adding new endpoints with decorators
 
-## Доступні сервіси
+## Available Services
 
-### API та документація
+### API and Documentation
 
 - **Swagger UI**: http://localhost:4000/api
 - **Swagger JSON**: http://localhost:4000/api-json
 - **Swagger YAML**: http://localhost:4000/api-yaml
 - **Static files (TTS audio)**: http://localhost:4000/public/tts/\*
 
-### Бази даних та сервіси
+### Databases and Services
 
 - **PostgreSQL**: localhost:5433
   - Database: `lexora`
@@ -486,38 +486,38 @@ $ docker compose restart db
   - Password: `admin123`
 - **Redis**: localhost:6379
 
-## Структура проекту
+## Project Structure
 
 ```
 lexora_api/
 ├── src/
-│   ├── ai/              # AI сервіси (Gemini)
-│   ├── auth/            # Аутентифікація та авторизація
-│   ├── card/            # Управління картками
-│   ├── dashboard/       # Головна сторінка
-│   ├── database/        # Prisma сервіс
-│   ├── deck/            # Управління колодами
-│   ├── folder/          # Управління папками
-│   ├── languages/       # Мови
-│   ├── redis/           # Redis сервіс
-│   ├── settings/        # Налаштування користувача
-│   ├── tts/             # Text-to-Speech сервіс
+│   ├── ai/              # AI services (Gemini)
+│   ├── auth/            # Authentication and authorization
+│   ├── card/            # Card management
+│   ├── dashboard/       # Main page
+│   ├── database/        # Prisma service
+│   ├── deck/            # Deck management
+│   ├── folder/          # Folder management
+│   ├── languages/       # Languages
+│   ├── redis/           # Redis service
+│   ├── settings/        # User settings
+│   ├── tts/             # Text-to-Speech service
 │   ├── vertex/          # Google Vertex AI
-│   ├── common/          # Спільні утиліти, guards, decorators
-│   │   ├── config.ts    # Константи конфігурації
-│   │   ├── seeds/       # Seed скрипти
+│   ├── common/          # Common utilities, guards, decorators
+│   │   ├── config.ts    # Configuration constants
+│   │   ├── seeds/       # Seed scripts
 │   │   ├── guards/      # Custom guards
 │   │   ├── decorators/  # Custom decorators
-│   │   └── types/       # TypeScript типи
-│   ├── app.module.ts    # Головний модуль
+│   │   └── types/       # TypeScript types
+│   ├── app.module.ts    # Main module
 │   └── main.ts          # Entry point
 ├── prisma/
-│   ├── schema.prisma    # Схема бази даних
-│   └── migrations/      # Міграції БД
+│   ├── schema.prisma    # Database schema
+│   └── migrations/      # DB migrations
 ├── public/
-│   └── tts/             # Кешовані аудіо файли
-├── keys/                # Ключі Google Cloud (не в git)
-├── docker-compose.yml   # Docker конфігурація
-├── Dockerfile.dev       # Dockerfile для development
-└── .env                 # Змінні оточення (не в git)
+│   └── tts/             # Cached audio files
+├── keys/                # Google Cloud keys (not in git)
+├── docker-compose.yml   # Docker configuration
+├── Dockerfile.dev       # Dockerfile for development
+└── .env                 # Environment variables (not in git)
 ```
