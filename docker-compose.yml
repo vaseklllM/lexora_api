@@ -11,7 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d lexora"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -43,28 +43,31 @@ services:
       timeout: 3s
       retries: 5
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.build
-    container_name: lexora_backend
-    ports:
-      - "127.0.0.1:4000:4000"
-    volumes:
-      - ./keys:/app/keys:ro
-    environment:
-      - NODE_ENV=production
-      - PORT=4000
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - GOOGLE_VERTEX_AI_JSON_PATH=./keys/lexora-vertex-ai.json
-    depends_on:
-      redis:
-        condition: service_healthy
-    env_file:
-      - .env
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.build
+  #   container_name: lexora_backend
+  #   ports:
+  #     - "127.0.0.1:4000:4000"
+  #   volumes:
+  #     - ./keys:/app/keys:ro
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PORT=4000
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+  #     - GOOGLE_VERTEX_AI_JSON_PATH=./keys/lexora-vertex-ai.json
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   env_file:
+  #     - .env
 
 volumes:
-  # pgdata:
-  # pgadmin:
+  pgdata:
+  pgadmin:
   redis_data:
