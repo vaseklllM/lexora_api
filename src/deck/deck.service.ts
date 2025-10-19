@@ -622,9 +622,6 @@ export class DeckService {
         userId,
         deckId: startReviewSessionDto.deckId,
         isNew: false,
-        lastReviewedAt: {
-          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
-        },
       },
     });
 
