@@ -2,6 +2,9 @@
 
 **Lexora** is a language learning application using flashcards. The API provides functionality for creating and organizing flashcards into decks and folders, with support for different languages and AI services for automatic data filling.
 
+🌐 **Website**: [https://lexora.co.ua/](https://lexora.co.ua/)  
+📖 **API Documentation**: [https://api.lexora.co.ua/api](https://api.lexora.co.ua/api)
+
 ## Main Features
 
 - 🃏 **Cards** - creation and management of flashcards for learning words
@@ -257,7 +260,8 @@ Cards are automatically classified by European Framework difficulty levels:
 
 ### Swagger UI
 
-- Available at: http://localhost:4000/api
+- **Production**: [https://api.lexora.co.ua/api](https://api.lexora.co.ua/api)
+- **Local**: http://localhost:4000/api
 - Export in JSON format: http://localhost:4000/api-json
 - Export in YAML format: http://localhost:4000/api-yaml
 - Bearer token support (automatic addition to all authorized requests)
@@ -470,9 +474,11 @@ The project structure supports easy extension:
 
 ### API and Documentation
 
-- **Swagger UI**: http://localhost:4000/api
-- **Swagger JSON**: http://localhost:4000/api-json
-- **Swagger YAML**: http://localhost:4000/api-yaml
+- **Website**: [https://lexora.co.ua/](https://lexora.co.ua/)
+- **Swagger UI (Production)**: [https://api.lexora.co.ua/api](https://api.lexora.co.ua/api)
+- **Swagger UI (Local)**: http://localhost:4000/api
+- **Swagger JSON (Local)**: http://localhost:4000/api-json
+- **Swagger YAML (Local)**: http://localhost:4000/api-yaml
 - **Static files (TTS audio)**: http://localhost:4000/public/tts/\*
 
 ### Databases and Services
