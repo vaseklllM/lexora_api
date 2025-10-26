@@ -84,37 +84,29 @@ export class FolderService {
 
   public async getFolderBreadcrumbs(
     userId: string,
-    folderParentId?: string | null,
+    folderId?: string | null,
   ): Promise<FolderBreadcrumbDto[]> {
-    if (!folderParentId) return [];
+    if (!folderId) return [];
 
-    const parentFolder = await this.databaseService.folder.findFirst({
-      where: { userId, id: folderParentId },
-      select: {
-        id: true,
-        name: true,
-        parentId: true,
-      },
-    });
-
-    if (!parentFolder) {
-      throw new NotFoundException('Parent folder not found');
-    }
-
-    const parentFolders = [
+    const breadcrumbs = await this.databaseService.$queryRaw<
       {
-        name: parentFolder.name,
-        id: parentFolder.id,
-      },
-    ];
+        id: string;
+        name: string;
+      }[]
+    > /* sql */ `
+      WITH RECURSIVE "breadcrumbs" AS (
+        SELECT "id", "name", "parentId" FROM "Folder" WHERE "id" = ${folderId} AND "userId" = ${userId}
+        
+        UNION ALL	
+        
+        SELECT "ParentFolder"."id", "ParentFolder"."name", "ParentFolder"."parentId" FROM "Folder" AS "ParentFolder"
+        JOIN "breadcrumbs" ON "ParentFolder"."id" = "breadcrumbs"."parentId"
+        WHERE "breadcrumbs"."parentId" IS NOT NULL AND "ParentFolder"."userId" = ${userId}
+      )
+      SELECT "id", "name" FROM "breadcrumbs"
+    `;
 
-    if (parentFolder.parentId) {
-      parentFolders.unshift(
-        ...(await this.getFolderBreadcrumbs(userId, parentFolder.parentId)),
-      );
-    }
-
-    return parentFolders;
+    return breadcrumbs.reverse();
   }
 
   async getFolder(
@@ -131,6 +123,13 @@ export class FolderService {
     if (!folder) {
       throw new NotFoundException('Folder not found');
     }
+
+    const breadcrumbs = await this.getFolderBreadcrumbs(
+      userId,
+      folder.parentId,
+    );
+
+    // console.log(breadcrumbs);
 
     return {
       name: folder.name,
@@ -150,7 +149,7 @@ export class FolderService {
           }
         : undefined,
       numberOfCards: await this.getNumberOfCardsInFolder(userId, folderId),
-      breadcrumbs: await this.getFolderBreadcrumbs(userId, folder.parentId),
+      breadcrumbs,
       childFolders: await this.getFolders(userId, folder.id),
       childDecks: await this.deckService.getDecks(userId, folder.id),
     };
