@@ -33,7 +33,9 @@ export class FolderService {
     userId: string,
     folderId: string,
   ): Promise<number> {
-    const result = await this.databaseService.$queryRaw<[{ count: bigint }]>`
+    const result = await this.databaseService.$queryRaw<
+      [{ count: bigint }]
+    > /* sql */ `
       WITH RECURSIVE folder_tree AS (
         SELECT id FROM "Folder" WHERE id = ${folderId} AND "userId" = ${userId}
         
