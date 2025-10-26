@@ -33,15 +33,12 @@ export class FolderService {
     userId: string,
     folderId: string,
   ): Promise<number> {
-    // Use raw SQL with recursive CTE to count all cards in folder and subfolders
     const result = await this.databaseService.$queryRaw<[{ count: bigint }]>`
       WITH RECURSIVE folder_tree AS (
-        -- Base case: start with the target folder
         SELECT id FROM "Folder" WHERE id = ${folderId} AND "userId" = ${userId}
         
         UNION ALL
         
-        -- Recursive case: find all child folders
         SELECT f.id 
         FROM "Folder" f
         INNER JOIN folder_tree ft ON f."parentId" = ft.id
