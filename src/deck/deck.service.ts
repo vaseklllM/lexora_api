@@ -14,7 +14,7 @@ import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
 import { CardDto } from 'src/card/dto/card.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { DeckDto } from './dto/deck.dto';
 import { FolderService } from 'src/folder/folder.service';
 import { REVIEW_SESSION_INTERVAL_MILLISECONDS } from 'src/common/config';
@@ -209,6 +209,30 @@ export class DeckService {
     };
   }
 
+  private async checkDeckNameConflict({
+    tx,
+    userId,
+    name,
+    folderId,
+  }: {
+    tx: Pick<PrismaClient, 'deck'>;
+    userId: string;
+    name: string;
+    folderId: string | null | undefined;
+  }): Promise<void> {
+    const existingDeck = await tx.deck.findFirst({
+      where: {
+        userId,
+        name,
+        folderId: folderId ?? null,
+      },
+    });
+
+    if (existingDeck) {
+      throw new ConflictException(`Deck with name '${name}' already exists`);
+    }
+  }
+
   async create(
     userId: string,
     createDeckDto: CreateDeckDto,
@@ -223,19 +247,12 @@ export class DeckService {
       }
     }
 
-    const findDeck = await this.databaseService.deck.findFirst({
-      where: {
-        userId,
-        name: createDeckDto.name,
-        folderId: createDeckDto.folderId ?? null,
-      },
+    await this.checkDeckNameConflict({
+      tx: this.databaseService,
+      userId,
+      name: createDeckDto.name,
+      folderId: createDeckDto.folderId,
     });
-
-    if (findDeck) {
-      throw new ConflictException(
-        `Deck with name '${findDeck.name}' already exists`,
-      );
-    }
 
     const checkLanguageCode = async (languageCode: string) => {
       const language = await this.databaseService.language.findFirst({
@@ -283,34 +300,12 @@ export class DeckService {
         throw new NotFoundException('Deck not found');
       }
 
-      if (findDeck.folderId) {
-        const findDeckInFolder = await tx.deck.findFirst({
-          where: {
-            folderId: findDeck.folderId,
-            name: renameDeckDto.name,
-          },
-        });
-
-        if (findDeckInFolder) {
-          throw new ConflictException(
-            `Deck with name '${findDeckInFolder.name}' already exists`,
-          );
-        }
-      } else {
-        const findDeckInUser = await tx.deck.findFirst({
-          where: {
-            userId,
-            name: renameDeckDto.name,
-            folderId: null,
-          },
-        });
-
-        if (findDeckInUser) {
-          throw new ConflictException(
-            `Deck with name '${findDeckInUser.name}' already exists`,
-          );
-        }
-      }
+      await this.checkDeckNameConflict({
+        tx,
+        userId,
+        name: renameDeckDto.name,
+        folderId: findDeck.folderId,
+      });
 
       const deck = await tx.deck.update({
         where: { id: renameDeckDto.deckId, userId },
@@ -371,15 +366,12 @@ export class DeckService {
       }
 
       if (!moveDto.toFolderId) {
-        const findDeckInHome = await tx.deck.findFirst({
-          where: { userId, name: deck.name, folderId: null },
+        await this.checkDeckNameConflict({
+          tx,
+          userId,
+          name: deck.name,
+          folderId: null,
         });
-
-        if (findDeckInHome) {
-          throw new ConflictException(
-            `Deck with name '${findDeckInHome.name}' already exists in home folder`,
-          );
-        }
 
         await tx.deck.update({
           where: { id: moveDto.deckId },
@@ -394,15 +386,12 @@ export class DeckService {
           throw new NotFoundException('Folder not found');
         }
 
-        const findDeckInFolder = await tx.deck.findFirst({
-          where: { folderId: moveDto.toFolderId, name: deck.name },
+        await this.checkDeckNameConflict({
+          tx,
+          userId,
+          name: deck.name,
+          folderId: moveDto.toFolderId,
         });
-
-        if (findDeckInFolder) {
-          throw new ConflictException(
-            `Deck with name '${findDeckInFolder.name}' already exists in folder '${folder.name}'`,
-          );
-        }
 
         await tx.deck.update({
           where: { id: moveDto.deckId },
