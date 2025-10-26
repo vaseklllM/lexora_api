@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LearningStrategyType } from '../types/learningStrategyType';
+import { LearningStrategyType } from '../../types/learningStrategyType';
 import { ILearningStrategy } from './learning-strategy.interface';
 import { PairItStrategy } from './pair-it.strategy';
 import { GuessItStrategy } from './guess-it.strategy';

@@ -32,7 +32,7 @@ import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
 import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
 import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
-import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy.factory';
+import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy';
 
 @Injectable()
 export class DeckService {
