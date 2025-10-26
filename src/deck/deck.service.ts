@@ -61,7 +61,7 @@ export class DeckService {
         cardsLearned: bigint;
         avgMasteryScore: number | null;
       }>
-    >`
+    > /* sql */ `
     SELECT 
       d.id,
       d.name,
