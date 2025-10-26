@@ -156,39 +156,31 @@ export class DeckService {
       throw new NotFoundException('Deck not found');
     }
 
-    const numberOfCards = await this.databaseService.card.count({
-      where: { deckId },
-    });
+    const cards = deck.cards;
 
-    const numberOfNewCards = await this.databaseService.card.count({
-      where: { deckId, isNew: true, masteryScore: 0 },
-    });
+    const numberOfNewCards = cards.filter(
+      (c) => c.isNew && c.masteryScore === 0,
+    ).length;
 
-    const numberOfCardsInProgress = await this.databaseService.card.count({
-      where: { deckId, isNew: false, masteryScore: { gte: 0, lt: 100 } },
-    });
+    const numberOfCardsInProgress = cards.filter(
+      (c) => !c.isNew && c.masteryScore >= 0 && c.masteryScore < 100,
+    ).length;
 
-    const numberOfCardsNeedToReview = await this.databaseService.card.count({
-      where: {
-        deckId,
-        isNew: false,
-        lastReviewedAt: {
-          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
-        },
-        masteryScore: {
-          lt: 100,
-        },
-      },
-    });
+    const numberOfCardsNeedToReview = cards.filter((c) => {
+      const isExpired =
+        c.lastReviewedAt <
+        new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS);
+      return !c.isNew && isExpired && c.masteryScore < 100;
+    }).length;
 
-    const numberOfCardsLearned = await this.databaseService.card.count({
-      where: { deckId, isNew: false, masteryScore: 100 },
-    });
+    const numberOfCardsLearned = cards.filter(
+      (c) => !c.isNew && c.masteryScore === 100,
+    ).length;
 
-    const masteryScore = await this.databaseService.card.aggregate({
-      where: { deckId },
-      _avg: { masteryScore: true },
-    });
+    const masteryScore =
+      cards.length > 0
+        ? cards.reduce((sum, c) => sum + c.masteryScore, 0) / cards.length
+        : 0;
 
     return {
       id: deck.id,
@@ -199,12 +191,12 @@ export class DeckService {
       languageWhatILearn: this.languagesService.convertLanguageToLanguageDto(
         deck.languageWhatILearn,
       ),
-      numberOfCards: numberOfCards,
+      numberOfCards: cards.length,
       numberOfNewCards: numberOfNewCards,
       numberOfCardsInProgress: numberOfCardsInProgress,
       numberOfCardsNeedToReview: numberOfCardsNeedToReview,
       numberOfCardsLearned: numberOfCardsLearned,
-      masteryScore: Math.floor(masteryScore._avg.masteryScore ?? 0),
+      masteryScore: Math.floor(masteryScore),
       foldersBreadcrumbs: await this.folderService.getFolderBreadcrumbs(
         userId,
         deck.folderId,
