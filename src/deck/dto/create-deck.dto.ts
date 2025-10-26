@@ -29,7 +29,7 @@ export class CreateDeckDto {
   folderId?: string;
 
   @ApiProperty({
-    example: 'en',
+    example: 'en-US',
     description: 'Language what I know id',
   })
   @IsString()
@@ -37,7 +37,7 @@ export class CreateDeckDto {
   languageWhatIKnowCode: string;
 
   @ApiProperty({
-    example: 'uk',
+    example: 'uk-UA',
     description: 'Language what I learn id',
   })
   @IsString()

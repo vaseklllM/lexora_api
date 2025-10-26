@@ -17,22 +17,11 @@ import { CardDto } from 'src/card/dto/card.dto';
 import { Prisma } from '@prisma/client';
 import { DeckDto } from './dto/deck.dto';
 import { FolderService } from 'src/folder/folder.service';
-import { StartLearningSessionDto } from './dto/start-learning-session.dto';
-import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
-import { StartReviewSessionDto } from './dto/start-review-session.dto';
-import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
-import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
-import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
 import { REVIEW_SESSION_INTERVAL_MILLISECONDS } from 'src/common/config';
-import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
-import { FinishReviewCardDto } from './dto/finish-review-card.dto';
 import { CardService } from 'src/card/card.service';
 import { LanguagesService } from 'src/languages/languages.service';
 import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
-import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
-import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
-import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy';
 
 @Injectable()
 export class DeckService {
@@ -42,7 +31,6 @@ export class DeckService {
     private readonly folderService: FolderService,
     private readonly cardService: CardService,
     private readonly languagesService: LanguagesService,
-    private readonly learningStrategyFactory: LearningStrategyFactory,
   ) {}
 
   async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
@@ -233,7 +221,7 @@ export class DeckService {
     return folder;
   }
 
-  private async checkIsExistDeck(userId: string, deckId: string) {
+  async checkIsExistDeck(userId: string, deckId: string) {
     const findDeck = await this.databaseService.deck.findFirst({
       where: { id: deckId, userId },
     });
@@ -443,151 +431,6 @@ export class DeckService {
 
     return {
       message: 'Successfully moved deck to folder',
-    };
-  }
-
-  async startLearningSession(
-    userId: string,
-    startLearningSessionDto: StartLearningSessionDto,
-  ): Promise<StartLearningSessionResponseDto> {
-    await this.checkIsExistDeck(userId, startLearningSessionDto.deckId);
-
-    const cards = await this.databaseService.card.findMany({
-      where: { userId, deckId: startLearningSessionDto.deckId, isNew: true },
-      take: startLearningSessionDto.count ?? 5,
-    });
-
-    if (cards.length === 0) {
-      throw new NotFoundException('No cards to learn');
-    }
-
-    return {
-      cards: cards.map((card) =>
-        this.cardService.convertCardToGetCardResponseDto(card),
-      ),
-    };
-  }
-
-  async finishLearningSession(
-    userId: string,
-    finishLearningSessionDto: FinishLearningSessionDto,
-  ): Promise<FinishLearningSessionResponseDto> {
-    await this.databaseService.card.updateMany({
-      where: {
-        userId,
-        id: { in: finishLearningSessionDto.cardIds },
-      },
-      data: { isNew: false },
-    });
-
-    return {
-      message: 'Learning session finished successfully',
-    };
-  }
-
-  async startReviewSession(
-    userId: string,
-    startReviewSessionDto: StartReviewSessionDto,
-  ): Promise<StartReviewSessionResponseDto> {
-    await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
-
-    const cards = await this.databaseService.card.findMany({
-      where: {
-        userId,
-        deckId: startReviewSessionDto.deckId,
-        isNew: false,
-        lastReviewedAt: {
-          lt: new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS),
-        },
-        masteryScore: {
-          lt: 100,
-        },
-      },
-    });
-
-    if (cards.length === 0) {
-      throw new NotFoundException('No cards to review');
-    }
-
-    return {
-      cards: cards.map((card) =>
-        this.cardService.convertCardToGetCardResponseDto(card),
-      ),
-    };
-  }
-
-  async finishReviewCard(
-    userId: string,
-    finishReviewCardDto: FinishReviewCardDto,
-  ): Promise<FinishReviewCardResponseDto> {
-    await this.databaseService.$transaction(async (tx) => {
-      const card = await tx.card.findFirst({
-        where: { userId, id: finishReviewCardDto.cardId },
-      });
-
-      if (!card) {
-        throw new NotFoundException('Card not found');
-      }
-
-      const strategy = this.learningStrategyFactory.getStrategy(
-        finishReviewCardDto.typeOfStrategy,
-      );
-
-      const isReviewSession =
-        card.lastReviewedAt <
-        new Date(Date.now() - REVIEW_SESSION_INTERVAL_MILLISECONDS);
-
-      await tx.card.update({
-        where: { id: finishReviewCardDto.cardId },
-        data: finishReviewCardDto.isCorrectAnswer
-          ? {
-              lastReviewedAt: new Date(),
-              masteryScore: ((): number | undefined => {
-                const weight = strategy.getCorrectWeight();
-                const newScore: number =
-                  card.masteryScore + (isReviewSession ? weight : weight / 5);
-
-                return newScore > 100 ? 100 : newScore;
-              })(),
-            }
-          : {
-              masteryScore: ((): number | undefined => {
-                const weight = strategy.getIncorrectWeight();
-                const newScore: number = card.masteryScore - weight;
-
-                return newScore < 0 ? 0 : newScore;
-              })(),
-            },
-      });
-    });
-
-    return {
-      message: 'Review card finished successfully',
-    };
-  }
-
-  async startReviewAllCardsSession(
-    userId: string,
-    startReviewSessionDto: StartReviewAllCardsSessionDto,
-  ): Promise<StartReviewAllCardsSessionResponseDto> {
-    await this.checkIsExistDeck(userId, startReviewSessionDto.deckId);
-
-    const cards = await this.databaseService.card.findMany({
-      where: {
-        userId,
-        deckId: startReviewSessionDto.deckId,
-        isNew: false,
-      },
-    });
-
-    if (cards.length === 0) {
-      throw new NotFoundException('No cards to review');
-    }
-
-    return {
-      cards: cards.map((card) =>
-        this.cardService.convertCardToGetCardResponseDto(card),
-      ),
     };
   }
 }

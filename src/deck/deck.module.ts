@@ -1,6 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { DeckController } from './deck.controller';
 import { DeckService } from './deck.service';
+import { LearningSessionService } from './learning-session.service';
+import { ReviewSessionService } from './review-session.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { FolderModule } from 'src/folder/folder.module';
 import { CardModule } from 'src/card/card.module';
@@ -14,7 +16,12 @@ import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy
     LanguagesModule,
   ],
   controllers: [DeckController],
-  providers: [DeckService, LearningStrategyFactory],
+  providers: [
+    DeckService,
+    LearningSessionService,
+    ReviewSessionService,
+    LearningStrategyFactory,
+  ],
   exports: [DeckService],
 })
 export class DeckModule {}

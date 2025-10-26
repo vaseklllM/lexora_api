@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DeckService } from './deck.service';
+import { LearningSessionService } from './learning-session.service';
+import { ReviewSessionService } from './review-session.service';
 import { CreateDeckDto } from './dto/create-deck.dto';
 import {
   CurrentUser,
@@ -40,7 +42,11 @@ import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-ca
 @ApiTags('Decks')
 @Controller('deck')
 export class DeckController {
-  constructor(private readonly deskService: DeckService) {}
+  constructor(
+    private readonly deskService: DeckService,
+    private readonly learningSessionService: LearningSessionService,
+    private readonly reviewSessionService: ReviewSessionService,
+  ) {}
 
   @Post('create')
   @Auth()
@@ -115,7 +121,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Query() startLearningSessionDto: StartLearningSessionDto,
   ): Promise<StartLearningSessionResponseDto> {
-    return this.deskService.startLearningSession(
+    return this.learningSessionService.startSession(
       user.id,
       startLearningSessionDto,
     );
@@ -133,7 +139,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Body() finishLearningSessionDto: FinishLearningSessionDto,
   ): Promise<FinishLearningSessionResponseDto> {
-    return this.deskService.finishLearningSession(
+    return this.learningSessionService.finishSession(
       user.id,
       finishLearningSessionDto,
     );
@@ -152,7 +158,10 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Query() startReviewSessionDto: StartReviewSessionDto,
   ): Promise<StartReviewSessionResponseDto> {
-    return this.deskService.startReviewSession(user.id, startReviewSessionDto);
+    return this.reviewSessionService.startSession(
+      user.id,
+      startReviewSessionDto,
+    );
   }
 
   @Patch('finish-review-card')
@@ -170,7 +179,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Body() finishReviewCardDto: FinishReviewCardDto,
   ): Promise<FinishReviewCardResponseDto> {
-    return this.deskService.finishReviewCard(user.id, finishReviewCardDto);
+    return this.reviewSessionService.finishCard(user.id, finishReviewCardDto);
   }
 
   @Get('start-review-all-cards-session')
@@ -186,7 +195,7 @@ export class DeckController {
     @CurrentUser() user: ICurrentUser,
     @Query() startReviewSessionDto: StartReviewAllCardsSessionDto,
   ): Promise<StartReviewAllCardsSessionResponseDto> {
-    return this.deskService.startReviewAllCardsSession(
+    return this.reviewSessionService.startAllCardsSession(
       user.id,
       startReviewSessionDto,
     );
