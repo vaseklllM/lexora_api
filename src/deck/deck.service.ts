@@ -26,13 +26,13 @@ import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-
 import { REVIEW_SESSION_INTERVAL_MILLISECONDS } from 'src/common/config';
 import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
 import { FinishReviewCardDto } from './dto/finish-review-card.dto';
-import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 import { CardService } from 'src/card/card.service';
 import { LanguagesService } from 'src/languages/languages.service';
 import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
 import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
 import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
+import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy.factory';
 
 @Injectable()
 export class DeckService {
@@ -42,6 +42,7 @@ export class DeckService {
     private readonly folderService: FolderService,
     private readonly cardService: CardService,
     private readonly languagesService: LanguagesService,
+    private readonly learningStrategyFactory: LearningStrategyFactory,
   ) {}
 
   async getDecks(userId: string, folderId?: string): Promise<DeckDto[]> {
@@ -528,47 +529,9 @@ export class DeckService {
         throw new NotFoundException('Card not found');
       }
 
-      function getCorrectWeight() {
-        switch (finishReviewCardDto.typeOfStrategy) {
-          case LearningStrategyType.PAIR_IT:
-            return 1;
-
-          case LearningStrategyType.GUESS_IT:
-            return 2;
-
-          case LearningStrategyType.RECALL_IT:
-            return 3;
-
-          case LearningStrategyType.TYPE_IT:
-            return 4;
-
-          default: {
-            const _check: never = finishReviewCardDto.typeOfStrategy;
-            throw new Error(`Unhandled learning strategy type: ${_check}`);
-          }
-        }
-      }
-
-      function getIncorrectWeight() {
-        switch (finishReviewCardDto.typeOfStrategy) {
-          case LearningStrategyType.PAIR_IT:
-            return 0.7;
-
-          case LearningStrategyType.GUESS_IT:
-            return 0.5;
-
-          case LearningStrategyType.RECALL_IT:
-            return 0.3;
-
-          case LearningStrategyType.TYPE_IT:
-            return 0.1;
-
-          default: {
-            const _check: never = finishReviewCardDto.typeOfStrategy;
-            throw new Error(`Unhandled learning strategy type: ${_check}`);
-          }
-        }
-      }
+      const strategy = this.learningStrategyFactory.getStrategy(
+        finishReviewCardDto.typeOfStrategy,
+      );
 
       const isReviewSession =
         card.lastReviewedAt <
@@ -580,7 +543,7 @@ export class DeckService {
           ? {
               lastReviewedAt: new Date(),
               masteryScore: ((): number | undefined => {
-                const weight = getCorrectWeight();
+                const weight = strategy.getCorrectWeight();
                 const newScore: number =
                   card.masteryScore + (isReviewSession ? weight : weight / 5);
 
@@ -589,7 +552,7 @@ export class DeckService {
             }
           : {
               masteryScore: ((): number | undefined => {
-                const weight = getIncorrectWeight();
+                const weight = strategy.getIncorrectWeight();
                 const newScore: number = card.masteryScore - weight;
 
                 return newScore < 0 ? 0 : newScore;

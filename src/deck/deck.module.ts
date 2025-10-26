@@ -5,6 +5,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { FolderModule } from 'src/folder/folder.module';
 import { CardModule } from 'src/card/card.module';
 import { LanguagesModule } from 'src/languages/languages.module';
+import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy.factory';
 @Module({
   imports: [
     DatabaseModule,
@@ -13,7 +14,7 @@ import { LanguagesModule } from 'src/languages/languages.module';
     LanguagesModule,
   ],
   controllers: [DeckController],
-  providers: [DeckService],
+  providers: [DeckService, LearningStrategyFactory],
   exports: [DeckService],
 })
 export class DeckModule {}
