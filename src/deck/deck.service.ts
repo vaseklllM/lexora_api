@@ -209,36 +209,18 @@ export class DeckService {
     };
   }
 
-  private async checkIsExistFolder(userId: string, folderId: string) {
-    const folder = await this.databaseService.folder.findFirst({
-      where: { userId, id: folderId },
-    });
-
-    if (!folder) {
-      throw new NotFoundException('Folder not found');
-    }
-
-    return folder;
-  }
-
-  async checkIsExistDeck(userId: string, deckId: string) {
-    const findDeck = await this.databaseService.deck.findFirst({
-      where: { id: deckId, userId },
-    });
-
-    if (!findDeck) {
-      throw new NotFoundException('Deck not found');
-    }
-
-    return findDeck;
-  }
-
   async create(
     userId: string,
     createDeckDto: CreateDeckDto,
   ): Promise<CreateDeckResponseDto> {
     if (createDeckDto.folderId) {
-      await this.checkIsExistFolder(userId, createDeckDto.folderId);
+      const folder = await this.databaseService.folder.findFirst({
+        where: { userId, id: createDeckDto.folderId },
+      });
+
+      if (!folder) {
+        throw new NotFoundException('Folder not found');
+      }
     }
 
     const findDeck = await this.databaseService.deck.findFirst({
