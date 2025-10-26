@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CardService } from 'src/card/card.service';
-import { StartLearningSessionDto } from './dto/start-learning-session.dto';
-import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
-import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
-import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
+import { StartLearningSessionDto } from './dto/learning-session/start.dto';
+import { StartLearningSessionResponseDto } from './dto/learning-session/start-response.dto';
+import { FinishLearningSessionDto } from './dto/learning-session/finish.dto';
+import { FinishLearningSessionResponseDto } from './dto/learning-session/finish-response.dto';
 
 @Injectable()
 export class LearningSessionService {
@@ -17,7 +17,6 @@ export class LearningSessionService {
     userId: string,
     startLearningSessionDto: StartLearningSessionDto,
   ): Promise<StartLearningSessionResponseDto> {
-    // Check if deck exists and belongs to user
     const deck = await this.databaseService.deck.findFirst({
       where: {
         id: startLearningSessionDto.deckId,

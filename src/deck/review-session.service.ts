@@ -2,12 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CardService } from 'src/card/card.service';
 import { LearningStrategyFactory } from 'src/common/strategies/learning-strategy';
-import { StartReviewSessionDto } from './dto/start-review-session.dto';
-import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
-import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
-import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
-import { FinishReviewCardDto } from './dto/finish-review-card.dto';
-import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
+import { StartReviewSessionDto } from './dto/review-session/start.dto';
+import { StartReviewSessionResponseDto } from './dto/review-session/start-response.dto';
+import { StartReviewAllCardsSessionDto } from './dto/review-session/start-all.dto';
+import { StartReviewAllCardsSessionResponseDto } from './dto/review-session/start-all-response.dto';
+import { FinishReviewCardDto } from './dto/review-session/finish.dto';
+import { FinishReviewCardResponseDto } from './dto/review-session/finish-response.dto';
 import { REVIEW_SESSION_INTERVAL_MILLISECONDS } from 'src/common/config';
 
 @Injectable()
@@ -22,7 +22,6 @@ export class ReviewSessionService {
     userId: string,
     startReviewSessionDto: StartReviewSessionDto,
   ): Promise<StartReviewSessionResponseDto> {
-    // Check if deck exists and belongs to user
     const deck = await this.databaseService.deck.findFirst({
       where: {
         id: startReviewSessionDto.deckId,
@@ -63,7 +62,6 @@ export class ReviewSessionService {
     userId: string,
     startReviewSessionDto: StartReviewAllCardsSessionDto,
   ): Promise<StartReviewAllCardsSessionResponseDto> {
-    // Check if deck exists and belongs to user
     const deck = await this.databaseService.deck.findFirst({
       where: {
         id: startReviewSessionDto.deckId,

@@ -25,19 +25,19 @@ import { RenameDeckResponseDto } from './dto/rename-deck-response.dto';
 import { DeleteDeckResponseDto } from './dto/delete-deck-response.dto';
 import { DeleteDeckDto } from './dto/delete-deck.dto';
 import { GetDeckResponseDto } from './dto/get-deck-response.dto';
-import { StartLearningSessionResponseDto } from './dto/start-learning-session-response.dto';
-import { StartLearningSessionDto } from './dto/start-learning-session.dto';
-import { StartReviewSessionDto } from './dto/start-review-session.dto';
-import { StartReviewSessionResponseDto } from './dto/start-review-session-response.dto';
-import { FinishLearningSessionResponseDto } from './dto/finish-learning-session-response.dto';
-import { FinishLearningSessionDto } from './dto/finish-learning-session.dto';
-import { FinishReviewCardResponseDto } from './dto/finish-review-card-response.dto';
-import { FinishReviewCardDto } from './dto/finish-review-card.dto';
+import { StartLearningSessionResponseDto } from './dto/learning-session/start-response.dto';
+import { StartLearningSessionDto } from './dto/learning-session/start.dto';
+import { StartReviewSessionDto } from './dto/review-session/start.dto';
+import { StartReviewSessionResponseDto } from './dto/review-session/start-response.dto';
+import { FinishLearningSessionResponseDto } from './dto/learning-session/finish-response.dto';
+import { FinishLearningSessionDto } from './dto/learning-session/finish.dto';
+import { FinishReviewCardResponseDto } from './dto/review-session/finish-response.dto';
+import { FinishReviewCardDto } from './dto/review-session/finish.dto';
 import { LearningStrategyType } from 'src/common/types/learningStrategyType';
 import { MoveResponseDto } from './dto/move-response.dto';
 import { MoveDto } from './dto/move.dto';
-import { StartReviewAllCardsSessionDto } from './dto/start-review-all-cards-session.dto';
-import { StartReviewAllCardsSessionResponseDto } from './dto/start-review-all-cards-session-response.dto';
+import { StartReviewAllCardsSessionDto } from './dto/review-session/start-all.dto';
+import { StartReviewAllCardsSessionResponseDto } from './dto/review-session/start-all-response.dto';
 
 @ApiTags('Decks')
 @Controller('deck')
