@@ -129,8 +129,6 @@ export class FolderService {
       folder.parentId,
     );
 
-    // console.log(breadcrumbs);
-
     return {
       name: folder.name,
       id: folder.id,
