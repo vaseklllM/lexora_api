@@ -5,6 +5,11 @@
 🌐 **Website**: [https://lexora.co.ua/](https://lexora.co.ua/)  
 📖 **API Documentation**: [https://api.lexora.co.ua/api](https://api.lexora.co.ua/api)
 
+### Demo account:
+
+login: user@example.com
+password: Password123!
+
 ## Main Features
 
 - 🃏 **Cards** - creation and management of flashcards for learning words
