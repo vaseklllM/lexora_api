@@ -5,10 +5,12 @@
 🌐 **Website**: [https://lexora.co.ua/](https://lexora.co.ua/)  
 📖 **API Documentation**: [https://api.lexora.co.ua/api](https://api.lexora.co.ua/api)
 
-### Demo account:
+### 🎯 Demo Account
 
-login: user@example.com
-password: Password123!
+```
+📧 Email:    user@example.com
+🔑 Password: Password123!
+```
 
 ## Main Features
 
