@@ -9,6 +9,7 @@ export interface JwtPayload {
 }
 
 export interface ICurrentUser extends Omit<User, 'password'> {
+  accessToken: string;
   jwt: Omit<JwtPayload, 'sub' | 'jwtId'> & { id: JwtPayload['jwtId'] };
 }
 

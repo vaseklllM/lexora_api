@@ -15,10 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: Buffer.from(process.env.JWT_SECRET as string, 'utf-8'),
+      passReqToCallback: true, // Дозволяє передавати request в validate
     });
   }
 
-  async validate(payload: JwtPayload): Promise<ICurrentUser> {
+  async validate(request: any, payload: JwtPayload): Promise<ICurrentUser> {
     const user = await this.databaseService.user.findUnique({
       where: { id: payload.sub },
     });
@@ -33,8 +34,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
+    const accessToken = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
+
     return {
       ...user,
+      accessToken: accessToken || '',
       jwt: {
         id: payload.jwtId,
         iat: payload.iat,
