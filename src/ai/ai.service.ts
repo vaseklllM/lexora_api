@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FillCardDataResponseDto } from './dto/fill-card-data-response.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { FillCardDataDto } from './dto/fill-card-data.dto';
-import { VertexProvider } from 'src/vertex/vertex';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 
@@ -10,7 +9,6 @@ import { HttpService } from '@nestjs/axios';
 export class AiService {
   constructor(
     private readonly database: DatabaseService,
-    private readonly vertex: VertexProvider,
     private readonly httpService: HttpService,
   ) {}
 
