@@ -27,10 +27,6 @@ export class AiController {
     @CurrentUser() user: ICurrentUser,
     @Query() fillCardDataDto: FillCardDataDto,
   ): Promise<FillCardDataResponseDto> {
-    return this.aiService.fillCardData(
-      user.id,
-      user.accessToken,
-      fillCardDataDto,
-    );
+    return this.aiService.fillCardData(user.id, fillCardDataDto);
   }
 }
